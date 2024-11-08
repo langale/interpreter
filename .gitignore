@@ -1,0 +1,7 @@
+interpreter-debug
+interpreter-release
+
+intlib-debug
+intlib-release
+
+*.pro.user
