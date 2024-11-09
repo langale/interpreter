@@ -66,21 +66,27 @@ public:
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void declare_variable(std::string&& s, std::any&& a) noexcept;
+	void declare_variable
+	(std::string&& s, std::any&& a)
+	noexcept;
 
 	/**
 	 * @brief Adds a new constant variable to this subscope.
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void declare_constant_variable(std::string&& s, std::any&& a) noexcept;
+	void declare_constant_variable
+	(std::string&& s, std::any&& a)
+	noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void set_variable_value(const std::string& s, std::any&& a) noexcept;
+	void set_variable_value
+	(const std::string& s, std::any&& a)
+	noexcept;
 
 	/* GETTERS */
 
@@ -89,10 +95,15 @@ public:
 	 * @param s The name of the variable to look for.
 	 * @returns The value of the variable if it exists.
 	 */
-	std::optional<variable_value> get_variable(const std::string& s) const noexcept;
+	std::optional<variable_value> get_variable
+	(const std::string& s)
+	const noexcept;
 
 	/// Does variable @e s exist?
-	bool variable_exists(const std::string& s) const noexcept {
+	bool variable_exists
+	(const std::string& s)
+	const noexcept
+	{
 		return find(s) != m_variables.end();
 	}
 
@@ -102,11 +113,17 @@ private:
 	typedef std::map<std::string, variable_value> Collection;
 
 	/// Find a variable @e s.
-	Collection::const_iterator find(const std::string& s) const noexcept {
+	Collection::const_iterator find
+	(const std::string& s)
+	const noexcept
+	{
 		return m_variables.find(s);
 	}
 	/// Find a variable @e s.
-	Collection::iterator find(const std::string& s) noexcept {
+	Collection::iterator find
+	(const std::string& s)
+	noexcept
+	{
 		return m_variables.find(s);
 	}
 

@@ -43,7 +43,10 @@ namespace memory {
 
 /* MODIFIERS */
 
-void subscope::declare_variable(std::string&& s, std::any&& a) noexcept {
+void subscope::declare_variable
+(std::string&& s, std::any&& a)
+noexcept
+{
 	Collection::iterator it = find(s);
 
 #if defined DEBUG
@@ -59,7 +62,10 @@ void subscope::declare_variable(std::string&& s, std::any&& a) noexcept {
 	});
 }
 
-void subscope::declare_constant_variable(std::string&& s, std::any&& a) noexcept {
+void subscope::declare_constant_variable
+(std::string&& s, std::any&& a)
+noexcept
+{
 	Collection::iterator it = find(s);
 
 #if defined DEBUG
@@ -75,7 +81,10 @@ void subscope::declare_constant_variable(std::string&& s, std::any&& a) noexcept
 	});
 }
 
-void subscope::set_variable_value(const std::string& s, std::any&& a) noexcept {
+void subscope::set_variable_value
+(const std::string& s, std::any&& a)
+noexcept
+{
 	Collection::iterator it = find(s);
 
 #if defined DEBUG
@@ -88,7 +97,8 @@ void subscope::set_variable_value(const std::string& s, std::any&& a) noexcept {
 
 /* GETTERS */
 
-std::optional<variable_value> subscope::get_variable(const std::string& s)
+std::optional<variable_value> subscope::get_variable
+(const std::string& s)
 const noexcept
 {
 	const auto it = find(s);

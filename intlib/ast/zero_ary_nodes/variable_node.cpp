@@ -45,7 +45,9 @@
 
 namespace interpreter {
 
-std::optional<std::any> program::evaluate(const ale::ast::variable_node& v) noexcept
+std::optional<std::any> program::evaluate
+(const ale::ast::variable_node& v)
+noexcept
 {
 	const std::string& name = v.get_name();
 

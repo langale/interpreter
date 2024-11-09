@@ -41,7 +41,8 @@
 
 namespace interpreter {
 
-std::optional<std::any> program::evaluate(const ale::ast::negation_node& v)
+std::optional<std::any> program::evaluate
+(const ale::ast::negation_node& v)
 noexcept
 {
 	const auto& child = v.get_child();

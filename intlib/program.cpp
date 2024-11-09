@@ -56,7 +56,10 @@ void program::clear() noexcept {
 	m_instructions.clear();
 }
 
-void program::add_instructions(std::vector<std::unique_ptr<ale::ast::node>>&& ins) noexcept {
+void program::add_instructions
+(std::vector<std::unique_ptr<ale::ast::node>>&& ins)
+noexcept
+{
 	if (m_instructions.size() == 0) {
 		m_instructions = std::move(ins);
 	}
@@ -68,7 +71,10 @@ void program::add_instructions(std::vector<std::unique_ptr<ale::ast::node>>&& in
 	}
 }
 
-void program::run_program(ale::stream& os) noexcept {
+void program::run_program
+(ale::stream& os)
+noexcept
+{
 	using ale::detail::operator<<;
 
 	for (const auto& i : m_instructions) {
@@ -86,7 +92,10 @@ void program::run_program(ale::stream& os) noexcept {
 
 /* OTHERS */
 
-void program::print_tree(ale::stream& os) const noexcept {
+void program::print_tree
+(ale::stream& os)
+const noexcept
+{
 	os << "= [fixedsize=false shape=none]\n";
 	os << "'PROGRAM'\n";
 	for (const auto& i : m_instructions) {

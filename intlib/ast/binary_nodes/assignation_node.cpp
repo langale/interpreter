@@ -141,7 +141,9 @@ noexcept
 	return true;
 }
 
-std::optional<std::any> program::evaluate(const ale::ast::assignation_node& v) noexcept
+std::optional<std::any> program::evaluate
+(const ale::ast::assignation_node& v)
+noexcept
 {
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();

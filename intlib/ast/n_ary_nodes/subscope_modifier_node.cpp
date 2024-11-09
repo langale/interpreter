@@ -44,7 +44,8 @@
 
 namespace interpreter {
 
-std::optional<std::any> program::evaluate(const ale::ast::subscope_modifier_node& v)
+std::optional<std::any> program::evaluate
+(const ale::ast::subscope_modifier_node& v)
 noexcept
 {
 	using ale::detail::operator<<;

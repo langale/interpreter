@@ -39,7 +39,9 @@
 
 namespace interpreter {
 
-std::optional<std::any> program::evaluate(const ale::ast::comma_separated_group_node&) noexcept
+std::optional<std::any> program::evaluate
+(const ale::ast::comma_separated_group_node&)
+noexcept
 {
 	ale::error() << ERROR_LOCATION << '\n';
 	ale::error() << "    Comma-separated group nodes cannot be evaluated.\n";

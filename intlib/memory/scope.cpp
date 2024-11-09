@@ -43,21 +43,30 @@ namespace memory {
 
 /* MODIFIERS */
 
-void scope::declare_variable(std::string&& s, std::any&& v) noexcept {
+void scope::declare_variable
+(std::string&& s, std::any&& v)
+noexcept
+{
 #if defined DEBUG
 	assert(not m_subscopes.back().variable_exists(s));
 #endif
 	m_subscopes.back().declare_variable(std::move(s), std::move(v));
 }
 
-void scope::declare_constant_variable(std::string&& s, std::any&& v) noexcept {
+void scope::declare_constant_variable
+(std::string&& s, std::any&& v)
+noexcept
+{
 #if defined DEBUG
 	assert(not m_subscopes.back().variable_exists(s));
 #endif
 	m_subscopes.back().declare_constant_variable(std::move(s), std::move(v));
 }
 
-void scope::set_variable_value(const std::string& s, std::any&& a) noexcept {
+void scope::set_variable_value
+(const std::string& s, std::any&& a)
+noexcept
+{
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		if (it->variable_exists(s)) {
 			it->set_variable_value(s, std::move(a));
@@ -68,7 +77,8 @@ void scope::set_variable_value(const std::string& s, std::any&& a) noexcept {
 
 /* GETTERS */
 
-std::optional<variable_value> scope::get_variable(const std::string& s)
+std::optional<variable_value> scope::get_variable
+(const std::string& s)
 const noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
@@ -80,7 +90,10 @@ const noexcept
 	return {};
 }
 
-bool scope::variable_exists(const std::string& s) const noexcept {
+bool scope::variable_exists
+(const std::string& s)
+const noexcept
+{
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		if (it->variable_exists(s)) {
 			return true;
@@ -89,7 +102,10 @@ bool scope::variable_exists(const std::string& s) const noexcept {
 	return false;
 }
 
-bool scope::variable_exists_shallow(const std::string& s) const noexcept {
+bool scope::variable_exists_shallow
+(const std::string& s)
+const noexcept
+{
 	return m_subscopes.back().variable_exists(s);
 }
 

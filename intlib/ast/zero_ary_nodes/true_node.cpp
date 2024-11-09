@@ -44,7 +44,9 @@
 
 namespace interpreter {
 
-std::optional<std::any> program::evaluate(const ale::ast::true_node&) noexcept
+std::optional<std::any> program::evaluate
+(const ale::ast::true_node&)
+noexcept
 {
 	return {true};
 }

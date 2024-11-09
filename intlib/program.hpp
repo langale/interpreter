@@ -135,15 +135,21 @@ public:
 	 * @param ins New instructions.
 	 * @post Ownership of @e n is taken by this class.
 	 */
-	void add_instructions(std::vector<std::unique_ptr<ale::ast::node>>&& ins) noexcept;
+	void add_instructions
+	(std::vector<std::unique_ptr<ale::ast::node>>&& ins)
+	noexcept;
 
 	/* OTHER */
 
 	/// Execute this program.
-	void run_program(ale::stream& os) noexcept;
+	void run_program
+	(ale::stream& os)
+	noexcept;
 
 	/// Output a program in a tree (AST) format to an output stream.
-	void print_tree(ale::stream& os) const noexcept;
+	void print_tree
+	(ale::stream& os)
+	const noexcept;
 
 private:
 	/// Calls the appropriate 'evaluate' function for @e v.
@@ -251,69 +257,113 @@ private:
 private:
 	/* n-ary nodes */
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::arithmetic_node& v, const ale::ast::node_type& t) noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::arithmetic_node& v, const ale::ast::node_type& t)
+	noexcept;
 
-	[[nodiscard]] std::optional<bool> evaluate_variable_sequence_in_comparison(
-		const ale::ast::comparison_node& v,
-		const ale::ast::node_type& t,
-		const std::unique_ptr<ale::ast::node>& c
-	) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::comparison_node& v, const ale::ast::node_type& t) noexcept;
+	[[nodiscard]] std::optional<bool> evaluate_variable_sequence_in_comparison
+	(const ale::ast::comparison_node& v, const ale::ast::node_type& t, const std::unique_ptr<ale::ast::node>& c)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::comparison_node& v, const ale::ast::node_type& t)
+	noexcept;
 
-	[[nodiscard]] std::optional<bool> evaluate_logical_node(
-		const ale::ast::logical_node& v,
-		const ale::ast::node_type& t,
-		const std::unique_ptr<ale::ast::node>& c
-	) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::logical_node& v, const ale::ast::node_type& t) noexcept;
+	[[nodiscard]] std::optional<bool> evaluate_logical_node
+	(const ale::ast::logical_node& v, const ale::ast::node_type& t, const std::unique_ptr<ale::ast::node>& c)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::logical_node& v, const ale::ast::node_type& t)
+	noexcept;
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::comma_separated_group_node& v) noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::comma_separated_group_node& v)
+	noexcept;
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::subscope_modifier_node& v) noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::subscope_modifier_node& v)
+	noexcept;
 
-	[[nodiscard]] std::vector<int64_t> get_index_sequence(const ale::ast::subscripted_variable_node& v) noexcept;
-	[[nodiscard]] std::string make_full_variable_name(const ale::ast::subscripted_variable_node& v) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::subscripted_variable_node& v) noexcept;
+	[[nodiscard]] std::vector<int64_t> get_index_sequence
+	(const ale::ast::subscripted_variable_node& v)
+	noexcept;
+	[[nodiscard]] std::string make_full_variable_name
+	(const ale::ast::subscripted_variable_node& v)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::subscripted_variable_node& v)
+	noexcept;
 
 	/* ternary nodes */
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::if_else_node& v) noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::if_else_node& v)
+	noexcept;
 
 	/* binary nodes */
 
-	[[nodiscard]] bool retrieve_variable_names__in_assignation(const ale::ast::variable_sequence_node& seq, std::vector<std::string>& names) noexcept;
-	[[nodiscard]] bool retrieve_variable_names__in_assignation(const ale::ast::comma_separated_group_node& n, std::vector<std::string>& names) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::assignation_node& v) noexcept;
+	[[nodiscard]] bool retrieve_variable_names__in_assignation
+	(const ale::ast::variable_sequence_node& seq, std::vector<std::string>& names)
+	noexcept;
+	[[nodiscard]] bool retrieve_variable_names__in_assignation
+	(const ale::ast::comma_separated_group_node& n, std::vector<std::string>& names)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::assignation_node& v)
+	noexcept;
 
-	[[nodiscard]] bool retrieve_variable_names__in_declaration(const ale::ast::variable_sequence_node& seq, std::vector<std::string>& names) noexcept;
-	[[nodiscard]] bool retrieve_variable_names__in_declaration(const ale::ast::comma_separated_group_node& seq, std::vector<std::string>& names) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::declaration_node& v) noexcept;
+	[[nodiscard]] bool retrieve_variable_names__in_declaration
+	(const ale::ast::variable_sequence_node& seq, std::vector<std::string>& names)
+	noexcept;
+	[[nodiscard]] bool retrieve_variable_names__in_declaration
+	(const ale::ast::comma_separated_group_node& seq, std::vector<std::string>& names)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::declaration_node& v)
+	noexcept;
 
-	[[nodiscard]] std::optional<std::any> first_value(
-		const ale::ast::comparison_node& v,
-		const std::unique_ptr<ale::ast::node>& c
-	) noexcept;
-	[[nodiscard]] std::optional<std::any> last_value(
-		const ale::ast::comparison_node& v,
-		const std::unique_ptr<ale::ast::node>& c
-	) noexcept;
-	[[nodiscard]] ale::ast::variable_sequence_node_iterator make_iterator(const ale::ast::variable_sequence_node& v) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::variable_sequence_node& v) noexcept;
+	[[nodiscard]] std::optional<std::any> first_value
+	(const ale::ast::comparison_node& v, const std::unique_ptr<ale::ast::node>& c)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> last_value
+	(const ale::ast::comparison_node& v, const std::unique_ptr<ale::ast::node>& c)
+	noexcept;
+	[[nodiscard]] ale::ast::variable_sequence_node_iterator make_iterator
+	(const ale::ast::variable_sequence_node& v)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::variable_sequence_node& v)
+	noexcept;
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::while_loop_node& v) noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::while_loop_node& v)
+	noexcept;
 
 	/* unary nodes */
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::negation_node& v) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::negative_node& v) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::positive_node& v) noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::negation_node& v)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::negative_node& v)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::positive_node& v)
+	noexcept;
 
 	/* zero-ary nodes */
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::false_node&) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::literal_node& v) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::true_node&) noexcept;
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::variable_node& v) noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::false_node&)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::literal_node& v)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::true_node&)
+	noexcept;
+	[[nodiscard]] std::optional<std::any> evaluate
+	(const ale::ast::variable_node& v)
+	noexcept;
 
 private:
 	/// All the instructions in this program.

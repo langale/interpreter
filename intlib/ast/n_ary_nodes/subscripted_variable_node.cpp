@@ -45,7 +45,8 @@
 
 namespace interpreter {
 
-std::string program::make_full_variable_name(const ale::ast::subscripted_variable_node& v)
+std::string program::make_full_variable_name
+(const ale::ast::subscripted_variable_node& v)
 noexcept
 {
 	using ale::detail::operator<<;
@@ -81,7 +82,8 @@ noexcept
 	return full_variable_name;
 }
 
-std::vector<int64_t> program::get_index_sequence(const ale::ast::subscripted_variable_node& v)
+std::vector<int64_t> program::get_index_sequence
+(const ale::ast::subscripted_variable_node& v)
 noexcept
 {
 	using ale::detail::operator<<;
@@ -118,7 +120,8 @@ noexcept
 	return indices;
 }
 
-std::optional<std::any> program::evaluate(const ale::ast::subscripted_variable_node& v)
+std::optional<std::any> program::evaluate
+(const ale::ast::subscripted_variable_node& v)
 noexcept
 {
 	const std::string full_variable_name = make_full_variable_name(v);

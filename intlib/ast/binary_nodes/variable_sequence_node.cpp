@@ -58,7 +58,8 @@ noexcept
 	return ale::ast::variable_sequence_node_iterator(std::move(first_indices), std::move(last_indices));
 }
 
-std::optional<std::any> program::get_variable_value(const std::string& var)
+std::optional<std::any> program::get_variable_value
+(const std::string& var)
 const noexcept
 {
 	if (not m_memory.variable_exists(var)) {

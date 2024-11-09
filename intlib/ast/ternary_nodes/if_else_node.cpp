@@ -45,7 +45,9 @@
 
 namespace interpreter {
 
-std::optional<std::any> program::evaluate(const ale::ast::if_else_node& v) noexcept
+std::optional<std::any> program::evaluate
+(const ale::ast::if_else_node& v)
+noexcept
 {
 	using ale::detail::operator<<;
 

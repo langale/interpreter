@@ -77,7 +77,9 @@ public:
 	 * @param s Name of the variable.
 	 * @param v Value of the variable.
 	 */
-	void declare_variable(std::string&& s, std::any&& v) noexcept;
+	void declare_variable
+	(std::string&& s, std::any&& v)
+	noexcept;
 
 	/**
 	 * @brief Sets the value of a constant variable to the current scope.
@@ -85,14 +87,18 @@ public:
 	 * @param v Value of the variable.
 	 * @pre Variable @e s does not already exist in the current subscope.
 	 */
-	void declare_constant_variable(std::string&& s, std::any&& v) noexcept;
+	void declare_constant_variable
+	(std::string&& s, std::any&& v)
+	noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void set_variable_value(const std::string& s, std::any&& a) noexcept;
+	void set_variable_value
+	(const std::string& s, std::any&& a)
+	noexcept;
 
 	/* GETTERS */
 
@@ -103,12 +109,18 @@ public:
 	 * @param s The name of the variable to look for.
 	 * @returns The value of the variable if it exists.
 	 */
-	std::optional<variable_value> get_variable(const std::string& s) const noexcept;
+	std::optional<variable_value> get_variable
+	(const std::string& s)
+	const noexcept;
 
 	/// Does a variable @e s exist?
-	bool variable_exists(const std::string& s) const noexcept;
+	bool variable_exists
+	(const std::string& s)
+	const noexcept;
 	/// Does a variable @e s exist in the current subscope?
-	bool variable_exists_shallow(const std::string& s) const noexcept;
+	bool variable_exists_shallow
+	(const std::string& s)
+	const noexcept;
 
 private:
 	/// The list of subscopes in this scope.

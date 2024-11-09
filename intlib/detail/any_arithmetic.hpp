@@ -44,17 +44,29 @@ namespace interpreter {
 namespace detail {
 
 /// Addition of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_addition(const std::any& a, const std::any& b) noexcept;
+[[nodiscard]] std::optional<std::any> any_arithmetic_addition
+(const std::any& a, const std::any& b)
+noexcept;
 /// Division of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_division(const std::any& a, const std::any& b) noexcept;
+[[nodiscard]] std::optional<std::any> any_arithmetic_division
+(const std::any& a, const std::any& b)
+noexcept;
 /// Exponentiation of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_exponentiation(const std::any& a, const std::any& b) noexcept;
+[[nodiscard]] std::optional<std::any> any_arithmetic_exponentiation
+(const std::any& a, const std::any& b)
+noexcept;
 /// Modulus of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_modulus(const std::any& a, const std::any& b) noexcept;
+[[nodiscard]] std::optional<std::any> any_arithmetic_modulus
+(const std::any& a, const std::any& b)
+noexcept;
 /// Multiplication of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_multiplication(const std::any& a, const std::any& b) noexcept;
+[[nodiscard]] std::optional<std::any> any_arithmetic_multiplication
+(const std::any& a, const std::any& b)
+noexcept;
 /// Subtraction of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_subtraction(const std::any& a, const std::any& b) noexcept;
+[[nodiscard]] std::optional<std::any> any_arithmetic_subtraction
+(const std::any& a, const std::any& b)
+noexcept;
 
 /// Computes two std::any according to the type of node
 [[nodiscard]] std::optional<std::any> any_arithmetic

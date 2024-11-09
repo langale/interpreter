@@ -44,7 +44,10 @@ namespace interpreter {
 namespace detail {
 
 [[nodiscard]]
-inline std::optional<bool> any_to_bool(const std::any& a) noexcept {
+inline std::optional<bool> any_to_bool
+(const std::any& a)
+noexcept
+{
 	if (ale::detail::is_type<bool>(a)) { return std::any_cast<bool>(a); }
 	if (ale::detail::is_type<int64_t>(a)) { return std::any_cast<int64_t>(a); }
 	if (ale::detail::is_type<uint64_t>(a)) { return std::any_cast<uint64_t>(a); }

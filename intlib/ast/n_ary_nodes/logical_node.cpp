@@ -60,7 +60,10 @@ noexcept
 	return false;
 }
 
-[[nodiscard]] bool break_when(const ale::ast::node_type& t) noexcept {
+[[nodiscard]] bool break_when
+(const ale::ast::node_type& t)
+noexcept
+{
 	if (t == ale::ast::node_type::logical_and) {
 		return false;
 	}

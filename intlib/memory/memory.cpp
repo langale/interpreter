@@ -38,7 +38,10 @@ namespace memory {
 
 /* MODIFIERS */
 
-void memory::declare_variable(std::string&& s, std::any&& v) noexcept {
+void memory::declare_variable
+(std::string&& s, std::any&& v)
+noexcept
+{
 	if (is_current_scope_global()) {
 		m_global_scope.declare_variable(std::move(s), std::move(v));
 	}
@@ -47,7 +50,10 @@ void memory::declare_variable(std::string&& s, std::any&& v) noexcept {
 	}
 }
 
-void memory::declare_constant_variable(std::string&& s, std::any&& v) noexcept {
+void memory::declare_constant_variable
+(std::string&& s, std::any&& v)
+noexcept
+{
 	if (is_current_scope_global()) {
 		m_global_scope.declare_constant_variable(std::move(s), std::move(v));
 	}
@@ -58,7 +64,8 @@ void memory::declare_constant_variable(std::string&& s, std::any&& v) noexcept {
 
 /* GETTERS */
 
-std::optional<variable_value> memory::get_variable(const std::string& s)
+std::optional<variable_value> memory::get_variable
+(const std::string& s)
 const noexcept
 {
 	if (num_local_scopes() > 0) {
@@ -75,7 +82,10 @@ const noexcept
 	return {};
 }
 
-bool memory::variable_exists(const std::string& s) const noexcept {
+bool memory::variable_exists
+(const std::string& s)
+const noexcept
+{
 	if (is_current_scope_global()) {
 		return m_global_scope.variable_exists(s);
 	}
@@ -85,7 +95,10 @@ bool memory::variable_exists(const std::string& s) const noexcept {
 		m_global_scope.variable_exists(s);
 }
 
-bool memory::variable_exists_shallow(const std::string& s) const noexcept {
+bool memory::variable_exists_shallow
+(const std::string& s)
+const noexcept
+{
 	if (is_current_scope_global()) {
 		return m_global_scope.variable_exists_shallow(s);
 	}

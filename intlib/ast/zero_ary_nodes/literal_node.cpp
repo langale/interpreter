@@ -39,7 +39,9 @@
 
 namespace interpreter {
 
-std::optional<std::any> program::evaluate(const ale::ast::literal_node& v) noexcept
+std::optional<std::any> program::evaluate
+(const ale::ast::literal_node& v)
+noexcept
 {
 	return v.get_value();
 }

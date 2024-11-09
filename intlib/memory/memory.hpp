@@ -65,29 +65,39 @@ public:
 	 * @param s Name of the variable.
 	 * @param v Value of the variable.
 	 */
-	void declare_variable(std::string&& s, std::any&& v) noexcept;
+	void declare_variable
+	(std::string&& s, std::any&& v)
+	noexcept;
 
 	/**
 	 * @brief Sets the value of a constant variable to the current scope.
 	 * @param s Name of the variable.
 	 * @param v Value of the variable.
 	 */
-	void declare_constant_variable(std::string&& s, std::any&& v) noexcept;
+	void declare_constant_variable
+	(std::string&& s, std::any&& v)
+	noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void set_variable_value(const std::string& s, std::any&& a) noexcept;
+	void set_variable_value
+	(const std::string& s, std::any&& a)
+	noexcept;
 
 	/* GETTERS */
 
 	/// Returns the value of variable @e s if it exists.
-	std::optional<variable_value> get_variable(const std::string& s) const noexcept;
+	std::optional<variable_value> get_variable
+	(const std::string& s)
+	const noexcept;
 
 	/// Returns the number of scopes.
-	std::size_t num_local_scopes() const noexcept { return m_local_scopes.size(); }
+	std::size_t num_local_scopes() const noexcept {
+		return m_local_scopes.size();
+	}
 
 	/// Returns a reference to the current scope.
 	const scope& get_current_scope() const noexcept {
@@ -99,14 +109,22 @@ public:
 	}
 
 	/// Returns a reference to the global scope.
-	const scope& get_global_scope() const noexcept { return m_global_scope; }
+	const scope& get_global_scope() const noexcept {
+		return m_global_scope;
+	}
 	/// Returns a reference to the global scope.
-	scope& get_global_scope() noexcept { return m_global_scope; }
+	scope& get_global_scope() noexcept {
+		return m_global_scope;
+	}
 
 	/// Does a variable @e s exist?
-	bool variable_exists(const std::string& s) const noexcept;
+	bool variable_exists
+	(const std::string& s)
+	const noexcept;
 	/// Does a variable @e s exist in the current subscope?
-	bool variable_exists_shallow(const std::string& s) const noexcept;
+	bool variable_exists_shallow
+	(const std::string& s)
+	const noexcept;
 
 	/// Is the current scope the global scope?
 	bool is_current_scope_global() const noexcept {
