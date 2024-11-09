@@ -43,18 +43,18 @@ ale::ast::variable_sequence_node_iterator program::make_iterator
 (const ale::ast::variable_sequence_node& seq)
 noexcept
 {
-	const std::unique_ptr<ale::ast::node>& left = seq.get_left_child();
-	const std::unique_ptr<ale::ast::node>& right = seq.get_right_child();
+	const auto& left_child = seq.get_left_child();
+	const auto& right_child = seq.get_right_child();
 #if defined DEBUG
-	assert(left != nullptr);
-	assert(right != nullptr);
+	assert(left_child != nullptr);
+	assert(right_child != nullptr);
 
-	assert(left->get_node_type() == ale::ast::node_type::subscripted_variable);
-	assert(right->get_node_type() == ale::ast::node_type::subscripted_variable);
+	assert(left_child->get_node_type() == ale::ast::node_type::subscripted_variable);
+	assert(right_child->get_node_type() == ale::ast::node_type::subscripted_variable);
 #endif
 
-	std::vector<int64_t> first_indices = get_index_sequence(static_cast<const ale::ast::subscripted_variable_node&>(*left.get()));
-	std::vector<int64_t> last_indices = get_index_sequence(static_cast<const ale::ast::subscripted_variable_node&>(*right.get()));
+	std::vector<int64_t> first_indices = get_index_sequence(static_cast<const ale::ast::subscripted_variable_node&>(*left_child.get()));
+	std::vector<int64_t> last_indices = get_index_sequence(static_cast<const ale::ast::subscripted_variable_node&>(*right_child.get()));
 	return ale::ast::variable_sequence_node_iterator(std::move(first_indices), std::move(last_indices));
 }
 

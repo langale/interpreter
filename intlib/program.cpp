@@ -47,10 +47,11 @@ program::program() noexcept {
 /* MODIFIERS */
 
 void program::clear() noexcept {
-	for (std::unique_ptr<ale::ast::node>& i : m_instructions) {
-		if (i != nullptr) {
-			i->clear();
-		}
+	for (auto& i : m_instructions) {
+#if defined DEBUG
+		assert(i != nullptr);
+#endif
+		i->clear();
 	}
 	m_instructions.clear();
 }
@@ -70,7 +71,7 @@ void program::add_instructions(std::vector<std::unique_ptr<ale::ast::node>>&& in
 void program::run_program(ale::stream& os) noexcept {
 	using ale::detail::operator<<;
 
-	for (const std::unique_ptr<ale::ast::node>& i : m_instructions) {
+	for (const auto& i : m_instructions) {
 		const std::optional<std::any> r = interpret_node(i);
 
 		// the evaluation of this node failed and there is no reason to
@@ -88,7 +89,7 @@ void program::run_program(ale::stream& os) noexcept {
 void program::print_tree(ale::stream& os) const noexcept {
 	os << "= [fixedsize=false shape=none]\n";
 	os << "'PROGRAM'\n";
-	for (const std::unique_ptr<ale::ast::node>& i : m_instructions) {
+	for (const auto& i : m_instructions) {
 		i->print_tree(os, " ");
 	}
 }

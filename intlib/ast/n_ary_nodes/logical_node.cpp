@@ -46,11 +46,7 @@
 namespace interpreter {
 
 [[nodiscard]] bool compute_logical_expression
-(
-	const ale::ast::node_type& t,
-	const bool l,
-	const bool r
-)
+(const ale::ast::node_type& t, const bool l, const bool r)
 noexcept
 {
 	if (t == ale::ast::node_type::logical_and) {
@@ -86,7 +82,8 @@ noexcept
 	if (c->get_node_type() == ale::ast::node_type::variable_sequence) {
 
 		const bool when_to_break = break_when(t);
-		const ale::ast::variable_sequence_node& seq = static_cast<const ale::ast::variable_sequence_node&>(*c.get());
+		const ale::ast::variable_sequence_node& seq =
+			static_cast<const ale::ast::variable_sequence_node&>(*c.get());
 
 		ale::ast::variable_sequence_node_iterator iter = make_iterator(seq);
 
@@ -139,9 +136,9 @@ std::optional<std::any> program::evaluate
 (const ale::ast::logical_node& v, const ale::ast::node_type& t)
 noexcept
 {
-	const auto& m_children = v.get_children();
+	const auto& children = v.get_children();
 
-	const std::optional<bool> rc = evaluate_logical_node(v, t, m_children[0]);
+	const std::optional<bool> rc = evaluate_logical_node(v, t, children[0]);
 	if (not rc.has_value()) {
 		return {};
 	}
@@ -149,7 +146,7 @@ noexcept
 	const bool when_to_break = break_when(t);
 
 	bool r = *rc;
-	for (const std::unique_ptr<ale::ast::node>& c : m_children | std::views::drop(1)) {
+	for (const std::unique_ptr<ale::ast::node>& c : children | std::views::drop(1)) {
 		if (r == when_to_break) {
 			break;
 		}

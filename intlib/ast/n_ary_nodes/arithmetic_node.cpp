@@ -51,9 +51,9 @@ std::optional<std::any> program::evaluate
 (const ale::ast::arithmetic_node& v, const ale::ast::node_type& t)
 noexcept
 {
-	const auto& m_children = v.get_children();
+	const auto& children = v.get_children();
 #if defined DEBUG
-	assert(m_children.size() >= 2);
+	assert(children.size() >= 2);
 #endif
 
 	const auto node_eval =
@@ -76,12 +76,12 @@ noexcept
 		return res;
 	};
 
-	std::optional<std::any> r = node_eval(m_children[0]);
+	std::optional<std::any> r = node_eval(children[0]);
 	if (not r.has_value()) {
 		return {};
 	}
 
-	for (const std::unique_ptr<ale::ast::node>& c : m_children | std::views::drop(1)) {
+	for (const std::unique_ptr<ale::ast::node>& c : children | std::views::drop(1)) {
 		const std::optional<std::any> rv = node_eval(c);
 		if (not rv.has_value()) {
 			return {};

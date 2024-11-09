@@ -82,7 +82,7 @@ noexcept
 		const std::unique_ptr<ale::ast::node>& c = iter.next_child();
 		if (c->get_node_type() == ale::ast::node_type::variable) {
 
-			std::string var_name = dynamic_cast<const ale::ast::variable_node * const>(c.get())->get_name();
+			std::string var_name = static_cast<ale::ast::variable_node *>(c.get())->get_name();
 			if (m_memory.variable_exists_shallow(var_name)) {
 				ale::error() << ERROR_LOCATION << '\n';
 				ale::error() << "    Redeclaration of variable '" << var_name << "'.\n";
@@ -114,15 +114,15 @@ noexcept
 
 std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) noexcept
 {
-	const std::unique_ptr<ale::ast::node>& m_left = v.get_left_child();
-	const std::unique_ptr<ale::ast::node>& m_right = v.get_right_child();
+	const auto& left_child = v.get_left_child();
+	const auto& right_child = v.get_right_child();
 
 #if defined DEBUG
-	assert(m_left != nullptr);
+	assert(left_child != nullptr);
 #endif
 
-	if (m_left->get_node_type() == ale::ast::node_type::variable) {
-		std::string var_name = static_cast<ale::ast::variable_node *>(m_left.get())->get_name();
+	if (left_child->get_node_type() == ale::ast::node_type::variable) {
+		std::string var_name = static_cast<ale::ast::variable_node *>(left_child.get())->get_name();
 		if (m_memory.variable_exists_shallow(var_name)) {
 			ale::error() << ERROR_LOCATION << '\n';
 			ale::error() << "    Redeclaration of variable '" << var_name << "'.\n";
@@ -130,12 +130,12 @@ std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) n
 		}
 
 		// This is a 'declare' node.
-		if (m_right == nullptr) {
+		if (right_child == nullptr) {
 			m_memory.declare_variable(std::move(var_name), {});
 			return std::any{};
 		}
 
-		const std::optional<std::any> value = interpret_node(m_right);
+		const std::optional<std::any> value = interpret_node(right_child);
 		if (not value.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
 			ale::error() << "    Evaluation of node failed.\n";
@@ -152,11 +152,11 @@ std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) n
 		return value;
 	}
 
-	if (m_left->get_node_type() == ale::ast::node_type::comma_separated_group) {
+	if (left_child->get_node_type() == ale::ast::node_type::comma_separated_group) {
 		std::vector<std::string> variable_names;
 		const bool r =
 			retrieve_variable_names__in_declaration(
-				static_cast<ale::ast::comma_separated_group_node&>(*m_left.get()),
+				static_cast<ale::ast::comma_separated_group_node&>(*left_child.get()),
 				variable_names
 			);
 
@@ -165,14 +165,14 @@ std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) n
 		}
 
 		// This is a 'declare' node.
-		if (m_right == nullptr) {
+		if (right_child == nullptr) {
 			for (std::string& var_name : variable_names) {
 				m_memory.declare_variable(std::move(var_name), {});
 			}
 			return std::any{};
 		}
 
-		const std::optional<std::any> value = interpret_node(m_right);
+		const std::optional<std::any> value = interpret_node(right_child);
 		if (not value.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
 			ale::error() << "    Evaluation of node failed.\n";
@@ -192,11 +192,11 @@ std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) n
 		return value;
 	}
 
-	if (m_left->get_node_type() == ale::ast::node_type::variable_sequence) {
+	if (left_child->get_node_type() == ale::ast::node_type::variable_sequence) {
 		std::vector<std::string> variable_names;
 		const bool r =
 			retrieve_variable_names__in_declaration(
-				static_cast<const ale::ast::variable_sequence_node&>(*m_left.get()),
+				static_cast<const ale::ast::variable_sequence_node&>(*left_child.get()),
 				variable_names
 			);
 
@@ -205,14 +205,14 @@ std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) n
 		}
 
 		// This is a 'declare' node.
-		if (m_right == nullptr) {
+		if (right_child == nullptr) {
 			for (std::string& var_name : variable_names) {
 				m_memory.declare_variable(std::move(var_name), {});
 			}
 			return std::any{};
 		}
 
-		const std::optional<std::any> value = interpret_node(m_right);
+		const std::optional<std::any> value = interpret_node(right_child);
 		if (not value.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
 			ale::error() << "    Evaluation of node failed.\n";
@@ -232,19 +232,18 @@ std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) n
 		return value;
 	}
 
-	if (m_left->get_node_type() == ale::ast::node_type::subscripted_variable) {
-		const ale::ast::subscripted_variable_node& n =
-			static_cast<const ale::ast::subscripted_variable_node&>(*m_left.get());
-
-		std::string var_name = make_full_variable_name(n);
+	if (left_child->get_node_type() == ale::ast::node_type::subscripted_variable) {
+		std::string var_name = make_full_variable_name(
+			static_cast<const ale::ast::subscripted_variable_node&>(*left_child.get())
+		);
 
 		// This is a 'declare' node.
-		if (m_right == nullptr) {
+		if (right_child == nullptr) {
 			m_memory.declare_variable(std::move(var_name), {});
 			return std::any{};
 		}
 
-		const std::optional<std::any> value = interpret_node(m_right);
+		const std::optional<std::any> value = interpret_node(right_child);
 		if (not value.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
 			ale::error() << "    Evaluation of node failed.\n";
@@ -267,7 +266,7 @@ std::optional<std::any> program::evaluate(const ale::ast::declaration_node& v) n
 	ale::error() << "        - a variable name\n";
 	ale::error() << "        - a comma-separated group\n";
 	ale::error() << "        - a variable sequence\n";
-	ale::error() << "    Found: '" << node_type_to_string(m_left->get_node_type()) << "'\n";
+	ale::error() << "    Found: '" << node_type_to_string(left_child->get_node_type()) << "'\n";
 	return {};
 }
 

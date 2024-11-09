@@ -49,17 +49,17 @@ std::optional<std::any> program::evaluate(const ale::ast::if_else_node& v) noexc
 {
 	using ale::detail::operator<<;
 
-	const auto& m_first = v.get_first_child();
-	const auto& m_second = v.get_second_child();
-	const auto& m_third = v.get_third_child();
+	const auto& first_child = v.get_first_child();
+	const auto& second_child = v.get_second_child();
+	const auto& third_child = v.get_third_child();
 
-	if (m_first == nullptr) {
+	if (first_child == nullptr) {
 		ale::error() << ERROR_LOCATION << '\n';
 		ale::error() << "    Condition node of if statement is null.\n";
 		return {};
 	}
 
-	const std::optional<std::any> cond = interpret_node(m_first);
+	const std::optional<std::any> cond = interpret_node(first_child);
 	if (not cond.has_value()) {
 		ale::error() << ERROR_LOCATION << '\n';
 		ale::error() << "    Evaluation of node failed.\n";
@@ -75,12 +75,12 @@ std::optional<std::any> program::evaluate(const ale::ast::if_else_node& v) noexc
 	}
 
 	if (*cond_bool) {
-		if (m_second != nullptr) {
-			return interpret_node(m_second);
+		if (second_child != nullptr) {
+			return interpret_node(second_child);
 		}
 	}
-	else if (m_third != nullptr) {
-		return interpret_node(m_third);
+	else if (third_child != nullptr) {
+		return interpret_node(third_child);
 	}
 
 	return std::any{};

@@ -50,7 +50,7 @@ noexcept
 	using ale::detail::operator<<;
 
 	m_memory.get_current_scope().push_subscope();
-	for (const std::unique_ptr<ale::ast::node>& w : v.get_children()) {
+	for (const auto& w : v.get_children()) {
 		const std::optional<std::any> r = interpret_node(w);
 		if (not r.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';

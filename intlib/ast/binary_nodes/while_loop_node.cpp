@@ -47,12 +47,12 @@ namespace interpreter {
 
 std::optional<std::any> program::evaluate(const ale::ast::while_loop_node& v) noexcept
 {
-	const auto& m_left = v.get_left_child();
-	const auto& m_right = v.get_right_child();
+	const auto& left_child = v.get_left_child();
+	const auto& right_child = v.get_right_child();
 
 	using ale::detail::operator<<;
 
-	if (m_left == nullptr) {
+	if (left_child == nullptr) {
 		ale::error() << ERROR_LOCATION << '\n';
 		ale::error() << "    Condition node of while loop is null.\n";
 		return {};
@@ -61,7 +61,7 @@ std::optional<std::any> program::evaluate(const ale::ast::while_loop_node& v) no
 	bool stop = false;
 	while (not stop) {
 
-		const std::optional<std::any> cond = interpret_node(m_left);
+		const std::optional<std::any> cond = interpret_node(left_child);
 		if (not cond.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
 			ale::error() << "    Evaluation of while loop condition failed.\n";
@@ -79,9 +79,9 @@ std::optional<std::any> program::evaluate(const ale::ast::while_loop_node& v) no
 		stop = not *cond_bool;
 		if (*cond_bool) {
 			// yes, this may produce infinite loops
-			if (m_right == nullptr) { continue; }
+			if (right_child == nullptr) { continue; }
 
-			const std::optional<std::any> r = interpret_node(m_right);
+			const std::optional<std::any> r = interpret_node(right_child);
 			if (not r.has_value()) {
 				ale::error() << ERROR_LOCATION << '\n';
 				ale::error() << "    Evaluation of while loop body.\n";

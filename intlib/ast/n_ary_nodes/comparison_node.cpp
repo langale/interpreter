@@ -179,14 +179,14 @@ std::optional<std::any> program::evaluate
 (const ale::ast::comparison_node& v, const ale::ast::node_type& t)
 noexcept
 {
-	const auto& m_children = v.get_children();
+	const auto& children = v.get_children();
 
 #if defined DEBUG
-	assert(m_children.size() > 0);
+	assert(children.size() > 0);
 #endif
 
-	if (m_children[0]->get_node_type() == ale::ast::node_type::variable_sequence) {
-		const std::optional<bool> res = evaluate_variable_sequence_in_comparison(v, t, m_children[0]);
+	if (children[0]->get_node_type() == ale::ast::node_type::variable_sequence) {
+		const std::optional<bool> res = evaluate_variable_sequence_in_comparison(v, t, children[0]);
 		if (not res.has_value()) {
 			return {};
 		}
@@ -199,7 +199,7 @@ noexcept
 		}
 	}
 
-	std::optional<std::any> previous = last_value(v, m_children[0]);
+	std::optional<std::any> previous = last_value(v, children[0]);
 
 	if (not previous.has_value()) {
 		ale::error() << ERROR_LOCATION << '\n';
@@ -210,7 +210,7 @@ noexcept
 		return {};
 	}
 
-	for (const std::unique_ptr<ale::ast::node>& c : m_children | std::views::drop(1)) {
+	for (const std::unique_ptr<ale::ast::node>& c : children | std::views::drop(1)) {
 		std::optional<std::any> current = first_value(v, c);
 		if (not current.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
@@ -222,20 +222,20 @@ noexcept
 		}
 
 		{
-			const std::optional<bool> comparison_result = detail::any_comparison(t, *previous, *current);
-			if (not comparison_result.has_value()) {
-				ale::error() << ERROR_LOCATION << '\n';
-				ale::error()
-					<< "    No pair was matched for '"
-					<< v.get_operation_string()
-					<< "' comparison.\n";
-				ale::error() << "    Left:  " << *previous << '\n';
-				ale::error() << "    Right: " << *current << '\n';
-				return {};
-			}
-			if (not *comparison_result) {
-				return false;
-			}
+		const std::optional<bool> comparison_result = detail::any_comparison(t, *previous, *current);
+		if (not comparison_result.has_value()) {
+			ale::error() << ERROR_LOCATION << '\n';
+			ale::error()
+				<< "    No pair was matched for '"
+				<< v.get_operation_string()
+				<< "' comparison.\n";
+			ale::error() << "    Left:  " << *previous << '\n';
+			ale::error() << "    Right: " << *current << '\n';
+			return {};
+		}
+		if (not *comparison_result) {
+			return false;
+		}
 		}
 
 		if (c->get_node_type() == ale::ast::node_type::variable_sequence) {

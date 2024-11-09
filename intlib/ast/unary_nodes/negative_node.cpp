@@ -44,9 +44,9 @@ namespace interpreter {
 std::optional<std::any> program::evaluate(const ale::ast::negative_node& v)
 noexcept
 {
-	const auto& m_child = v.get_child();
+	const auto& child = v.get_child();
 
-	std::optional<std::any> rr = interpret_node(m_child);
+	std::optional<std::any> rr = interpret_node(child);
 	if (not rr.has_value()) {
 		ale::error() << ERROR_LOCATION << '\n';
 		ale::error() << "    Node evaluation failed.\n";

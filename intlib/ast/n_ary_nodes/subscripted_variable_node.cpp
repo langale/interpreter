@@ -51,7 +51,7 @@ noexcept
 	using ale::detail::operator<<;
 
 	std::string full_variable_name = v.get_variable_name();
-	for (const std::unique_ptr<ale::ast::node>& c : v.get_children()) {
+	for (const auto& c : v.get_children()) {
 		const std::optional<std::any> res = interpret_node(c);
 		if (not res.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
@@ -88,7 +88,7 @@ noexcept
 
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
-	for (const std::unique_ptr<ale::ast::node>& c : v.get_children()) {
+	for (const auto& c : v.get_children()) {
 		const std::optional<std::any> res = interpret_node(c);
 		if (not res.has_value()) {
 			ale::error() << ERROR_LOCATION << '\n';
