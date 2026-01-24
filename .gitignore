@@ -1,7 +1,4 @@
-interpreter-debug
-interpreter-release
+cmake-build-debug/
+cmake-build-release/
 
-intlib-debug
-intlib-release
-
-*.pro.user
+.idea
