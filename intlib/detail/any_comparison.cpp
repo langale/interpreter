@@ -41,7 +41,7 @@
 #include <ale/logger.hpp>
 
 // interpreter includes
-#include <detail/any_comparison.hpp>
+#include <intlib/detail/any_comparison.hpp>
 
 namespace interpreter {
 namespace detail {

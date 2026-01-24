@@ -42,7 +42,7 @@
 
 int main(int argc, char *argv[]) {
 	if (argc == 1) {
-		std::cout << "./ale filename\n";
+		std::cout << "./interpreter filename\n";
 		return 0;
 	}
 

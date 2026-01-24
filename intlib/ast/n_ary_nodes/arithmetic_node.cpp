@@ -43,7 +43,7 @@
 #include <ale/detail/any_output.hpp>
 
 // interpreter includes
-#include <detail/any_arithmetic.hpp>
+#include <intlib/detail/any_arithmetic.hpp>
 
 namespace interpreter {
 

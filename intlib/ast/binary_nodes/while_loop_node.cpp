@@ -41,7 +41,7 @@
 
 // program includes
 #include <intlib/program.hpp>
-#include <detail/any_to_bool.hpp>
+#include <intlib/detail/any_to_bool.hpp>
 
 namespace interpreter {
 

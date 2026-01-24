@@ -51,7 +51,7 @@
 #include <ale/ast/binary_nodes/variable_sequence_node.hpp>
 
 // interpreter includes
-#include <detail/any_comparison.hpp>
+#include <intlib/detail/any_comparison.hpp>
 
 namespace interpreter {
 
