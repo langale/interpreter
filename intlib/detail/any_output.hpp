@@ -1,14 +1,12 @@
 /*********************************************************************
  *
- * ALE interpreter library -- the base utilities for a command line utility
- * to run programs written in ALE
+ * ALE language -- an interpreted programming language
+ * Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
- *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
+ * This file is part of the implementation of ALE. The full code is
+ * available at:
  *
- * This file is part of the implementation of an interpreter for ALE.
- * The full code is available at:
- *
- *     https://github.com/lluisalemanypuig/alelang
+ *     https://github.com/langale/ale
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -31,42 +29,52 @@
  *
  ********************************************************************/
 
+#pragma once
+
 #if defined DEBUG
 #include <cassert>
 #endif
+#include <ostream>
+#include <string>
+#include <any>
 
-#include <ale/logger/Logger.hpp>
 #include <intlib/detail/any_type.hpp>
 
-#include <intlib/Program.hpp>
-
 namespace intlib {
+namespace detail {
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::VariableNode& v) noexcept
+/**
+ * @brief Operator << for std::any.
+ * @param os Output stream.
+ * @param a std::any value.
+ * @returns A reference to an output stream @e os.
+ */
+inline std::ostream& operator<< (std::ostream& os, const std::any& a) noexcept
 {
-	const std::string& name = v.get_variable_name();
-
-	if (not m_memory.variable_exists(name)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Variable '" << name
-		// 			 << "' undefined in the current scope.\n";
-		return {};
+	const std::string name = demangle_name_type(a.type().name());
+	if (is_type<bool>(name)) {
+		os << std::boolalpha << std::any_cast<bool>(a);
 	}
-
-	std::optional<memory::VariableValue> res = m_memory.get_variable(name);
+	else if (is_type<int64_t>(name)) {
+		os << std::any_cast<int64_t>(a);
+	}
+	else if (is_type<uint64_t>(name)) {
+		os << std::any_cast<uint64_t>(a);
+	}
+	else if (is_type<double>(name)) {
+		os << std::any_cast<double>(a);
+	}
+	else if (is_type<std::string>(name)) {
+		os << std::any_cast<std::string>(a);
+	}
+	else {
 #if defined DEBUG
-	assert(res.has_value());
+		assert(false);
 #endif
-
-	if (detail::is_type<void>(res->value)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Variable '" << name
-		// 			 << "' has no value in the current scope.\n";
-		return {};
 	}
 
-	return std::move(res->value);
+	return os;
 }
 
+} // namespace detail
 } // namespace intlib

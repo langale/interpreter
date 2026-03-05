@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,25 +31,22 @@
  *
  ********************************************************************/
 
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 
-// C++ includes
 #include <optional>
 #include <ranges>
 #include <any>
 
-// ale includes
-#include <ale/detail/any_type.hpp>
-#include <ale/detail/any_output.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_output.hpp>
 
-// interpreter includes
 #include <intlib/detail/any_arithmetic.hpp>
 
-namespace interpreter {
+namespace intlib {
 
-std::optional<std::any> program::evaluate
-(const ale::ast::arithmetic_node& v, const ale::ast::node_type& t)
-noexcept
+std::optional<std::any> Program::evaluate(
+	const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e& t
+) noexcept
 {
 	const auto& children = v.get_children();
 #if defined DEBUG
@@ -57,20 +54,18 @@ noexcept
 #endif
 
 	const auto node_eval =
-	[&](const std::unique_ptr<ale::ast::node>& c) -> std::optional<std::any>
+		[&](const std::unique_ptr<ale::ast::Node>& c) -> std::optional<std::any>
 	{
 		const std::optional<std::any> res = interpret_node(c);
 		if (not res.has_value()) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error()
-				<< "    Evaluation of node failed in arithmetic node '"
-				<< v.get_operation_string()
-				<< "'.\n";
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Evaluation of node failed in arithmetic node '"
+			// 			 << v.get_operation_string() << "'.\n";
 			return {};
 		}
-		if (ale::detail::is_type<void>(*res)) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error() << "    Evaluation of node returned a void value.\n";
+		if (detail::is_type<void>(*res)) {
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Evaluation of node returned a void value.\n";
 			return {};
 		}
 		return res;
@@ -81,7 +76,8 @@ noexcept
 		return {};
 	}
 
-	for (const std::unique_ptr<ale::ast::node>& c : children | std::views::drop(1)) {
+	for (const std::unique_ptr<ale::ast::Node>& c :
+		 children | std::views::drop(1)) {
 		const std::optional<std::any> rv = node_eval(c);
 		if (not rv.has_value()) {
 			return {};
@@ -90,15 +86,13 @@ noexcept
 		r = detail::any_arithmetic(t, *r, *rv);
 
 		if (not r.has_value()) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error()
-				<< "    Operation in arithmetic node '"
-				<< v.get_operation_string()
-				<< "' failed.\n";
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Operation in arithmetic node '"
+			// 			 << v.get_operation_string() << "' failed.\n";
 			return {};
 		}
 	}
 	return r;
 }
 
-} // -- interpreter
+} // namespace intlib

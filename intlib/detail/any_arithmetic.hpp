@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -33,45 +33,42 @@
 
 #pragma once
 
-// C++ includes
 #include <optional>
 #include <any>
 
-// ale includes
-#include <ale/ast/node_type.hpp>
+#include <ale/ast/utils/node_type_enum.hpp>
 
-namespace interpreter {
+namespace intlib {
 namespace detail {
 
 /// Addition of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_addition
-(const std::any& a, const std::any& b)
-noexcept;
+[[nodiscard]] std::optional<std::any>
+any_arithmetic_addition(const std::any& a, const std::any& b) noexcept;
+
 /// Division of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_division
-(const std::any& a, const std::any& b)
-noexcept;
+[[nodiscard]] std::optional<std::any>
+any_arithmetic_division(const std::any& a, const std::any& b) noexcept;
+
 /// Exponentiation of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_exponentiation
-(const std::any& a, const std::any& b)
-noexcept;
+[[nodiscard]] std::optional<std::any>
+any_arithmetic_exponentiation(const std::any& a, const std::any& b) noexcept;
+
 /// Modulus of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_modulus
-(const std::any& a, const std::any& b)
-noexcept;
+[[nodiscard]] std::optional<std::any>
+any_arithmetic_modulus(const std::any& a, const std::any& b) noexcept;
+
 /// Multiplication of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_multiplication
-(const std::any& a, const std::any& b)
-noexcept;
+[[nodiscard]] std::optional<std::any>
+any_arithmetic_multiplication(const std::any& a, const std::any& b) noexcept;
+
 /// Subtraction of two std::any values.
-[[nodiscard]] std::optional<std::any> any_arithmetic_subtraction
-(const std::any& a, const std::any& b)
-noexcept;
+[[nodiscard]] std::optional<std::any>
+any_arithmetic_subtraction(const std::any& a, const std::any& b) noexcept;
 
 /// Computes two std::any according to the type of node
-[[nodiscard]] std::optional<std::any> any_arithmetic
-(const ale::ast::node_type& t, const std::any& a, const std::any& b)
-noexcept;
+[[nodiscard]] std::optional<std::any> any_arithmetic(
+	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
+) noexcept;
 
-} // -- namespace detail
-} // -- namespace interpreter
+} // namespace detail
+} // namespace intlib

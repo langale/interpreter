@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,14 +31,14 @@
  *
  ********************************************************************/
 
-#include <intlib/memory/memory.hpp>
+#include <intlib/memory/Memory.hpp>
 
-namespace interpreter {
+namespace intlib {
 namespace memory {
 
 /* MODIFIERS */
 
-void memory::declare_variable
+void Memory::declare_variable
 (std::string&& s, std::any&& v)
 noexcept
 {
@@ -50,7 +50,7 @@ noexcept
 	}
 }
 
-void memory::declare_constant_variable
+void Memory::declare_constant_variable
 (std::string&& s, std::any&& v)
 noexcept
 {
@@ -64,25 +64,25 @@ noexcept
 
 /* GETTERS */
 
-std::optional<variable_value> memory::get_variable
+std::optional<VariableValue> Memory::get_variable
 (const std::string& s)
 const noexcept
 {
 	if (num_local_scopes() > 0) {
-		std::optional<variable_value> scoped = m_local_scopes.top().get_variable(s);
+		std::optional<VariableValue> scoped = m_local_scopes.top().get_variable(s);
 		if (scoped.has_value()) {
 			return scoped;
 		}
 	}
 
-	std::optional<variable_value> global = m_global_scope.get_variable(s);
+	std::optional<VariableValue> global = m_global_scope.get_variable(s);
 	if (global.has_value()) {
 		return global;
 	}
 	return {};
 }
 
-bool memory::variable_exists
+bool Memory::variable_exists
 (const std::string& s)
 const noexcept
 {
@@ -95,7 +95,7 @@ const noexcept
 		m_global_scope.variable_exists(s);
 }
 
-bool memory::variable_exists_shallow
+bool Memory::variable_exists_shallow
 (const std::string& s)
 const noexcept
 {
@@ -106,4 +106,4 @@ const noexcept
 }
 
 } // -- namespace memory
-} // -- namespace interpreter
+} // -- namespace intlib

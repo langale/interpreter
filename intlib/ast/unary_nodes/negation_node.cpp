@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,26 +31,23 @@
  *
  ********************************************************************/
 
-// ale includes
-#include <ale/logger.hpp>
-#include <ale/detail/any_type.hpp>
+#include <ale/logger/Logger.hpp>
+#include <intlib/detail/any_type.hpp>
 
-// program includes
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 
-namespace interpreter {
+namespace intlib {
 
-std::optional<std::any> program::evaluate
-(const ale::ast::negation_node& v)
-noexcept
+std::optional<std::any>
+Program::evaluate(const ale::ast::NegationNode& v) noexcept
 {
 	const auto& child = v.get_child();
 
 	std::optional<std::any> rr = interpret_node(child);
 	if (not rr.has_value()) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Node evaluation failed.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Node evaluation failed.\n";
 		return {};
 	}
 
@@ -59,9 +56,9 @@ noexcept
 		return not *r;
 	}
 
-	UNHANDLED_ANY(ale::error(), r);
+	// UNHANDLED_ANY(ale::error(), r);
 
 	return {};
 }
 
-} // -- namespace interpreter
+} // namespace intlib

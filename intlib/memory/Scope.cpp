@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,21 +31,18 @@
  *
  ********************************************************************/
 
-#include <intlib/memory/scope.hpp>
+#include <intlib/memory/Scope.hpp>
 
-// C++ includes
 #if defined DEBUG
 #include <cassert>
 #endif
 
-namespace interpreter {
+namespace intlib {
 namespace memory {
 
 /* MODIFIERS */
 
-void scope::declare_variable
-(std::string&& s, std::any&& v)
-noexcept
+void Scope::declare_variable(std::string&& s, std::any&& v) noexcept
 {
 #if defined DEBUG
 	assert(not m_subscopes.back().variable_exists(s));
@@ -53,9 +50,7 @@ noexcept
 	m_subscopes.back().declare_variable(std::move(s), std::move(v));
 }
 
-void scope::declare_constant_variable
-(std::string&& s, std::any&& v)
-noexcept
+void Scope::declare_constant_variable(std::string&& s, std::any&& v) noexcept
 {
 #if defined DEBUG
 	assert(not m_subscopes.back().variable_exists(s));
@@ -63,9 +58,7 @@ noexcept
 	m_subscopes.back().declare_constant_variable(std::move(s), std::move(v));
 }
 
-void scope::set_variable_value
-(const std::string& s, std::any&& a)
-noexcept
+void Scope::set_variable_value(const std::string& s, std::any&& a) noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		if (it->variable_exists(s)) {
@@ -77,12 +70,11 @@ noexcept
 
 /* GETTERS */
 
-std::optional<variable_value> scope::get_variable
-(const std::string& s)
-const noexcept
+std::optional<VariableValue>
+Scope::get_variable(const std::string& s) const noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
-		std::optional<variable_value> r = it->get_variable(s);
+		std::optional<VariableValue> r = it->get_variable(s);
 		if (r.has_value()) {
 			return r;
 		}
@@ -90,9 +82,7 @@ const noexcept
 	return {};
 }
 
-bool scope::variable_exists
-(const std::string& s)
-const noexcept
+bool Scope::variable_exists(const std::string& s) const noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		if (it->variable_exists(s)) {
@@ -102,12 +92,10 @@ const noexcept
 	return false;
 }
 
-bool scope::variable_exists_shallow
-(const std::string& s)
-const noexcept
+bool Scope::variable_exists_shallow(const std::string& s) const noexcept
 {
 	return m_subscopes.back().variable_exists(s);
 }
 
-} // -- namespace memory
-} // -- namespace interpreter
+} // namespace memory
+} // namespace intlib

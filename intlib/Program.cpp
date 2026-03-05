@@ -31,41 +31,37 @@
  *
  ********************************************************************/
 
-#pragma once
+#include <intlib/detail/any_output.hpp>
+#include <ale/logger/Stream.hpp>
 
-#include <optional>
-#include <any>
-
-#include <ale/ast/utils/node_type_enum.hpp>
+#include <intlib/Program.hpp>
 
 namespace intlib {
-namespace detail {
 
-/// Equal (==) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_equal(const std::any& a, const std::any& b) noexcept;
-/// Not-Equal (!=) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_not_equal(const std::any& a, const std::any& b) noexcept;
-/// Less than (<) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_less_than(const std::any& a, const std::any& b) noexcept;
-/// Less than or equal to (<=) comparison of two std::any.
-[[nodiscard]] std::optional<bool> any_comparison_less_than_equal_to(
-	const std::any& a, const std::any& b
-) noexcept;
-/// Greater than (>) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_greater_than(const std::any& a, const std::any& b) noexcept;
-/// Greater than or equal to (>=) comparison of two std::any.
-[[nodiscard]] std::optional<bool> any_comparison_greater_than_equal_to(
-	const std::any& a, const std::any& b
-) noexcept;
+Program::Program() noexcept
+{
+	m_memory.initialize();
+}
 
-/// Compares two std::any according to the type of node
-[[nodiscard]] std::optional<bool> any_comparison(
-	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
-) noexcept;
+/* MODIFIERS */
 
-} // namespace detail
+void Program::add_instructions(std::unique_ptr<ale::ast::Node>&& node) noexcept
+{
+	m_program_node = std::move(node);
+}
+
+void Program::run_program(ale::logger::Stream& os) noexcept
+{
+	interpret_node(m_program_node);
+}
+
+/* OTHERS */
+
+void Program::print_tree(ale::logger::Stream& os) const noexcept
+{
+	os.out() << "= [fixedsize=false shape=none]\n";
+	os.out() << "'PROGRAM'\n";
+	m_program_node->print_tree(os.out(), " ");
+}
+
 } // namespace intlib

@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,32 +31,29 @@
  *
  ********************************************************************/
 
-// C++ includes
 #include <optional>
 #include <any>
 
-// ale includes
-#include <ale/detail/any_type.hpp>
-#include <ale/detail/any_output.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_output.hpp>
 
-// program includes
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 
-namespace interpreter {
+namespace intlib {
 
-std::optional<std::any> program::evaluate
-(const ale::ast::while_loop_node& v)
+std::optional<std::any> Program::evaluate
+(const ale::ast::WhileLoopNode& v)
 noexcept
 {
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
 
-	using ale::detail::operator<<;
+	// using ale::detail::operator<<;
 
 	if (left_child == nullptr) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Condition node of while loop is null.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Condition node of while loop is null.\n";
 		return {};
 	}
 
@@ -65,16 +62,16 @@ noexcept
 
 		const std::optional<std::any> cond = interpret_node(left_child);
 		if (not cond.has_value()) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error() << "    Evaluation of while loop condition failed.\n";
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Evaluation of while loop condition failed.\n";
 			return {};
 		}
 
 		const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
 		if (not cond_bool.has_value()) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error() << "    Condition of while loop could not be converted into a Boolean value.\n";
-			ale::error() << "    Evaluation: " << *cond << '\n';
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Condition of while loop could not be converted into a Boolean value.\n";
+			// ale::error() << "    Evaluation: " << *cond << '\n';
 			return {};
 		}
 
@@ -85,8 +82,8 @@ noexcept
 
 			const std::optional<std::any> r = interpret_node(right_child);
 			if (not r.has_value()) {
-				ale::error() << ERROR_LOCATION << '\n';
-				ale::error() << "    Evaluation of while loop body.\n";
+				// ale::error() << ERROR_LOCATION << '\n';
+				// ale::error() << "    Evaluation of while loop body.\n";
 				return {};
 			}
 		}

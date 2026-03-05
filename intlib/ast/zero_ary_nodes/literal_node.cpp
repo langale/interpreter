@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,19 +31,32 @@
  *
  ********************************************************************/
 
-// ale includes
-#include <ale/logger.hpp>
+#include <intlib/Program.hpp>
 
-// program includes
-#include <intlib/program.hpp>
+namespace intlib {
 
-namespace interpreter {
-
-std::optional<std::any> program::evaluate
-(const ale::ast::literal_node& v)
-noexcept
+std::optional<std::any>
+Program::evaluate(const ale::ast::LiteralStringNode& v) noexcept
 {
 	return v.get_value();
 }
 
-} // -- namespace interpreter
+std::optional<std::any>
+Program::evaluate(const ale::ast::LiteralDecimalNode& v) noexcept
+{
+	return v.get_value();
+}
+
+std::optional<std::any>
+Program::evaluate(const ale::ast::LiteralUnsignedIntegerNode& v) noexcept
+{
+	return v.get_value();
+}
+
+std::optional<std::any>
+Program::evaluate(const ale::ast::LiteralSignedIntegerNode& v) noexcept
+{
+	return v.get_value();
+}
+
+} // namespace intlib

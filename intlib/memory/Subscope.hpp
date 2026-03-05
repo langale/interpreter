@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -33,17 +33,16 @@
 
 #pragma once
 
-// C++ includes
 #include <optional>
 #include <string>
 #include <map>
 #include <any>
 
-namespace interpreter {
+namespace intlib {
 namespace memory {
 
 /// Data associated to each variable name.
-struct variable_value {
+struct VariableValue {
 	/// The actual value that the variable holds.
 	std::any value;
 	/// Whether or not the variable is declared with 'const'.
@@ -57,8 +56,9 @@ struct variable_value {
  * value (@ref interpreter::memory::variable_value). Variables can be constant or
  * mutable.
  */
-class subscope {
+class Subscope {
 public:
+
 	/* MODIFIERS */
 
 	/**
@@ -66,27 +66,21 @@ public:
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void declare_variable
-	(std::string&& s, std::any&& a)
-	noexcept;
+	void declare_variable(std::string&& s, std::any&& a) noexcept;
 
 	/**
 	 * @brief Adds a new constant variable to this subscope.
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void declare_constant_variable
-	(std::string&& s, std::any&& a)
-	noexcept;
+	void declare_constant_variable(std::string&& s, std::any&& a) noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void set_variable_value
-	(const std::string& s, std::any&& a)
-	noexcept;
+	void set_variable_value(const std::string& s, std::any&& a) noexcept;
 
 	/* GETTERS */
 
@@ -95,14 +89,11 @@ public:
 	 * @param s The name of the variable to look for.
 	 * @returns The value of the variable if it exists.
 	 */
-	std::optional<variable_value> get_variable
-	(const std::string& s)
-	const noexcept;
+	std::optional<VariableValue>
+	get_variable(const std::string& s) const noexcept;
 
 	/// Does variable @e s exist?
-	bool variable_exists
-	(const std::string& s)
-	const noexcept
+	bool variable_exists(const std::string& s) const noexcept
 	{
 		return find(s) != m_variables.end();
 	}
@@ -110,27 +101,24 @@ public:
 private:
 
 	/// Useful typedef.
-	typedef std::map<std::string, variable_value> Collection;
+	using Collection = std::map<std::string, VariableValue>;
 
 	/// Find a variable @e s.
-	Collection::const_iterator find
-	(const std::string& s)
-	const noexcept
+	Collection::const_iterator find(const std::string& s) const noexcept
 	{
 		return m_variables.find(s);
 	}
 	/// Find a variable @e s.
-	Collection::iterator find
-	(const std::string& s)
-	noexcept
+	Collection::iterator find(const std::string& s) noexcept
 	{
 		return m_variables.find(s);
 	}
 
 private:
+
 	/// The collection of non-constant variables in this subscope.
 	Collection m_variables;
 };
 
-} // -- namespace memory
-} // -- namespace interpreter
+} // namespace memory
+} // namespace intlib

@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,48 +31,44 @@
  *
  ********************************************************************/
 
-// C++ includes
 #include <optional>
 #include <any>
 
-// ale includes
-#include <ale/detail/any_type.hpp>
-#include <ale/detail/any_output.hpp>
+#include <intlib/detail/any_output.hpp>
 
-// program includes
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 
-namespace interpreter {
+namespace intlib {
 
-std::optional<std::any> program::evaluate
-(const ale::ast::if_else_node& v)
-noexcept
+std::optional<std::any>
+Program::evaluate(const ale::ast::IfElseNode& v) noexcept
 {
-	using ale::detail::operator<<;
+	// using ale::detail::operator<<;
 
 	const auto& first_child = v.get_first_child();
 	const auto& second_child = v.get_second_child();
 	const auto& third_child = v.get_third_child();
 
 	if (first_child == nullptr) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Condition node of if statement is null.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Condition node of if statement is null.\n";
 		return {};
 	}
 
 	const std::optional<std::any> cond = interpret_node(first_child);
 	if (not cond.has_value()) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Evaluation of node failed.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Evaluation of node failed.\n";
 		return {};
 	}
 
 	const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
 	if (not cond_bool.has_value()) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Condition of if statement could not be converted into a Boolean value.\n";
-		ale::error() << "    Evaluation: " << *cond << '\n';
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Condition of if statement could not be converted "
+		// 				"into a Boolean value.\n";
+		// ale::error() << "    Evaluation: " << *cond << '\n';
 		return {};
 	}
 
@@ -88,4 +84,4 @@ noexcept
 	return std::any{};
 }
 
-} // -- interpreter
+} // namespace intlib

@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,42 +31,40 @@
  *
  ********************************************************************/
 
-// C++ includes
 #include <optional>
 #include <any>
 
-// ale includes
-#include <ale/detail/any_type.hpp>
-#include <ale/detail/any_output.hpp>
-#include <ale/detail/macros.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_output.hpp>
+#include <intlib/detail/macros.hpp>
 
-// program includes
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 
-namespace interpreter {
+namespace intlib {
 
-std::string program::make_full_variable_name
-(const ale::ast::subscripted_variable_node& v)
-noexcept
+std::string Program::make_full_variable_name(
+	const ale::ast::SubscriptedVariableNode& v
+) noexcept
 {
-	using ale::detail::operator<<;
+	// using ale::detail::operator<<;
 
 	std::string full_variable_name = v.get_variable_name();
 	for (const auto& c : v.get_children()) {
 		const std::optional<std::any> res = interpret_node(c);
 		if (not res.has_value()) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error() << "    Evaluation of subscript node failed.\n";
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Evaluation of subscript node failed.\n";
 			return {};
 		}
 		const std::any& r = *res;
 
-		const bool is_uint64 = ale::detail::is_type<uint64_t>(r);
-		const bool is_int64 = ale::detail::is_type<int64_t>(r);
+		const bool is_uint64 = detail::is_type<uint64_t>(r);
+		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error() << "    Evaluation of subscript is not an unsigned integer value.\n";
-			ale::error() << "    Result: '" << r << "'.\n";
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Evaluation of subscript is not an unsigned "
+			// 				"integer value.\n";
+			// ale::error() << "    Result: '" << r << "'.\n";
 			return {};
 		}
 
@@ -82,35 +80,35 @@ noexcept
 	return full_variable_name;
 }
 
-std::vector<int64_t> program::get_index_sequence
-(const ale::ast::subscripted_variable_node& v)
-noexcept
+std::vector<int64_t>
+Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v) noexcept
 {
-	using ale::detail::operator<<;
+	// using ale::detail::operator<<;
 
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
 	for (const auto& c : v.get_children()) {
 		const std::optional<std::any> res = interpret_node(c);
 		if (not res.has_value()) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error() << "    Evaluation of subscript node failed.\n";
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Evaluation of subscript node failed.\n";
 			return {};
 		}
 
 		const std::any& r = *res;
-		const bool is_uint64 = ale::detail::is_type<uint64_t>(r);
-		const bool is_int64 = ale::detail::is_type<int64_t>(r);
+		const bool is_uint64 = detail::is_type<uint64_t>(r);
+		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
-			ale::error() << ERROR_LOCATION << '\n';
-			ale::error() << "    Evaluation of subscript is not an unsigned integer value.\n";
-			ale::error() << "    Result: '" << r << "'.\n";
+			// ale::error() << ERROR_LOCATION << '\n';
+			// ale::error() << "    Evaluation of subscript is not an unsigned "
+			// 				"integer value.\n";
+			// ale::error() << "    Result: '" << r << "'.\n";
 			return {};
 		}
 
 		if (is_uint64) {
 			const uint64_t j = std::any_cast<uint64_t>(r);
-			indices[i++] = ale::detail::to_int64(j);
+			indices[i++] = detail::to_int64(j);
 		}
 		else {
 			const int64_t j = std::any_cast<int64_t>(r);
@@ -120,28 +118,30 @@ noexcept
 	return indices;
 }
 
-std::optional<std::any> program::evaluate
-(const ale::ast::subscripted_variable_node& v)
-noexcept
+std::optional<std::any>
+Program::evaluate(const ale::ast::SubscriptedVariableNode& v) noexcept
 {
 	const std::string full_variable_name = make_full_variable_name(v);
 	if (not m_memory.variable_exists(full_variable_name)) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Variable '" << full_variable_name << "' does not exist in this scope.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Variable '" << full_variable_name
+		// 			 << "' does not exist in this scope.\n";
 		return {};
 	}
-	std::optional<memory::variable_value> res = m_memory.get_variable(full_variable_name);
+	std::optional<memory::VariableValue> res =
+		m_memory.get_variable(full_variable_name);
 #if defined DEBUG
 	assert(res.has_value());
 #endif
 
-	if (ale::detail::is_type<void>(res->value)) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Variable '" << full_variable_name << "' has no value in the current scope.\n";
+	if (detail::is_type<void>(res->value)) {
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Variable '" << full_variable_name
+		// 			 << "' has no value in the current scope.\n";
 		return {};
 	}
 
 	return std::move(res->value);
 }
 
-} // -- interpreter
+} // namespace intlib

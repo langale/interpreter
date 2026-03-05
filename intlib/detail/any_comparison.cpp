@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,36 +31,38 @@
  *
  ********************************************************************/
 
-#include <ale/ast/n_ary_nodes/comparison/comparison_equal_node.hpp>
+#include <ale/ast/n_ary_nodes/comparison/ComparisonEqualNode.hpp>
 
-// C++ includes
 #include <optional>
 #include <any>
 
-// ale includes
-#include <ale/logger.hpp>
+#include <ale/logger/Logger.hpp>
 
-// interpreter includes
 #include <intlib/detail/any_comparison.hpp>
 
-namespace interpreter {
+namespace intlib {
 namespace detail {
 
-std::optional<bool> any_comparison
-(const ale::ast::node_type& t, const std::any& a, const std::any& b)
-noexcept
+std::optional<bool> any_comparison(
+	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
+) noexcept
 {
 	switch (t) {
-	case ale::ast::node_type::comparison_equal: return any_comparison_equal(a, b);
-	case ale::ast::node_type::comparison_not_equal: return any_comparison_not_equal(a, b);
-	case ale::ast::node_type::comparison_less_than: return any_comparison_less_than(a, b);
-	case ale::ast::node_type::comparison_less_equal: return any_comparison_less_than_equal_to(a, b);
-	case ale::ast::node_type::comparison_greater_than: return any_comparison_greater_than(a, b);
-	case ale::ast::node_type::comparison_greater_equal: return any_comparison_greater_than_equal_to(a, b);
-	default:
-		return {};
+	case ale::ast::node_type_e::Comparison_Equal:
+		return any_comparison_equal(a, b);
+	case ale::ast::node_type_e::Comparison_Not_Equal:
+		return any_comparison_not_equal(a, b);
+	case ale::ast::node_type_e::Comparison_Less_Than:
+		return any_comparison_less_than(a, b);
+	case ale::ast::node_type_e::Comparison_Less_Equal:
+		return any_comparison_less_than_equal_to(a, b);
+	case ale::ast::node_type_e::Comparison_Greater_Than:
+		return any_comparison_greater_than(a, b);
+	case ale::ast::node_type_e::Comparison_Greater_Equal:
+		return any_comparison_greater_than_equal_to(a, b);
+	default: return {};
 	}
 }
 
-} // -- namespace detail
-} // -- namespace interpreter
+} // namespace detail
+} // namespace intlib

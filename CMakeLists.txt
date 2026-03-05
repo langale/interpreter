@@ -8,8 +8,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(INTERPRETER_MAJOR 99.99)
 set(INTERPRETER_PATCH 99)
 
-option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
-
 # ******************************************************************************
 # Custom functions
 
@@ -30,6 +28,11 @@ endfunction(add_link_flag)
 function(define_symbol executable symbol)
 	target_compile_options(${executable} PRIVATE ${symbol})
 endfunction(define_symbol)
+
+function(add_sanitize_option executable option)
+	target_compile_options(${executable} PRIVATE -fsanitize=${option})
+	target_link_options(${executable} PRIVATE -fsanitize=${option})
+endfunction(add_sanitize_option)
 
 function(configure_executable executable)
 	# define executable's properties
@@ -66,9 +69,16 @@ function(configure_executable executable)
 	# Compile-mode dependent flags
 
 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+		add_compile_flag(${executable} -g)
 		add_compile_flag(${executable} -Og)
 		define_symbol(${executable} -DDEBUG)
 		define_symbol(${executable} -D_GLIBCXX_DEBUG)
+	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "DebugWithLogs")
+		add_compile_flag(${executable} -g)
+		add_compile_flag(${executable} -Og)
+		define_symbol(${executable} -DDEBUG)
+		define_symbol(${executable} -D_GLIBCXX_DEBUG)
+		define_symbol(${executable} -DALE_LOGGING_MESSAGES)
 	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Profiling")
 		add_compile_flag(${executable} -g)
 		add_compile_flag(${executable} -pg)
@@ -86,8 +96,11 @@ function(configure_executable executable)
 
 	if (ENABLE_ASAN)
 		add_compile_flag(${executable} -fno-omit-frame-pointer)
-		target_compile_options(${executable} PRIVATE -fsanitize=address)
-		target_link_options(${executable} PRIVATE -fsanitize=address)
+		add_sanitize_option(${executable} address)
+		add_sanitize_option(${executable} undefined)
+		add_sanitize_option(${executable} leak)
+		add_sanitize_option(${executable} unreachable)
+		add_sanitize_option(${executable} null)
 	endif()
 
 	# ***************************************************************************
@@ -132,24 +145,22 @@ message(STATUS "INTERPRETER_DIR: ${INTERPRETER_DIR}")
 # ******************************************************************************
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+get_filename_component(INTERPRETER_BUILD_DIR "${CMAKE_BINARY_DIR}" NAME)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-	message(STATUS "Link against intlib (debug compilation of intlib)")
-	set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/cmake-build-debug/intlib)
 	set(INTERPRETER_LIB_NAME intlib)
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "DebugWithLogs")
+	set(INTERPRETER_LIB_NAME intliblog)
 elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Profiling")
-	message(STATUS "Link against intlibprofiling (debug compilation of intlibprofiling)")
-	set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/cmake-build-profiling/intlib)
 	set(INTERPRETER_LIB_NAME intlibprofiling)
 elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Instrumentation")
-	message(STATUS "Link against intlibinstrumentation (debug compilation of intlibinstrumentation)")
-	set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/cmake-build-instrumentation/intlib)
 	set(INTERPRETER_LIB_NAME intlibinstrumentation)
 else()
-	message(STATUS "Link against intliboptimized (debug compilation of intliboptimized)")
-	set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/cmake-build-release/intlib)
 	set(INTERPRETER_LIB_NAME intliboptimized)
 endif()
+
+set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/${INTERPRETER_BUILD_DIR}/intlib)
+
 message(STATUS "    INTERPRETER_LIB_DIR:  ${INTERPRETER_LIB_DIR}")
 message(STATUS "    INTERPRETER_LIB_NAME: ${INTERPRETER_LIB_NAME}")
 
@@ -169,18 +180,18 @@ if (NOT DEFINED ALE_DIR)
 	message(FATAL_ERROR "Please, read the last few lines above and follow the instructions given.")
 else()
 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-		set(ALE_LIB_DIR ${ALE_DIR}/cmake-build-debug)
 		set(ALE_LIB_NAME ale)
+	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "DebugWithLogs")
+		set(ALE_LIB_NAME alelog)
 	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Profiling")
-		set(ALE_LIB_DIR ${ALE_DIR}/cmake-build-profiling)
 		set(ALE_LIB_NAME aleprofiling)
 	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Instrumentation")
-		set(ALE_LIB_DIR ${ALE_DIR}/cmake-build-instrumentation)
 		set(ALE_LIB_NAME aleinstrumentation)
 	else()
-		set(ALE_LIB_DIR cmake-build-release)
 		set(ALE_LIB_NAME aleoptimized)
 	endif()
+	
+	set(ALE_LIB_DIR ${ALE_DIR}/${INTERPRETER_BUILD_DIR}/ale)
 	
 	message(STATUS "Compile against ALE:")
 	message(STATUS "    ALE_DIR:      ${ALE_DIR}")
@@ -191,7 +202,9 @@ endif()
 # *******************************************************************************
 # Build-dependent options
 
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "DebugWithLogs")
 elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Profiling")
 elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Instrumentation")
 else()
@@ -206,6 +219,8 @@ else()
 		message(STATUS "    Error message: ${IPO_CHECK_ERROR}")
 	endif()
 endif()
+
+message(STATUS "    Enable ASAN (-DENABLE_ASAN=ON/OFF)? ${ENABLE_ASAN}")
 
 # *******************************************************************************
 # Add subdirectories

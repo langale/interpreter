@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,18 +31,16 @@
  *
  ********************************************************************/
 
-// C++ includes
 #include <optional>
 #include <cmath>
 #include <any>
 
-// ale includes
-#include <ale/logger.hpp>
+#include <ale/logger/Logger.hpp>
 
-#include <ale/detail/macros.hpp>
-#include <ale/detail/any_type.hpp>
+#include <intlib/detail/macros.hpp>
+#include <intlib/detail/any_type.hpp>
 
-namespace interpreter {
+namespace intlib {
 namespace detail {
 
 std::optional<std::any> any_arithmetic_subtraction
@@ -50,49 +48,47 @@ std::optional<std::any> any_arithmetic_subtraction
 noexcept
 {
 
-	if (ale::detail::is_type<uint64_t>(a)) {
+	if (is_type<uint64_t>(a)) {
 		const uint64_t ai = std::any_cast<uint64_t>(a);
 
-		if (ale::detail::is_type<uint64_t>(b)) {
+		if (is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
 			if (ai < bi) {
-				return ale::detail::to_int64(ai) - ale::detail::to_int64(bi);
+				return to_int64(ai) - to_int64(bi);
 			}
-			else {
-				return ai - bi;
-			}
+			return ai - bi;
 		}
 
-		if (ale::detail::is_type<int64_t>(b)) {
+		if (is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			const int64_t r = ale::detail::to_int64(ai) - bi;
+			const int64_t r = to_int64(ai) - bi;
 			if (r >= 0) {
 				return static_cast<uint64_t>(r);
 			}
 			return r;
 		}
 
-		if (ale::detail::is_type<double>(b)) {
+		if (is_type<double>(b)) {
 			const double bd = std::any_cast<double>(b);
-			return ale::detail::to_double(ai) - bd;
+			return to_double(ai) - bd;
 		}
 
-		UNHANDLED_ANY(ale::error(), b);
+		// UNHANDLED_ANY(ale::error(), b);
 	}
 
-	if (ale::detail::is_type<int64_t>(a)) {
+	if (is_type<int64_t>(a)) {
 		const int64_t ai = std::any_cast<int64_t>(a);
 
-		if (ale::detail::is_type<uint64_t>(b)) {
+		if (is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			const int64_t r = ai - ale::detail::to_int64(bi);
+			const int64_t r = ai - to_int64(bi);
 			if (r >= 0) {
 				return static_cast<uint64_t>(r);
 			}
 			return r;
 		}
 
-		if (ale::detail::is_type<int64_t>(b)) {
+		if (is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
 			const int64_t r = ai - bi;
 			if (r >= 0) {
@@ -101,38 +97,38 @@ noexcept
 			return r;
 		}
 
-		if (ale::detail::is_type<double>(b)) {
-			return ale::detail::to_double(ai) - std::any_cast<double>(b);
+		if (is_type<double>(b)) {
+			return to_double(ai) - std::any_cast<double>(b);
 		}
 
-		UNHANDLED_ANY(ale::error(), b);
+		// UNHANDLED_ANY(ale::error(), b);
 	}
 
-	if (ale::detail::is_type<double>(a)) {
+	if (is_type<double>(a)) {
 		const double ai = std::any_cast<double>(a);
 
-		if (ale::detail::is_type<uint64_t>(b)) {
+		if (is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return ai - ale::detail::to_double(bi);
+			return ai - to_double(bi);
 		}
 
-		if (ale::detail::is_type<int64_t>(b)) {
+		if (is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return ai - ale::detail::to_double(bi);
+			return ai - to_double(bi);
 		}
 
-		if (ale::detail::is_type<double>(b)) {
+		if (is_type<double>(b)) {
 			const double bd = std::any_cast<double>(b);
 			return ai - bd;
 		}
 
-		UNHANDLED_ANY(ale::error(), b);
+		// UNHANDLED_ANY(ale::error(), b);
 	}
 
-	UNHANDLED_ANY(ale::error(), a);
+	// UNHANDLED_ANY(ale::error(), a);
 
 	return {};
 }
 
 } // -- namespace detail
-} // -- namespace interpreter
+} // -- namespace intlib

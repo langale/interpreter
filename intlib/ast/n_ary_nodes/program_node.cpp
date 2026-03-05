@@ -31,41 +31,20 @@
  *
  ********************************************************************/
 
-#pragma once
-
 #include <optional>
 #include <any>
 
-#include <ale/ast/utils/node_type_enum.hpp>
+#include <ale/ast/n_ary_nodes/ProgramNode.hpp>
+
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_output.hpp>
+
+#include <intlib/Program.hpp>
 
 namespace intlib {
-namespace detail {
 
-/// Equal (==) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_equal(const std::any& a, const std::any& b) noexcept;
-/// Not-Equal (!=) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_not_equal(const std::any& a, const std::any& b) noexcept;
-/// Less than (<) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_less_than(const std::any& a, const std::any& b) noexcept;
-/// Less than or equal to (<=) comparison of two std::any.
-[[nodiscard]] std::optional<bool> any_comparison_less_than_equal_to(
-	const std::any& a, const std::any& b
-) noexcept;
-/// Greater than (>) comparison of two std::any.
-[[nodiscard]] std::optional<bool>
-any_comparison_greater_than(const std::any& a, const std::any& b) noexcept;
-/// Greater than or equal to (>=) comparison of two std::any.
-[[nodiscard]] std::optional<bool> any_comparison_greater_than_equal_to(
-	const std::any& a, const std::any& b
-) noexcept;
+std::optional<std::any>
+Program::evaluate(const ale::ast::ProgramNode& v) noexcept
+{ }
 
-/// Compares two std::any according to the type of node
-[[nodiscard]] std::optional<bool> any_comparison(
-	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
-) noexcept;
-
-} // namespace detail
 } // namespace intlib

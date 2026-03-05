@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -33,13 +33,11 @@
 
 #pragma once
 
-// C++ includes
 #include <vector>
 
-// interpreter includes
-#include <intlib/memory/subscope.hpp>
+#include <intlib/memory/Subscope.hpp>
 
-namespace interpreter {
+namespace intlib {
 namespace memory {
 
 /**
@@ -48,7 +46,7 @@ namespace memory {
  * A scope is a sequence of subscopes, the last of which is the last subscope
  * created and the first in which variables are looked for and stored in.
  */
-class scope {
+class Scope {
 public:
 
 	/* MODIFIERS */
@@ -59,7 +57,8 @@ public:
 	 * This should be called when entering a sub scope delimited by '{' '}',
 	 * such as when entering an if statement, a loop, ...
 	 */
-	void push_subscope() noexcept {
+	void push_subscope() noexcept
+	{
 		m_subscopes.push_back({});
 	}
 	/**
@@ -68,7 +67,8 @@ public:
 	 * This should be called when exiting a sub scope delimited by '{' '}',
 	 * such as when leaving an if statement, a loop, ...
 	 */
-	void pop_subscope() noexcept {
+	void pop_subscope() noexcept
+	{
 		m_subscopes.pop_back();
 	}
 
@@ -77,9 +77,7 @@ public:
 	 * @param s Name of the variable.
 	 * @param v Value of the variable.
 	 */
-	void declare_variable
-	(std::string&& s, std::any&& v)
-	noexcept;
+	void declare_variable(std::string&& s, std::any&& v) noexcept;
 
 	/**
 	 * @brief Sets the value of a constant variable to the current scope.
@@ -87,18 +85,14 @@ public:
 	 * @param v Value of the variable.
 	 * @pre Variable @e s does not already exist in the current subscope.
 	 */
-	void declare_constant_variable
-	(std::string&& s, std::any&& v)
-	noexcept;
+	void declare_constant_variable(std::string&& s, std::any&& v) noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
 	 * @param s Variable name.
 	 * @param a Value of the variable.
 	 */
-	void set_variable_value
-	(const std::string& s, std::any&& a)
-	noexcept;
+	void set_variable_value(const std::string& s, std::any&& a) noexcept;
 
 	/* GETTERS */
 
@@ -109,23 +103,19 @@ public:
 	 * @param s The name of the variable to look for.
 	 * @returns The value of the variable if it exists.
 	 */
-	std::optional<variable_value> get_variable
-	(const std::string& s)
-	const noexcept;
+	std::optional<VariableValue>
+	get_variable(const std::string& s) const noexcept;
 
 	/// Does a variable @e s exist?
-	bool variable_exists
-	(const std::string& s)
-	const noexcept;
+	bool variable_exists(const std::string& s) const noexcept;
 	/// Does a variable @e s exist in the current subscope?
-	bool variable_exists_shallow
-	(const std::string& s)
-	const noexcept;
+	bool variable_exists_shallow(const std::string& s) const noexcept;
 
 private:
+
 	/// The list of subscopes in this scope.
-	std::vector<subscope> m_subscopes;
+	std::vector<Subscope> m_subscopes;
 };
 
-} // -- namespace memory
-} // -- namespace interpreter
+} // namespace memory
+} // namespace intlib

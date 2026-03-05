@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,17 +31,14 @@
  *
  ********************************************************************/
 
-// ale includes
-#include <ale/logger.hpp>
+#include <ale/logger/Logger.hpp>
 
-// program includes
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 
-namespace interpreter {
+namespace intlib {
 
-ale::ast::variable_sequence_node_iterator program::make_iterator
-(const ale::ast::variable_sequence_node& seq)
-noexcept
+ale::utils::SequenceNodeIterator
+Program::make_iterator(const ale::ast::SequenceNode& seq) noexcept
 {
 	const auto& left_child = seq.get_left_child();
 	const auto& right_child = seq.get_right_child();
@@ -49,44 +46,60 @@ noexcept
 	assert(left_child != nullptr);
 	assert(right_child != nullptr);
 
-	assert(left_child->get_node_type() == ale::ast::node_type::subscripted_variable);
-	assert(right_child->get_node_type() == ale::ast::node_type::subscripted_variable);
+	assert(
+		left_child->get_node_type() ==
+		ale::ast::node_type_e::Subscripted_Variable
+	);
+	assert(
+		right_child->get_node_type() ==
+		ale::ast::node_type_e::Subscripted_Variable
+	);
 #endif
 
-	std::vector<int64_t> first_indices = get_index_sequence(static_cast<const ale::ast::subscripted_variable_node&>(*left_child.get()));
-	std::vector<int64_t> last_indices = get_index_sequence(static_cast<const ale::ast::subscripted_variable_node&>(*right_child.get()));
-	return ale::ast::variable_sequence_node_iterator(std::move(first_indices), std::move(last_indices));
+	std::vector<int64_t> first_indices = get_index_sequence(
+		static_cast<const ale::ast::SubscriptedVariableNode&>(*left_child.get())
+	);
+	std::vector<int64_t> last_indices = get_index_sequence(
+		static_cast<const ale::ast::SubscriptedVariableNode&>(
+			*right_child.get()
+		)
+	);
+	return ale::utils::SequenceNodeIterator(
+		std::move(first_indices), std::move(last_indices)
+	);
 }
 
-std::optional<std::any> program::get_variable_value
-(const std::string& var)
-const noexcept
+std::optional<std::any>
+Program::get_variable_value(const std::string& var) const noexcept
 {
 	if (not m_memory.variable_exists(var)) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error()
-			<< "    Trying to use an undeclared variable '"
-			<< var
-			<< "'.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error()
+		// 	<< "    Trying to use an undeclared variable '"
+		// 	<< var
+		// 	<< "'.\n";
 		return {};
 	}
 
-	std::optional<memory::variable_value> variable_value = m_memory.get_variable(var);
+	std::optional<memory::VariableValue> variable_value =
+		m_memory.get_variable(var);
 	if (not variable_value.has_value()) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Variable '" << var << "' exists but it has no value.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Variable '" << var << "' exists but it has no value.\n";
 		return {};
 	}
 
 	return std::move(variable_value->value);
 }
 
-std::optional<std::any> program::evaluate(const ale::ast::variable_sequence_node& v) noexcept {
-	ale::error() << ERROR_LOCATION << '\n';
-	ale::error()
-		<< "    Nodes of type '" << ale::ast::node_type_to_string(v.get_node_type())
-		<< "' cannot be evaluated.\n";
+std::optional<std::any>
+Program::evaluate(const ale::ast::SequenceNode& v) noexcept
+{
+	// ale::error() << ERROR_LOCATION << '\n';
+	// ale::error()
+	// 	<< "    Nodes of type '" << ale::ast::node_type_e_to_string(v.get_node_type())
+	// 	<< "' cannot be evaluated.\n";
 	return {};
 }
 
-} // -- namespace interpreter
+} // namespace intlib

@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,21 +31,18 @@
  *
  ********************************************************************/
 
-#include <intlib/memory/subscope.hpp>
+#include <intlib/memory/Subscope.hpp>
 
-// C++ includes
 #if defined DEBUG
 #include <cassert>
 #endif
 
-namespace interpreter {
+namespace intlib {
 namespace memory {
 
 /* MODIFIERS */
 
-void subscope::declare_variable
-(std::string&& s, std::any&& a)
-noexcept
+void Subscope::declare_variable(std::string&& s, std::any&& a) noexcept
 {
 	Collection::iterator it = find(s);
 
@@ -53,18 +50,12 @@ noexcept
 	assert(it == m_variables.end());
 #endif
 
-	m_variables.insert({
-		std::move(s),
-		{
-			.value = std::move(a),
-			.is_constant = false
-		}
-	});
+	m_variables.insert(
+		{std::move(s), {.value = std::move(a), .is_constant = false}}
+	);
 }
 
-void subscope::declare_constant_variable
-(std::string&& s, std::any&& a)
-noexcept
+void Subscope::declare_constant_variable(std::string&& s, std::any&& a) noexcept
 {
 	Collection::iterator it = find(s);
 
@@ -72,18 +63,12 @@ noexcept
 	assert(it == m_variables.end());
 #endif
 
-	m_variables.insert({
-		std::move(s),
-		{
-			.value = std::move(a),
-			.is_constant = true
-		}
-	});
+	m_variables.insert(
+		{std::move(s), {.value = std::move(a), .is_constant = true}}
+	);
 }
 
-void subscope::set_variable_value
-(const std::string& s, std::any&& a)
-noexcept
+void Subscope::set_variable_value(const std::string& s, std::any&& a) noexcept
 {
 	Collection::iterator it = find(s);
 
@@ -97,14 +82,15 @@ noexcept
 
 /* GETTERS */
 
-std::optional<variable_value> subscope::get_variable
-(const std::string& s)
-const noexcept
+std::optional<VariableValue>
+Subscope::get_variable(const std::string& s) const noexcept
 {
 	const auto it = find(s);
-	if (it == m_variables.end()) { return {}; }
+	if (it == m_variables.end()) {
+		return {};
+	}
 	return it->second;
 }
 
-} // -- namespace memory
-} // -- namespace interpreter
+} // namespace memory
+} // namespace intlib

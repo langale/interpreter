@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,48 +31,44 @@
  *
  ********************************************************************/
 
-// ale includes
-#include <ale/logger.hpp>
-#include <ale/detail/any_type.hpp>
-#include <ale/detail/macros.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/macros.hpp>
 
-// program includes
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 
-namespace interpreter {
+namespace intlib {
 
-std::optional<std::any> program::evaluate
-(const ale::ast::negative_node& v)
-noexcept
+std::optional<std::any>
+Program::evaluate(const ale::ast::NegativeNode& v) noexcept
 {
 	const auto& child = v.get_child();
 
 	std::optional<std::any> rr = interpret_node(child);
 	if (not rr.has_value()) {
-		ale::error() << ERROR_LOCATION << '\n';
-		ale::error() << "    Node evaluation failed.\n";
+		// ale::error() << ERROR_LOCATION << '\n';
+		// ale::error() << "    Node evaluation failed.\n";
 		return {};
 	}
 
 	const std::any& r = *rr;
-	if (ale::detail::is_type<uint64_t>(r)) {
+	if (detail::is_type<uint64_t>(r)) {
 		const uint64_t ri = std::any_cast<uint64_t>(r);
-		return -ale::detail::to_int64(ri);
+		return -detail::to_int64(ri);
 	}
 
-	if (ale::detail::is_type<int64_t>(r)) {
+	if (detail::is_type<int64_t>(r)) {
 		const int64_t ri = std::any_cast<int64_t>(r);
 		return -ri;
 	}
 
-	if (ale::detail::is_type<double>(r)) {
+	if (detail::is_type<double>(r)) {
 		const double ri = std::any_cast<double>(r);
 		return -ri;
 	}
 
-	UNHANDLED_ANY(ale::error(), r);
+	// UNHANDLED_ANY(ale::error(), r);
 
 	return {};
 }
 
-} // -- namespace interpreter
+} // namespace intlib

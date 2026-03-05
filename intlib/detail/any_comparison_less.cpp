@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -31,20 +31,18 @@
  *
  ********************************************************************/
 
-#include <ale/ast/n_ary_nodes/comparison/comparison_equal_node.hpp>
+#include <ale/ast/n_ary_nodes/comparison/ComparisonEqualNode.hpp>
 
-// C++ includes
 #include <optional>
 #include <string>
 #include <any>
 
-// ale includes
-#include <ale/logger.hpp>
+#include <ale/logger/Logger.hpp>
 
-#include <ale/detail/macros.hpp>
-#include <ale/detail/any_type.hpp>
+#include <intlib/detail/macros.hpp>
+#include <intlib/detail/any_type.hpp>
 
-namespace interpreter {
+namespace intlib {
 namespace detail {
 
 template <typename T, typename U>
@@ -53,7 +51,7 @@ template <typename T, typename U>
 noexcept
 {
 	if constexpr (std::equality_comparable_with<T,U>) {
-		if (ale::detail::is_type<T>(left) and ale::detail::is_type<U>(right)) {
+		if (detail::is_type<T>(left) and detail::is_type<U>(right)) {
 			const T l = std::any_cast<T>(left);
 			const U r = std::any_cast<U>(right);
 			if constexpr (std::is_floating_point_v<T> or std::is_floating_point_v<U>) {
@@ -120,4 +118,4 @@ noexcept
 }
 
 } // -- namespace detail
-} // -- namespace interpreter
+} // -- namespace intlib

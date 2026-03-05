@@ -3,7 +3,7 @@
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
- *     Copyright (C) 2024 Lluís Alemany Puig
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
@@ -33,14 +33,12 @@
 
 #pragma once
 
-// C++ includes
 #include <optional>
 
-// ale includes
-#include <ale/detail/any_type.hpp>
-#include <ale/detail/macros.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/macros.hpp>
 
-namespace interpreter {
+namespace intlib {
 namespace detail {
 
 [[nodiscard]]
@@ -48,12 +46,12 @@ inline std::optional<bool> any_to_bool
 (const std::any& a)
 noexcept
 {
-	if (ale::detail::is_type<bool>(a)) { return std::any_cast<bool>(a); }
-	if (ale::detail::is_type<int64_t>(a)) { return std::any_cast<int64_t>(a); }
-	if (ale::detail::is_type<uint64_t>(a)) { return std::any_cast<uint64_t>(a); }
-	if (ale::detail::is_type<double>(a)) { return ale::detail::to_int64(std::any_cast<double>(a)); }
+	if (detail::is_type<bool>(a)) { return std::any_cast<bool>(a); }
+	if (detail::is_type<int64_t>(a)) { return std::any_cast<int64_t>(a); }
+	if (detail::is_type<uint64_t>(a)) { return std::any_cast<uint64_t>(a); }
+	if (detail::is_type<double>(a)) { return detail::to_int64(std::any_cast<double>(a)); }
 	return {};
 }
 
 } // -- namespace detail
-} // -- namespace interpreter
+} // -- namespace intlib
