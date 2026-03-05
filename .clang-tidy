@@ -1,0 +1,70 @@
+Checks: "-*,bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,-modernize-use-trailing-return-type,readability-identifier-naming,-cppcoreguidelines-owning-memory"
+WarningsAsErrors: "*"
+HeaderFilterRegex: ".*"
+FormatStyle: file  # Tell clang-tidy to use .clang-format
+
+CheckOptions:
+  # Classes and Structs
+  - { key: readability-identifier-naming.ClassCase, value: CamelCase }
+  #- { key: readability-identifier-naming.ClassPrefix, value: _ }
+  #- { key: readability-identifier-naming.ClassSuffix, value: _ }
+  - { key: readability-identifier-naming.StructCase, value: CamelCase }
+  #- { key: readability-identifier-naming.StructPrefix, value: _ }
+  #- { key: readability-identifier-naming.StructSuffix, value: _ }
+
+  # Member classes
+  - { key: readability-identifier-naming.PublicMemberCase, value: lower_case }
+  #- { key: readability-identifier-naming.PublicMemberPrefix, value: m_ }
+  #- { key: readability-identifier-naming.PublicMemberSuffix, value: m_ }
+  - { key: readability-identifier-naming.ProtectedMemberCase, value: lower_case }
+  - { key: readability-identifier-naming.ProtectedMemberPrefix, value: m_ }
+  #- { key: readability-identifier-naming.ProtectedMemberSuffix, value: m_ }
+  - { key: readability-identifier-naming.PrivateMemberCase, value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
+  #- { key: readability-identifier-naming.PrivateMemberSuffix, value: m_ }
+
+  # Concepts
+  - { key: readability-identifier-naming.ConceptCase, value: CamelCase }
+  #- { key: readability-identifier-naming.ConceptPrefix, value: _ }
+  - { key: readability-identifier-naming.ConceptSuffix, value: _c }
+
+  # Functions
+  - { key: readability-identifier-naming.FunctionCase, value: lower_case }
+  #- { key: readability-identifier-naming.FunctionPrefix, value: lower_case }
+  #- { key: readability-identifier-naming.FunctionSuffix, value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase, value: lower_case }
+  #- { key: readability-identifier-naming.ParameterPrefix, value: lower_case }
+  #- { key: readability-identifier-naming.ParameterSuffix, value: lower_case }
+  - { key: readability-identifier-naming.VariableCase, value: lower_case }
+  #- { key: readability-identifier-naming.VariablePrefix, value: lower_case }
+  #- { key: readability-identifier-naming.VariableSuffix, value: lower_case }
+  - { key: readability-identifier-naming.TypedefCase, value: CamelCase }
+  #- { key: readability-identifier-naming.TypedefCasePrefix, value: _t }
+  #- { key: readability-identifier-naming.TypedefCaseSuffix, value: _t }
+  - { key: readability-identifier-naming.TypeTemplateParameterCase, value: lower_case }
+  #- { key: readability-identifier-naming.TypeTemplateParameterPrefix, value: _t }
+  - { key: readability-identifier-naming.TypeTemplateParameterSuffix, value: _t }
+  - { key: readability-identifier-naming.TemplateParameterCase, value: lower_case }
+  #- { key: readability-identifier-naming.TemplateParameterPrefix, value: _t }
+  #- { key: readability-identifier-naming.TemplateParameterSuffix, value: _t }
+
+  # Enumerations
+  - { key: readability-identifier-naming.EnumCase, value: lower_case }
+  #- { key: readability-identifier-naming.EnumPrefix, value: _t }
+  - { key: readability-identifier-naming.EnumSuffix, value: _e }
+  - { key: readability-identifier-naming.EnumConstantCase, value: Camel_Snake_Case }
+
+  # Macros, 'using', Typedef
+  - { key: readability-identifier-naming.MacroCase, value: UPPER_CASE }
+  - { key: readability-identifier-naming.TypeAliasCase, value: CamelCase }
+  #- { key: readability-identifier-naming.TypeAliasCasePrefix, value: _t }
+  #- { key: readability-identifier-naming.TypeAliasCaseSuffix, value: _t }
+  - { key: readability-identifier-naming.TypedefCase, value: CamelCase }
+  #- { key: readability-identifier-naming.TypedefCasePrefix, value: _t }
+  #- { key: readability-identifier-naming.TypedefCaseSuffix, value: _t }
+
+  # Constant, static variables
+  - { key: readability-identifier-naming.ConstCase, value: UPPER_CASE }
+
+  # Allowed macros
+  - { key: cppcoreguidelines-macro-usage.AllowedRegexp, value: "ALE_UNEXPECTED_END_OF_INPUT"}
