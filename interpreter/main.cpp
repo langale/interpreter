@@ -29,57 +29,89 @@
  *
  ********************************************************************/
 
-// C++ includes
 #include <iostream>
-#include <optional>
+#include <print>
 
-// ale includes
 #include <ale/lexer/lexer.hpp>
+#include <ale/parser/utils/ParseResult.hpp>
 #include <ale/parser/parser.hpp>
+#include <ale/logger/Logger.hpp>
 
-// interpreter includes
-#include <intlib/program.hpp>
+#include <intlib/Program.hpp>
 
-int main(int argc, char *argv[]) {
+using TokenType = ale::lexer::TokenType;
+using Token = ale::lexer::Token;
+
+int main(int argc, char *argv[])
+{
 	if (argc == 1) {
 		std::cout << "./interpreter filename\n";
 		return 0;
 	}
 
-	std::optional<ale::lexer::token_vector> f =
-		ale::lexer::read_file(argv[1]);
+	std::string filename(argv[1]);
+	const ale::lexer::ReadResult read_res = ale::lexer::read_file(filename);
 
-	if (not f.has_value()) {
-		std::cerr << "File could not be opened.\n";
+	if (not read_res) {
+		const auto& err = read_res.error();
+		std::println("File '{}' could not be opened.", filename);
+		std::println("    Error: {}.", err.error);
 		return 1;
 	}
 
 	auto& l = ale::logger::get_instance();
-	l.use_terminal_stream();
+	l.use_terminal_only();
 
-	std::cout << "File contents: '" << f->get_all_chars() << "'\n";
-	const bool res = ale::lexer::tokenize(*f);
-	if (not res) {
-		std::cerr << "Tokenization failed.\n";
+	const ale::lexer::SuccessfulRead& read = *read_res;
+
+	ale::lexer::TokenizeResult tokenize_res = ale::lexer::tokenize(read);
+	if (not tokenize_res) {
+		const auto& [error, line, character, unmatched_text] =
+			tokenize_res.error();
+
+		std::println("Program could not be tokenized.");
+		std::println("    Error:          {}.", error);
+		std::println("    At line:        {}.", line);
+		std::println("    At character:   {}.", character);
+		std::println("    Next substring: {}.", unmatched_text);
 		return 1;
 	}
 
-	std::cout << "Parsing program...\n";
-	std::optional<std::vector<std::unique_ptr<ale::ast::node>>> instructions =
-		ale::parser::parse_program(*f);
+	ale::lexer::TokenVector& tokvec = *tokenize_res;
 
-	if (not instructions) {
-		std::cerr << "Program could not be parsed.\n";
+	ale::parser::ParseResult parse_res = ale::parser::parse_program(tokvec);
+
+	if (ale::parser::result_is_match_error(parse_res)) {
 		l.force_flush();
+
+		const auto& [rules, errors, messages, program_token_numbers] =
+			std::get<ale::parser::MatchError>(parse_res);
+
+		std::println("Program could not be parsed.");
+
+		size_t num_errors = errors.size();
+		for (size_t i = 0; i < num_errors; ++i) {
+			std::println("Error #{}.", i);
+			std::println("    Type: {}.", errors[i]);
+			std::println("    Message: {}.", messages[i]);
+			std::println("    At rule: {}.", rules[i]);
+			std::println("    At token number: {}.", program_token_numbers[i]);
+			std::println("        Which is token:  {}.", tokvec[TokenType{i}]);
+			std::println("        Whose string is: {}.", tokvec[Token{i}]);
+		}
 		return 1;
 	}
 
-	interpreter::program p;
-	p.add_instructions(std::move(*instructions));
+	auto m = std::move(std::get<ale::parser::MatchedRule>(parse_res));
+
+	intlib::Program p;
+	p.add_instructions(std::move(m.node));
 
 	std::cout << "---------------\n";
 	std::cout << "Program's evaluation:\n";
-	p.run_program(ale::output());
 
-	p.clear();
+
+	std::ofstream fout;
+	ale::logger::Stream stream(true, false, true, std::cout, fout);
+	p.run_program(stream);
 }

@@ -21,7 +21,7 @@ function(configure_interpreter_executable executable)
 	
 	# Interpreter lib
 	target_link_libraries(${executable} ${INTERPRETER_LIB_DIR}/lib${INTERPRETER_LIB_NAME}.so)
-	target_link_libraries(${executable} ${ALE_LIB_DIR}/ale/lib${ALE_LIB_NAME}.so)
+	target_link_libraries(${executable} ${ALE_LIB_DIR}/lib${ALE_LIB_NAME}.so)
 
 	configure_executable(${executable})
 
