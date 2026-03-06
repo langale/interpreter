@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 	auto m = std::move(std::get<ale::parser::MatchedRule>(parse_res));
 
 	intlib::Program p;
-	p.add_instructions(std::move(m.node));
+	p.set_program_node(std::move(m.node));
 
 	std::cout << "---------------\n";
 	std::cout << "Program's evaluation:\n";
