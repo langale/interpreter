@@ -6,7 +6,7 @@
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
  *
- *     https://github.com/lluisalemanypuig/alelang
+ *     https://github.com/langale/interpreter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
