@@ -41,17 +41,22 @@
 namespace intlib {
 namespace detail {
 
-[[nodiscard]]
-inline std::optional<bool> any_to_bool
-(const std::any& a)
-noexcept
+[[nodiscard]] inline std::optional<bool> any_to_bool(const std::any& a) noexcept
 {
-	if (detail::is_type<bool>(a)) { return std::any_cast<bool>(a); }
-	if (detail::is_type<int64_t>(a)) { return std::any_cast<int64_t>(a); }
-	if (detail::is_type<uint64_t>(a)) { return std::any_cast<uint64_t>(a); }
-	if (detail::is_type<double>(a)) { return detail::to_int64(std::any_cast<double>(a)); }
+	if (detail::is_type<bool>(a)) {
+		return std::any_cast<bool>(a);
+	}
+	if (detail::is_type<int64_t>(a)) {
+		return std::any_cast<int64_t>(a);
+	}
+	if (detail::is_type<uint64_t>(a)) {
+		return std::any_cast<uint64_t>(a);
+	}
+	if (detail::is_type<double>(a)) {
+		return to_int64(std::any_cast<double>(a));
+	}
 	return {};
 }
 
-} // -- namespace detail
-} // -- namespace intlib
+} // namespace detail
+} // namespace intlib

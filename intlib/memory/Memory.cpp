@@ -38,9 +38,7 @@ namespace memory {
 
 /* MODIFIERS */
 
-void Memory::declare_variable
-(std::string&& s, std::any&& v)
-noexcept
+void Memory::declare_variable(std::string&& s, std::any&& v) noexcept
 {
 	if (is_current_scope_global()) {
 		m_global_scope.declare_variable(std::move(s), std::move(v));
@@ -50,26 +48,28 @@ noexcept
 	}
 }
 
-void Memory::declare_constant_variable
-(std::string&& s, std::any&& v)
-noexcept
+void Memory::declare_constant_variable(std::string&& s, std::any&& v) noexcept
 {
 	if (is_current_scope_global()) {
 		m_global_scope.declare_constant_variable(std::move(s), std::move(v));
 	}
 	else {
-		m_local_scopes.top().declare_constant_variable(std::move(s), std::move(v));
+		m_local_scopes.top().declare_constant_variable(
+			std::move(s), std::move(v)
+		);
 	}
 }
 
+void Memory::set_variable_value(const std::string&, std::any&&) noexcept { }
+
 /* GETTERS */
 
-std::optional<VariableValue> Memory::get_variable
-(const std::string& s)
-const noexcept
+std::optional<VariableValue>
+Memory::get_variable(const std::string& s) const noexcept
 {
 	if (num_local_scopes() > 0) {
-		std::optional<VariableValue> scoped = m_local_scopes.top().get_variable(s);
+		std::optional<VariableValue> scoped =
+			m_local_scopes.top().get_variable(s);
 		if (scoped.has_value()) {
 			return scoped;
 		}
@@ -82,22 +82,16 @@ const noexcept
 	return {};
 }
 
-bool Memory::variable_exists
-(const std::string& s)
-const noexcept
+bool Memory::variable_exists(const std::string& s) const noexcept
 {
 	if (is_current_scope_global()) {
 		return m_global_scope.variable_exists(s);
 	}
-	return
-		m_local_scopes.top().variable_exists(s)
-		or
-		m_global_scope.variable_exists(s);
+	return m_local_scopes.top().variable_exists(s) or
+		   m_global_scope.variable_exists(s);
 }
 
-bool Memory::variable_exists_shallow
-(const std::string& s)
-const noexcept
+bool Memory::variable_exists_shallow(const std::string& s) const noexcept
 {
 	if (is_current_scope_global()) {
 		return m_global_scope.variable_exists_shallow(s);
@@ -105,5 +99,5 @@ const noexcept
 	return m_local_scopes.top().variable_exists_shallow(s);
 }
 
-} // -- namespace memory
-} // -- namespace intlib
+} // namespace memory
+} // namespace intlib
