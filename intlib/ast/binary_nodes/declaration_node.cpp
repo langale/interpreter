@@ -45,6 +45,7 @@ bool Program::retrieve_variable_names_in_declaration(
 	const ale::ast::SequenceNode& seq, std::vector<std::string>& names
 )
 {
+	/*
 	ale::utils::SequenceNodeIterator iter_seq = make_iterator(seq);
 
 	while (not iter_seq.end()) {
@@ -60,6 +61,7 @@ bool Program::retrieve_variable_names_in_declaration(
 		names.push_back(std::move(var_name));
 		iter_seq.next_indices();
 	}
+	*/
 
 	return true;
 }
@@ -69,6 +71,7 @@ bool Program::retrieve_variable_names_in_declaration(
 	std::vector<std::string>& names
 )
 {
+	/*
 	ale::ast::NAryNodeIterator iter(group);
 
 	while (not iter.end()) {
@@ -102,10 +105,11 @@ bool Program::retrieve_variable_names_in_declaration(
 			return false;
 		}
 	}
+	*/
 	return true;
 }
 
-std::optional<std::any> Program::evaluate(const ale::ast::DeclarationNode& v)
+EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 {
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
@@ -114,6 +118,7 @@ std::optional<std::any> Program::evaluate(const ale::ast::DeclarationNode& v)
 	assert(left_child != nullptr);
 #endif
 
+	/*
 	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
 		std::string var_name =
 			static_cast<ale::ast::VariableNode *>(left_child.get())
@@ -274,6 +279,7 @@ std::optional<std::any> Program::evaluate(const ale::ast::DeclarationNode& v)
 	// ale::error() << "        - a variable sequence\n";
 	// ale::error() << "    Found: '"
 	// 			 << node_type_to_string(left_child->get_node_type()) << "'\n";
+	*/
 	return {};
 }
 

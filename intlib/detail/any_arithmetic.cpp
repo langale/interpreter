@@ -44,7 +44,7 @@ namespace intlib {
 namespace detail {
 
 std::optional<std::any> any_arithmetic(
-	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
+	const ale::ast::node_type_e t, const std::any& a, const std::any& b
 )
 {
 	switch (t) {

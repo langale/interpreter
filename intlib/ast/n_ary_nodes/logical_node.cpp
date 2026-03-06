@@ -35,15 +35,15 @@
 #include <ranges>
 #include <any>
 
-#include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
+#include <ale/logger/macros.hpp>
 
+#include <intlib/detail/any_type.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
-[[nodiscard]] bool compute_logical_expression(
-	const ale::ast::node_type_e& t, const bool l, const bool r
+[[nodiscard]] static bool compute_logical_expression(
+	const ale::ast::node_type_e t, const bool l, const bool r
 )
 {
 	if (t == ale::ast::node_type_e::Logical_And) {
@@ -52,12 +52,16 @@ namespace intlib {
 	if (t == ale::ast::node_type_e::Logical_Or) {
 		return l or r;
 	}
-	// ale::error() << ERROR_LOCATION << '\n';
-	// ale::error() << "    Wrong type of node type '" << t << "'.\n";
+
+	ALE_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
+#if defined DEBUG
+	assert(false);
+#endif
+
 	return false;
 }
 
-[[nodiscard]] bool break_when(const ale::ast::node_type_e& t)
+[[nodiscard]] static bool break_when(const ale::ast::node_type_e t)
 {
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return false;
@@ -65,98 +69,77 @@ namespace intlib {
 	if (t == ale::ast::node_type_e::Logical_Or) {
 		return true;
 	}
-	// ale::error() << ERROR_LOCATION << '\n';
-	// ale::error() << "    Wrong type of node type '" << t << "'.\n";
+
+	ALE_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
+#if defined DEBUG
+	assert(false);
+#endif
+
 	return false;
 }
 
-std::optional<bool> Program::evaluate_logical_node(
+EvaluationResult Program::evaluate_logical_node(
 	const ale::ast::LogicalNode& v,
-	const ale::ast::node_type_e& t,
+	const ale::ast::node_type_e t,
 	const std::unique_ptr<ale::ast::Node>& c
 )
 {
-	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
-
-		const bool when_to_break = break_when(t);
-		const ale::ast::SequenceNode& seq =
-			static_cast<const ale::ast::SequenceNode&>(*c.get());
-
-		ale::utils::SequenceNodeIterator iter = make_iterator(seq);
-
-		bool eval = not when_to_break;
-		bool first = true;
-
-		while ((eval != when_to_break) and not iter.end()) {
-			const std::vector<int64_t>& current = iter.get_current_indices();
-			const std::string var = seq.make_variable_name(current);
-
-			const std::optional<std::any> opt_value = get_variable_value(var);
-			if (not opt_value.has_value()) {
-				return {};
-			}
-
-			const std::any& value = *opt_value;
-			const bool val = std::any_cast<bool>(value);
-			if (first) {
-				eval = val;
-				first = false;
-			}
-			else {
-				eval = compute_logical_expression(t, eval, val);
-			}
-
-			iter.next_indices();
-		}
-		return {eval};
+	EvaluationResult res = interpret_node(c);
+	if (not res) {
+		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		return append_error(
+			std::move(res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			"Node evaluation failed"
+		);
 	}
 
-	const std::optional<std::any> res = interpret_node(c);
-	if (not res.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error()
-		// 	<< "    Evaluation of node failed in logical node '"
-		// 	<< v.get_operation_string()
-		// 	<< "'.\n";
-		return {};
-	}
-	const std::any& r = *res;
+	std::any r = std::move(*res);
 	if (not detail::is_type<bool>(r)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Evaluation of node is not a Boolean value.\n";
-		return {};
+		ALE_PRINT_LOC(
+			ale::logger::println, "Evaluation of node is not a Boolean value."
+		);
+		return append_error(
+			std::move(res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			"Evaluation of node is not a Boolean value."
+		);
 	}
-	return std::any_cast<bool>(r);
+	return r;
 }
 
-std::optional<std::any> Program::evaluate(
-	const ale::ast::LogicalNode& v, const ale::ast::node_type_e& t
-)
+EvaluationResult
+Program::evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e t)
 {
 	const auto& children = v.get_children();
 
-	const std::optional<bool> rc = evaluate_logical_node(v, t, children[0]);
-	if (not rc.has_value()) {
-		return {};
+	EvaluationResult rc = evaluate_logical_node(v, t, children[0]);
+	if (not rc) {
+		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		return rc.error();
 	}
 
 	const bool when_to_break = break_when(t);
 
-	bool r = *rc;
+	bool rc_value = std::any_cast<bool>(*rc);
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
-		if (r == when_to_break) {
+
+		if (rc_value == when_to_break) {
 			break;
 		}
 
-		const std::optional<bool> rv = evaluate_logical_node(v, t, c);
-		if (not rv.has_value()) {
-			return {};
+		EvaluationResult rv = evaluate_logical_node(v, t, c);
+		if (not rv) {
+			ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+			return rc.error();
 		}
 
-		r = compute_logical_expression(t, r, *rv);
+		bool rv_value = std::any_cast<bool>(*rv);
+		rc_value = compute_logical_expression(t, rc_value, rv_value);
 	}
-	return r;
+
+	return rc_value;
 }
 
 } // namespace intlib

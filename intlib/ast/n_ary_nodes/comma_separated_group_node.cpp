@@ -31,18 +31,26 @@
  *
  ********************************************************************/
 
-#include <ale/logger/Logger.hpp>
+#include <ale/logger/macros.hpp>
+#include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
 
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::CommaSeparatedGroupNode&)
+EvaluationResult Program::evaluate(const ale::ast::CommaSeparatedGroupNode& v)
 {
-	// ale::error() << ERROR_LOCATION << '\n';
-	// ale::error() << "    Comma-separated group nodes cannot be evaluated.\n";
-	return {};
+	ALE_PRINT_LOC2(
+		ale::logger::println,
+		"Cannot evaluate nodes of type '{}'.",
+		v.get_node_type()
+	);
+	return EvaluationError{
+		.error = {evaluation_error_e::Forbidden_Evaluation_Of_Node},
+		.message = {std::format(
+			"Cannot evaluate nodes of type '{}'.", v.get_node_type()
+		)}
+	};
 }
 
 } // namespace intlib

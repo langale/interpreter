@@ -67,7 +67,7 @@ any_arithmetic_subtraction(const std::any& a, const std::any& b);
 
 /// Computes two std::any according to the type of node
 [[nodiscard]] std::optional<std::any> any_arithmetic(
-	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
+	const ale::ast::node_type_e t, const std::any& a, const std::any& b
 );
 
 } // namespace detail

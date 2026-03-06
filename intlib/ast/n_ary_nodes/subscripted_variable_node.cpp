@@ -32,7 +32,11 @@
  ********************************************************************/
 
 #include <optional>
+#include <ranges>
 #include <any>
+
+#include <ale/logger/Logger.hpp>
+#include <ale/logger/macros.hpp>
 
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
@@ -42,17 +46,19 @@
 
 namespace intlib {
 
-std::string
+std::optional<std::string>
 Program::make_full_variable_name(const ale::ast::SubscriptedVariableNode& v)
 {
-	// using ale::detail::operator<<;
-
 	std::string full_variable_name = v.get_variable_name();
-	for (const auto& c : v.get_children()) {
-		const std::optional<std::any> res = interpret_node(c);
-		if (not res.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of subscript node failed.\n";
+	for (const auto& [i, c] : v.get_children() | std::views::enumerate) {
+		const EvaluationResult res = interpret_node(c);
+		if (not res) {
+			ALE_PRINT_LOC2(
+				ale::logger::println,
+				"Failed evaluation of child {} of subscripted variable {}.",
+				i,
+				v.get_variable_name()
+			);
 			return {};
 		}
 		const std::any& r = *res;
@@ -60,37 +66,42 @@ Program::make_full_variable_name(const ale::ast::SubscriptedVariableNode& v)
 		const bool is_uint64 = detail::is_type<uint64_t>(r);
 		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of subscript is not an unsigned "
-			// 				"integer value.\n";
-			// ale::error() << "    Result: '" << r << "'.\n";
+			ALE_PRINT_LOC2(
+				ale::logger::println,
+				"Evaluation of child {} of subscripted variable {} is not an "
+				"integral number.",
+				i,
+				v.get_variable_name()
+			);
 			return {};
 		}
 
 		if (is_uint64) {
-			const uint64_t j = std::any_cast<uint64_t>(r);
+			const auto j = std::any_cast<uint64_t>(r);
 			full_variable_name += "_" + std::to_string(j);
 		}
 		else {
-			const int64_t j = std::any_cast<int64_t>(r);
+			const auto j = std::any_cast<int64_t>(r);
 			full_variable_name += "_" + std::to_string(j);
 		}
 	}
 	return full_variable_name;
 }
 
-std::vector<int64_t>
+std::optional<std::vector<int64_t>>
 Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v)
 {
-	// using ale::detail::operator<<;
-
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
 	for (const auto& c : v.get_children()) {
 		const std::optional<std::any> res = interpret_node(c);
 		if (not res.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of subscript node failed.\n";
+			ALE_PRINT_LOC2(
+				ale::logger::println,
+				"Failed evaluation of child {} of subscripted variable {}.",
+				i,
+				v.get_variable_name()
+			);
 			return {};
 		}
 
@@ -98,10 +109,13 @@ Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v)
 		const bool is_uint64 = detail::is_type<uint64_t>(r);
 		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of subscript is not an unsigned "
-			// 				"integer value.\n";
-			// ale::error() << "    Result: '" << r << "'.\n";
+			ALE_PRINT_LOC2(
+				ale::logger::println,
+				"Evaluation of child {} of subscripted variable {} is not an "
+				"integral number.",
+				i,
+				v.get_variable_name()
+			);
 			return {};
 		}
 
@@ -117,16 +131,44 @@ Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v)
 	return indices;
 }
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
+EvaluationResult Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
 {
-	const std::string full_variable_name = make_full_variable_name(v);
-	if (not m_memory.variable_exists(full_variable_name)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Variable '" << full_variable_name
-		// 			 << "' does not exist in this scope.\n";
-		return {};
+	const std::optional<std::string> full_variable_name_w =
+		make_full_variable_name(v);
+
+	if (not full_variable_name_w) {
+		ALE_PRINT_LOC2(
+			ale::logger::println,
+			"Full variable name of subscripted variable {} could not be "
+			"retrieved.",
+			v.get_variable_name()
+		);
+		return EvaluationError{
+			.error = {evaluation_error_e::Valueless_Variable},
+			.message = {std::format(
+				"Full variable name of subscripted variable {} could not be "
+				"retrieved.",
+				v.get_variable_name()
+			)}
+		};
 	}
+
+	const std::string& full_variable_name = *full_variable_name_w;
+	if (not m_memory.variable_exists(full_variable_name)) {
+		ALE_PRINT_LOC2(
+			ale::logger::println,
+			"Variable '{}' is not defined in this scope.",
+			full_variable_name
+		);
+		return EvaluationError{
+			.error = {evaluation_error_e::Valueless_Variable},
+			.message = {std::format(
+				"Variable '{}' is not defined in this scope.",
+				full_variable_name
+			)}
+		};
+	}
+
 	std::optional<memory::VariableValue> res =
 		m_memory.get_variable(full_variable_name);
 #if defined DEBUG
@@ -134,10 +176,15 @@ Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
 #endif
 
 	if (detail::is_type<void>(res->value)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Variable '" << full_variable_name
-		// 			 << "' has no value in the current scope.\n";
-		return {};
+		ALE_PRINT_LOC2(
+			ale::logger::println, "Variable '{}' has no value.", full_variable_name
+		);
+		return EvaluationError{
+			.error = {evaluation_error_e::Valueless_Variable},
+			.message = {
+				std::format("Variable '{}' has no value.", full_variable_name)
+			}
+		};
 	}
 
 	return std::move(res->value);

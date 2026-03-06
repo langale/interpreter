@@ -50,11 +50,11 @@
 
 namespace intlib {
 
-// using ale::detail::operator<<;
-
-std::optional<std::any> Program::first_value
-(const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c)
+EvaluationResult Program::first_value(
+	const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c
+)
 {
+	/*
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& vv =
 			static_cast<const ale::ast::SequenceNode&>(*c.get());
@@ -81,11 +81,16 @@ std::optional<std::any> Program::first_value
 		return {};
 	}
 	return value;
+	*/
+
+	return true;
 }
 
-std::optional<std::any> Program::last_value
-(const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c)
+EvaluationResult Program::last_value(
+	const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c
+)
 {
+	/*
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& vv =
 			static_cast<const ale::ast::SequenceNode&>(*c.get());
@@ -112,64 +117,16 @@ std::optional<std::any> Program::last_value
 		return {};
 	}
 	return value;
+	*/
+
+	return true;
 }
 
-std::optional<bool> Program::evaluate_variable_sequence_in_comparison
-(
-	const ale::ast::ComparisonNode& v,
-	const ale::ast::node_type_e& t,
-	const std::unique_ptr<ale::ast::Node>& c
+EvaluationResult Program::evaluate(
+	const ale::ast::ComparisonNode& v, const ale::ast::node_type_e t
 )
 {
-#if defined DEBUG
-	assert(c->get_node_type() == ale::ast::node_type_e::Sequence);
-#endif
-
-	const ale::ast::SequenceNode& vv = static_cast<const ale::ast::SequenceNode&>(*c.get());
-	ale::utils::SequenceNodeIterator iter = make_iterator(vv);
-
-	bool eval = true;
-	bool first = true;
-
-	std::optional<std::any> previous;
-	while (eval and not iter.end()) {
-		const std::vector<int64_t>& current_idx = iter.get_current_indices();
-		const std::string var = vv.make_variable_name(current_idx);
-
-		std::optional<std::any> current = get_variable_value(var);
-		if (not current.has_value()) {
-			return {};
-		}
-
-		if (first) [[unlikely]] {
-			previous = current;
-			first = false;
-		}
-		else [[likely]] {
-			const std::optional<bool> res = detail::any_comparison(t, *previous, *current);
-			if (not res.has_value()) {
-				// ale::error() << ERROR_LOCATION << '\n';
-				// ale::error()
-				// 	<< "    No pair was matched for '"
-				// 	<< v.get_operation_string()
-				// 	<< "' comparison.\n";
-				// ale::error() << "    Left:  " << *previous << '\n';
-				// ale::error() << "    Right: " << *current << '\n';
-				return {};
-			}
-
-			eval = *res;
-			previous = std::move(current);
-		}
-		iter.next_indices();
-	}
-
-	return eval;
-}
-
-std::optional<std::any> Program::evaluate
-(const ale::ast::ComparisonNode& v, const ale::ast::node_type_e& t)
-{
+	/*
 	const auto& children = v.get_children();
 
 #if defined DEBUG
@@ -177,7 +134,8 @@ std::optional<std::any> Program::evaluate
 #endif
 
 	if (children[0]->get_node_type() == ale::ast::node_type_e::Sequence) {
-		const std::optional<bool> res = evaluate_variable_sequence_in_comparison(v, t, children[0]);
+		const std::optional<bool> res =
+			evaluate_variable_sequence_in_comparison(v, t, children[0]);
 		if (not res.has_value()) {
 			return {};
 		}
@@ -201,7 +159,8 @@ std::optional<std::any> Program::evaluate
 		return {};
 	}
 
-	for (const std::unique_ptr<ale::ast::Node>& c : children | std::views::drop(1)) {
+	for (const std::unique_ptr<ale::ast::Node>& c :
+		 children | std::views::drop(1)) {
 		std::optional<std::any> current = first_value(v, c);
 		if (not current.has_value()) {
 			// ale::error() << ERROR_LOCATION << '\n';
@@ -213,24 +172,26 @@ std::optional<std::any> Program::evaluate
 		}
 
 		{
-		const std::optional<bool> comparison_result = detail::any_comparison(t, *previous, *current);
-		if (not comparison_result.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error()
-			// 	<< "    No pair was matched for '"
-			// 	<< v.get_operation_string()
-			// 	<< "' comparison.\n";
-			// ale::error() << "    Left:  " << *previous << '\n';
-			// ale::error() << "    Right: " << *current << '\n';
-			return {};
-		}
-		if (not *comparison_result) {
-			return false;
-		}
+			const std::optional<bool> comparison_result =
+				detail::any_comparison(t, *previous, *current);
+			if (not comparison_result.has_value()) {
+				// ale::error() << ERROR_LOCATION << '\n';
+				// ale::error()
+				// 	<< "    No pair was matched for '"
+				// 	<< v.get_operation_string()
+				// 	<< "' comparison.\n";
+				// ale::error() << "    Left:  " << *previous << '\n';
+				// ale::error() << "    Right: " << *current << '\n';
+				return {};
+			}
+			if (not *comparison_result) {
+				return false;
+			}
 		}
 
 		if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
-			std::optional<bool> res = evaluate_variable_sequence_in_comparison(v, t, c);
+			std::optional<bool> res =
+				evaluate_variable_sequence_in_comparison(v, t, c);
 			if (not res.has_value()) {
 				return {};
 			}
@@ -244,8 +205,9 @@ std::optional<std::any> Program::evaluate
 			previous = std::move(current);
 		}
 	}
+	*/
 
 	return true;
 }
 
-} // -- namespace intlib
+} // namespace intlib

@@ -43,7 +43,7 @@
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::ProgramNode&)
+EvaluationResult Program::evaluate(const ale::ast::ProgramNode&)
 {
 	return {};
 }

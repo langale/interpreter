@@ -93,6 +93,8 @@ template <typename type_t>
 	else {
 		static_assert(false);
 	}
+
+	return false;
 }
 
 /**
@@ -108,10 +110,6 @@ template <typename type_t>
 	const std::string name = demangle_name_type(a.type().name());
 	return is_type<type_t>(name);
 }
-
-#define UNHANDLED_ANY(os, a)                                                   \
-	os << ERROR_LOCATION << "Unhandled type '" << intlib::detail::get_name(a)  \
-	   << "'.\n"
 
 } // namespace detail
 } // namespace intlib

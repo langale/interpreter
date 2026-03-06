@@ -31,8 +31,6 @@
  *
  ********************************************************************/
 
-#pragma once
-
 #include <intlib/evaluation_error_enum.hpp>
 #include <intlib/EvaluationResult.hpp>
 

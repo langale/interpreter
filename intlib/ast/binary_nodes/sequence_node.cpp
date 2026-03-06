@@ -31,7 +31,7 @@
  *
  ********************************************************************/
 
-#include <ale/logger/Logger.hpp>
+#include <ale/logger/macros.hpp>
 
 #include <intlib/Program.hpp>
 
@@ -40,6 +40,7 @@ namespace intlib {
 ale::utils::SequenceNodeIterator
 Program::make_iterator(const ale::ast::SequenceNode& seq)
 {
+	/*
 	const auto& left_child = seq.get_left_child();
 	const auto& right_child = seq.get_right_child();
 #if defined DEBUG
@@ -64,40 +65,39 @@ Program::make_iterator(const ale::ast::SequenceNode& seq)
 			*right_child.get()
 		)
 	);
-	return ale::utils::SequenceNodeIterator(
-		std::move(first_indices), std::move(last_indices)
-	);
+	*/
+
+	return ale::utils::SequenceNodeIterator({}, {});
 }
 
 std::optional<std::any>
 Program::get_variable_value(const std::string& var) const
 {
 	if (not m_memory.variable_exists(var)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error()
-		// 	<< "    Trying to use an undeclared variable '"
-		// 	<< var
-		// 	<< "'.\n";
+		ALE_PRINT_LOC2(
+			ale::logger::println, "Trying to use undeclared variable {}.", var
+		);
 		return {};
 	}
 
 	std::optional<memory::VariableValue> variable_value =
 		m_memory.get_variable(var);
+
 	if (not variable_value.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Variable '" << var << "' exists but it has no value.\n";
+		ALE_PRINT_LOC2(
+			ale::logger::println,
+			"Variable {} exists but it does not have a value.",
+			var
+		);
 		return {};
 	}
 
 	return std::move(variable_value->value);
 }
 
-std::optional<std::any> Program::evaluate(const ale::ast::SequenceNode& v)
+EvaluationResult Program::evaluate(const ale::ast::SequenceNode& v)
 {
-	// ale::error() << ERROR_LOCATION << '\n';
-	// ale::error()
-	// 	<< "    Nodes of type '" << ale::ast::node_type_e_to_string(v.get_node_type())
-	// 	<< "' cannot be evaluated.\n";
+
 	return {};
 }
 

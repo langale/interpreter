@@ -44,8 +44,8 @@
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(
-	const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e& t
+EvaluationResult Program::evaluate(
+	const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e t
 )
 {
 	const auto& children = v.get_children();
@@ -53,6 +53,7 @@ std::optional<std::any> Program::evaluate(
 	assert(children.size() >= 2);
 #endif
 
+	/*
 	const auto node_eval =
 		[&](const std::unique_ptr<ale::ast::Node>& c) -> std::optional<std::any>
 	{
@@ -92,7 +93,9 @@ std::optional<std::any> Program::evaluate(
 			return {};
 		}
 	}
-	return r;
+	*/
+
+	return 100;
 }
 
 } // namespace intlib

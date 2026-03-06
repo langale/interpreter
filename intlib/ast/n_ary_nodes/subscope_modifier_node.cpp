@@ -31,36 +31,38 @@
  *
  ********************************************************************/
 
-#include <optional>
 #include <any>
 
-#include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
+#include <ale/logger/macros.hpp>
 
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::SubscopeModifierNode& v)
+EvaluationResult Program::evaluate(const ale::ast::SubscopeModifierNode& v)
 {
-	// using ale::detail::operator<<;
-
 	m_memory.get_current_scope().push_subscope();
 	for (const auto& w : v.get_children()) {
-		const std::optional<std::any> r = interpret_node(w);
-		if (not r.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of node failed.\n";
-			return {};
+		EvaluationResult r = interpret_node(w);
+		if (not r) {
+			ALE_PRINT_LOC(ale::logger::println, "Evaluation of node failed.");
+			return append_error(
+				std::move(r.error()),
+				evaluation_error_e::Evaluation_Of_Node_Failed,
+				"Node evaluation failed"
+			);
 		}
+
 		const std::any& value = *r;
 		if (value.has_value()) {
-			// ale::output() << value << '\n';
+			ALE_PRINT_LOC(
+				ale::logger::println,
+				"Potentially-ignored return value or expression."
+			);
 		}
 	}
 	m_memory.get_current_scope().pop_subscope();
-	return std::any{};
+	return {};
 }
 
 } // namespace intlib

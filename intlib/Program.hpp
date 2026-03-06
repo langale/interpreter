@@ -101,7 +101,22 @@ public:
 	 * @param node The program node.
 	 * @post Ownership of @e n is taken by this class.
 	*/
-	void add_instructions(std::unique_ptr<ale::ast::Node>&& node) noexcept;
+	void set_program_node(std::unique_ptr<ale::ast::Node>&& node) noexcept
+	{
+		m_program_node = std::move(node);
+	}
+
+	/* GETTERS */
+
+	/**
+	 * @brief Adds a list of instructions to the Program.
+	 * @returns A constant reference to the main node of this program.
+	*/
+	[[nodiscard]] const std::unique_ptr<ale::ast::Node>&
+	get_program_node() noexcept
+	{
+		return m_program_node;
+	}
 
 	/* OTHER */
 
@@ -110,8 +125,6 @@ public:
 
 	/// Output a Program in a tree (AST) format to an output stream.
 	void print_tree(ale::logger::Stream& os) const;
-
-private:
 
 	/// Calls the appropriate 'evaluate' function for @e v.
 	template <typename node_t, typename... params_t>
@@ -215,60 +228,50 @@ private:
 			break;
 		}
 
-		return std::unexpected{EvaluationError{
-			*v,
-			evaluation_error_e::Unhandled_Node_Type,
-			std::format("Unhandled node type {}.", v->get_node_type())
-		}};
+		return EvaluationError{
+			.error = {evaluation_error_e::Unhandled_Node_Type},
+			.message = {
+				std::format("Unhandled node type {}.", v->get_node_type())
+			}
+		};
 	}
-
-private:
 
 	[[nodiscard]] std::optional<std::any>
 	get_variable_value(const std::string& var) const;
 
-private:
-
 	/* n-ary nodes */
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e& t);
+	[[nodiscard]] EvaluationResult
+	evaluate(const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e t);
 
-	[[nodiscard]] std::optional<bool> evaluate_variable_sequence_in_comparison(
-		const ale::ast::ComparisonNode& v,
-		const ale::ast::node_type_e& t,
-		const std::unique_ptr<ale::ast::Node>& c
-	);
+	[[nodiscard]] EvaluationResult
+	evaluate(const ale::ast::ComparisonNode& v, const ale::ast::node_type_e t);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::ComparisonNode& v, const ale::ast::node_type_e& t);
-
-	[[nodiscard]] std::optional<bool> evaluate_logical_node(
+	[[nodiscard]] EvaluationResult evaluate_logical_node(
 		const ale::ast::LogicalNode& v,
-		const ale::ast::node_type_e& t,
+		const ale::ast::node_type_e t,
 		const std::unique_ptr<ale::ast::Node>& c
 	);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e& t);
+	[[nodiscard]] EvaluationResult
+	evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e t);
 
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	evaluate(const ale::ast::CommaSeparatedGroupNode& v);
 
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	evaluate(const ale::ast::SubscopeModifierNode& v);
 
-	[[nodiscard]] std::vector<int64_t>
+	[[nodiscard]] std::optional<std::vector<int64_t>>
 	get_index_sequence(const ale::ast::SubscriptedVariableNode& v);
 
-	[[nodiscard]] std::string
+	[[nodiscard]] std::optional<std::string>
 	make_full_variable_name(const ale::ast::SubscriptedVariableNode& v);
 
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	evaluate(const ale::ast::SubscriptedVariableNode& v);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::ProgramNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::ProgramNode& v);
 
 	/* ternary nodes */
 
@@ -285,8 +288,7 @@ private:
 		std::vector<std::string>& names
 	);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::AssignationNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::AssignationNode& v);
 
 	[[nodiscard]] bool retrieve_variable_names_in_declaration(
 		const ale::ast::SequenceNode& seq, std::vector<std::string>& names
@@ -297,15 +299,14 @@ private:
 		std::vector<std::string>& names
 	);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::DeclarationNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::DeclarationNode& v);
 
-	[[nodiscard]] std::optional<std::any> first_value(
+	[[nodiscard]] EvaluationResult first_value(
 		const ale::ast::ComparisonNode& v,
 		const std::unique_ptr<ale::ast::Node>& c
 	);
 
-	[[nodiscard]] std::optional<std::any> last_value(
+	[[nodiscard]] EvaluationResult last_value(
 		const ale::ast::ComparisonNode& v,
 		const std::unique_ptr<ale::ast::Node>& c
 	);
@@ -313,11 +314,9 @@ private:
 	[[nodiscard]] ale::utils::SequenceNodeIterator
 	make_iterator(const ale::ast::SequenceNode& v);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::SequenceNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::SequenceNode& v);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::WhileLoopNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::WhileLoopNode& v);
 
 	/* unary nodes */
 

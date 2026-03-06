@@ -43,6 +43,7 @@ bool Program::retrieve_variable_names_in_assignation(
 	const ale::ast::SequenceNode& seq, std::vector<std::string>& names
 )
 {
+	/*
 	ale::utils::SequenceNodeIterator iter_seq = make_iterator(seq);
 
 	while (not iter_seq.end()) {
@@ -71,6 +72,7 @@ bool Program::retrieve_variable_names_in_assignation(
 		names.push_back(std::move(var_name));
 		iter_seq.next_indices();
 	}
+	*/
 
 	return true;
 }
@@ -80,6 +82,7 @@ bool Program::retrieve_variable_names_in_assignation(
 	std::vector<std::string>& names
 )
 {
+	/*
 	ale::ast::NAryNodeIterator iter(group);
 
 	while (not iter.end()) {
@@ -135,10 +138,11 @@ bool Program::retrieve_variable_names_in_assignation(
 			return false;
 		}
 	}
+	*/
 	return true;
 }
 
-std::optional<std::any> Program::evaluate(const ale::ast::AssignationNode& v)
+EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 {
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
@@ -148,6 +152,7 @@ std::optional<std::any> Program::evaluate(const ale::ast::AssignationNode& v)
 	assert(right_child != nullptr);
 #endif
 
+	/*
 	std::optional<std::any> value = interpret_node(right_child);
 	if (not value.has_value()) {
 		// ale::error() << ERROR_LOCATION << '\n';
@@ -271,6 +276,8 @@ std::optional<std::any> Program::evaluate(const ale::ast::AssignationNode& v)
 	// ale::error() << "        - a variable sequence\n";
 	// ale::error() << "        - a subscripted variable\n";
 	// ale::error() << "    Found: '" << left_child->get_node_type() << "'\n";
+	*/
+
 	return {};
 }
 

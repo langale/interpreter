@@ -34,43 +34,50 @@
 #include <optional>
 #include <any>
 
-#include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
+#include <ale/logger/macros.hpp>
 
 #include <intlib/Program.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::WhileLoopNode& v)
+EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 {
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
 
-	// using ale::detail::operator<<;
-
 	if (left_child == nullptr) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Condition node of while loop is null.\n";
+		ALE_PRINT_LOC(
+			ale::logger::println, "Condition in while loop is missing."
+		);
 		return {};
 	}
 
 	bool stop = false;
 	while (not stop) {
-
-		const std::optional<std::any> cond = interpret_node(left_child);
-		if (not cond.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of while loop condition failed.\n";
-			return {};
+		EvaluationResult cond = interpret_node(left_child);
+		if (not cond) {
+			ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+			return append_error(
+				std::move(cond.error()),
+				evaluation_error_e::Evaluation_Of_Node_Failed,
+				"Node evaluation failed"
+			);
 		}
 
 		const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
-		if (not cond_bool.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Condition of while loop could not be converted into a Boolean value.\n";
-			// ale::error() << "    Evaluation: " << *cond << '\n';
-			return {};
+		if (not cond_bool) {
+			ALE_PRINT_LOC(
+				ale::logger::println,
+				"Could not convert value in while loop condition to a Boolean "
+				"value."
+			);
+			return append_error(
+				std::move(cond.error()),
+				evaluation_error_e::Conversion_To_Bool_Failed,
+				"Could not convert value in while loop condition to a Boolean "
+				"value."
+			);
 		}
 
 		stop = not *cond_bool;
@@ -80,11 +87,17 @@ std::optional<std::any> Program::evaluate(const ale::ast::WhileLoopNode& v)
 				continue;
 			}
 
-			const std::optional<std::any> r = interpret_node(right_child);
-			if (not r.has_value()) {
-				// ale::error() << ERROR_LOCATION << '\n';
-				// ale::error() << "    Evaluation of while loop body.\n";
-				return {};
+			EvaluationResult r = interpret_node(right_child);
+			if (not r) {
+				ALE_PRINT_LOC(
+					ale::logger::println,
+					"Evaluation of while loop body failed."
+				);
+				return append_error(
+					std::move(cond.error()),
+					evaluation_error_e::Evaluation_Of_Node_While_Loop_Failed,
+					"Evaluation of while loop body failed."
+				);
 			}
 		}
 	}

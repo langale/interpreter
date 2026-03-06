@@ -45,6 +45,12 @@ enum class evaluation_error_e : uint8_t {
 	Valueless_Variable,
 
 	Evaluation_Of_Node_Failed,
+	Evaluation_Of_Node_While_Loop_Failed,
+	Evaluation_Of_Node_Is_Not_A_Boolean_Value,
+
+	Forbidden_Evaluation_Of_Node,
+
+	Conversion_To_Bool_Failed,
 
 	If_Statement_Condition_Empty
 };
@@ -60,8 +66,16 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 	case evaluation_error_e::Valueless_Variable: return "Valueless_Variable";
 	case evaluation_error_e::Evaluation_Of_Node_Failed:
 		return "Evaluation_Of_Node_Failed";
+	case evaluation_error_e::Evaluation_Of_Node_While_Loop_Failed:
+		return "Evaluation_Of_Node_While_Loop_Failed";
+	case evaluation_error_e::Evaluation_Of_Node_Is_Not_A_Boolean_Value:
+		return "Evaluation_Of_Node_Is_Not_A_Boolean_Value";
 	case evaluation_error_e::If_Statement_Condition_Empty:
 		return "If_Statement_Condition_Empty";
+	case evaluation_error_e::Forbidden_Evaluation_Of_Node:
+		return "Forbidden_Evaluation_Of_Node";
+	case evaluation_error_e::Conversion_To_Bool_Failed:
+		return "Conversion_To_Bool_Failed";
 	default: return "?";
 	}
 }

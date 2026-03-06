@@ -43,12 +43,7 @@ Program::Program() noexcept
 	m_memory.initialize();
 }
 
-/* MODIFIERS */
-
-void Program::add_instructions(std::unique_ptr<ale::ast::Node>&& node) noexcept
-{
-	m_program_node = std::move(node);
-}
+/* OTHERS */
 
 void Program::run_program(ale::logger::Stream& os)
 {

@@ -48,10 +48,16 @@ EvaluationResult Program::evaluate(const ale::ast::VariableNode& v) const
 	const std::string& name = v.get_variable_name();
 
 	if (not m_memory.variable_exists(name)) {
-		ALE_PRINT_LOC2(ale::logger::println, "Undefined variable '{}'.", name);
+		ALE_PRINT_LOC2(
+			ale::logger::println,
+			"Variable '{}' is not defined in this scope.",
+			name
+		);
 		return EvaluationError{
 			.error = {evaluation_error_e::Valueless_Variable},
-			.message = {std::format("Variable '{}' has no value.", name)}
+			.message = {
+				std::format("Variable '{}' is not defined in this scope.", name)
+			}
 		};
 	}
 
