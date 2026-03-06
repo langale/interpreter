@@ -34,12 +34,13 @@
 #include <ale/ast/zero_ary_nodes/FalseNode.hpp>
 
 #include <intlib/Program.hpp>
+#include <intlib/EvaluationResult.hpp>
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::FalseNode&)
+EvaluationResult Program::evaluate(const ale::ast::FalseNode&)
 {
-	return {false};
+	return false;
 }
 
 } // namespace intlib

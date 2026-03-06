@@ -41,9 +41,9 @@
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::TrueNode&)
+EvaluationResult Program::evaluate(const ale::ast::TrueNode&)
 {
-	return {true};
+	return true;
 }
 
 } // namespace intlib

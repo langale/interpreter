@@ -36,21 +36,23 @@
 #endif
 
 #include <ale/logger/Logger.hpp>
+#include <ale/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::VariableNode& v)
+EvaluationResult Program::evaluate(const ale::ast::VariableNode& v) const
 {
 	const std::string& name = v.get_variable_name();
 
 	if (not m_memory.variable_exists(name)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Variable '" << name
-		// 			 << "' undefined in the current scope.\n";
-		return {};
+		ALE_PRINT_LOC2(ale::logger::println, "Undefined variable '{}'.", name);
+		return EvaluationError{
+			.error = {evaluation_error_e::Valueless_Variable},
+			.message = {std::format("Variable '{}' has no value.", name)}
+		};
 	}
 
 	std::optional<memory::VariableValue> res = m_memory.get_variable(name);
@@ -59,10 +61,13 @@ std::optional<std::any> Program::evaluate(const ale::ast::VariableNode& v)
 #endif
 
 	if (detail::is_type<void>(res->value)) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Variable '" << name
-		// 			 << "' has no value in the current scope.\n";
-		return {};
+		ALE_PRINT_LOC2(
+			ale::logger::println, "Variable '{}' has no value.", name
+		);
+		return EvaluationError{
+			.error = {evaluation_error_e::Valueless_Variable},
+			.message = {std::format("Variable '{}' has no value.", name)}
+		};
 	}
 
 	return std::move(res->value);

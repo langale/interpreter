@@ -34,6 +34,8 @@
 #include <optional>
 #include <any>
 
+#include <ale/logger/macros.hpp>
+
 #include <intlib/detail/any_output.hpp>
 
 #include <intlib/Program.hpp>
@@ -41,34 +43,45 @@
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::IfElseNode& v)
+EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 {
-	// using ale::detail::operator<<;
-
 	const auto& first_child = v.get_first_child();
 	const auto& second_child = v.get_second_child();
 	const auto& third_child = v.get_third_child();
 
 	if (first_child == nullptr) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Condition node of if statement is null.\n";
-		return {};
+		ALE_PRINT_LOC(
+			ale::logger::println, "Condition of if statement is null."
+		);
+		return EvaluationError{
+			.error = {evaluation_error_e::If_Statement_Condition_Empty},
+			.message = {"Condition of if statement is null."}
+		};
 	}
 
-	const std::optional<std::any> cond = interpret_node(first_child);
+	EvaluationResult cond = interpret_node(first_child);
 	if (not cond.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Evaluation of node failed.\n";
-		return {};
+		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		return append_error(
+			std::move(cond.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			"Node evaluation failed"
+		);
 	}
 
 	const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
-	if (not cond_bool.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Condition of if statement could not be converted "
-		// 				"into a Boolean value.\n";
-		// ale::error() << "    Evaluation: " << *cond << '\n';
-		return {};
+	if (not cond_bool) {
+		ALE_PRINT_LOC2(
+			ale::logger::println,
+			"Unhandled variable type '{}'.",
+			detail::get_name(*cond_bool)
+		);
+		return EvaluationError{
+			.error = {evaluation_error_e::Unhandled_Variable_Type},
+			.message = {
+				std::format("Unhandled type '{}'", detail::get_name(*cond_bool))
+			}
+		};
 	}
 
 	if (*cond_bool) {
@@ -80,7 +93,7 @@ std::optional<std::any> Program::evaluate(const ale::ast::IfElseNode& v)
 		return interpret_node(third_child);
 	}
 
-	return std::any{};
+	return {};
 }
 
 } // namespace intlib

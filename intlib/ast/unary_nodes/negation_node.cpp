@@ -31,33 +31,42 @@
  *
  ********************************************************************/
 
-#include <ale/logger/Logger.hpp>
-#include <intlib/detail/any_type.hpp>
+#include <ale/logger/macros.hpp>
 
 #include <intlib/Program.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::NegationNode& v)
+EvaluationResult Program::evaluate(const ale::ast::NegationNode& v)
 {
 	const auto& child = v.get_child();
 
-	std::optional<std::any> rr = interpret_node(child);
+	EvaluationResult rr = interpret_node(child);
 	if (not rr.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Node evaluation failed.\n";
-		return {};
+		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		return append_error(
+			std::move(rr.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			"Node evaluation failed"
+		);
 	}
 
 	const std::optional<bool> r = detail::any_to_bool(*rr);
 	if (r) {
+		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", *r);
 		return not *r;
 	}
 
-	// UNHANDLED_ANY(ale::error(), r);
-
-	return {};
+	ALE_PRINT_LOC2(
+		ale::logger::println,
+		"Unhandled variable type '{}'.",
+		detail::get_name(*rr)
+	);
+	return EvaluationError{
+		.error = {evaluation_error_e::Unhandled_Variable_Type},
+		.message = {std::format("Unhandled type '{}'", detail::get_name(*rr))}
+	};
 }
 
 } // namespace intlib

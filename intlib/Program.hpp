@@ -72,6 +72,7 @@
 
 #include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 
+#include <intlib/EvaluationResult.hpp>
 #include <intlib/memory/Memory.hpp>
 
 namespace intlib {
@@ -121,7 +122,7 @@ private:
 	}
 
 	/// Interprets the contents of node @e v and, optionally, returns a result.
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	interpret_node(const std::unique_ptr<ale::ast::Node>& v)
 	{
 #if defined DEBUG
@@ -201,7 +202,7 @@ private:
 		case ale::ast::node_type_e::Literal_String:
 			return call_evaluate<ale::ast::LiteralStringNode>(v);
 		case ale::ast::node_type_e::Literal_Decimal:
-			return call_evaluate<ale::ast::LiteralStringNode>(v);
+			return call_evaluate<ale::ast::LiteralDecimalNode>(v);
 		case ale::ast::node_type_e::Literal_Unsigned_Integer:
 			return call_evaluate<ale::ast::LiteralUnsignedIntegerNode>(v);
 		case ale::ast::node_type_e::Literal_Signed_Integer:
@@ -214,9 +215,11 @@ private:
 			break;
 		}
 
-		/// TODO: return error
-
-		return {};
+		return std::unexpected{EvaluationError{
+			*v,
+			evaluation_error_e::Unhandled_Node_Type,
+			std::format("Unhandled node type {}.", v->get_node_type())
+		}};
 	}
 
 private:
@@ -269,8 +272,7 @@ private:
 
 	/* ternary nodes */
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::IfElseNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::IfElseNode& v);
 
 	/* binary nodes */
 
@@ -319,35 +321,32 @@ private:
 
 	/* unary nodes */
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::NegationNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::NegationNode& v);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::NegativeNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::NegativeNode& v);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::PositiveNode& v);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::PositiveNode& v);
 
 	/* zero-ary nodes */
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::FalseNode&);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::FalseNode&);
 
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	evaluate(const ale::ast::LiteralStringNode& v);
 
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	evaluate(const ale::ast::LiteralDecimalNode& v);
 
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	evaluate(const ale::ast::LiteralUnsignedIntegerNode& v);
 
-	[[nodiscard]] std::optional<std::any>
+	[[nodiscard]] EvaluationResult
 	evaluate(const ale::ast::LiteralSignedIntegerNode& v);
 
-	[[nodiscard]] std::optional<std::any> evaluate(const ale::ast::TrueNode&);
+	[[nodiscard]] EvaluationResult evaluate(const ale::ast::TrueNode&);
 
-	[[nodiscard]] std::optional<std::any>
-	evaluate(const ale::ast::VariableNode& v);
+	[[nodiscard]] EvaluationResult
+	evaluate(const ale::ast::VariableNode& v) const;
 
 private:
 

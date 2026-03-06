@@ -31,43 +31,56 @@
  *
  ********************************************************************/
 
+#include <ale/logger/macros.hpp>
+
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/macros.hpp>
-
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::PositiveNode& v)
+EvaluationResult Program::evaluate(const ale::ast::PositiveNode& v)
 {
 	const auto& child = v.get_child();
 
-	std::optional<std::any> rr = interpret_node(child);
+	EvaluationResult rr = interpret_node(child);
 	if (not rr.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error() << "    Node evaluation failed.\n";
-		return {};
+		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		return append_error(
+			std::move(rr.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			"Node evaluation failed"
+		);
 	}
 
 	const std::any& r = *rr;
 	if (detail::is_type<uint64_t>(r)) {
 		const uint64_t ri = std::any_cast<uint64_t>(r);
+		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", *ri);
 		return detail::to_int64(ri);
 	}
 
 	if (detail::is_type<int64_t>(r)) {
 		const int64_t ri = std::any_cast<int64_t>(r);
+		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", *ri);
 		return ri;
 	}
 
 	if (detail::is_type<double>(r)) {
 		const double ri = std::any_cast<double>(r);
+		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", *ri);
 		return ri;
 	}
 
-	// UNHANDLED_ANY(ale::error(), r);
-
-	return {};
+	ALE_PRINT_LOC2(
+		ale::logger::println,
+		"Unhandled variable type '{}'.",
+		detail::get_name(*rr)
+	);
+	return EvaluationError{
+		.error = {evaluation_error_e::Unhandled_Variable_Type},
+		.message = {std::format("Unhandled type '{}'", detail::get_name(*rr))}
+	};
 }
 
 } // namespace intlib
