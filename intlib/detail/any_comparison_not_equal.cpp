@@ -31,15 +31,11 @@
  *
  ********************************************************************/
 
-#include <ale/ast/n_ary_nodes/comparison/ComparisonEqualNode.hpp>
-
 #include <optional>
 #include <string>
 #include <any>
 
-#include <ale/logger/Logger.hpp>
-
-#include <intlib/detail/macros.hpp>
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 
 namespace intlib {
@@ -49,6 +45,8 @@ template <typename left_t, typename right_t>
 [[nodiscard]] static std::optional<bool>
 any_comparison_not_equal(const std::any& left, const std::any& right)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
 		if (detail::is_type<left_t>(left) and detail::is_type<right_t>(right)) {
 			const left_t l = std::any_cast<left_t>(left);
@@ -86,6 +84,8 @@ template <typename left_t>
 	const std::any& left, const std::any& right
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if (const auto r = any_comparison_not_equal<left_t, bool>(left, right);
 		r.has_value()) {
 		return r;
@@ -108,6 +108,8 @@ template <typename left_t>
 std::optional<bool>
 any_comparison_not_equal(const std::any& left, const std::any& right)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if (const auto r =
 			any_comparison_not_equal_right_numeric<bool>(left, right);
 		r.has_value()) {

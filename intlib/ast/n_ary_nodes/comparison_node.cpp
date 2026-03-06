@@ -40,11 +40,12 @@
 #include <ranges>
 #include <any>
 
+#include <ale/ast/binary_nodes/SequenceNode.hpp>
+
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
-
-#include <ale/ast/binary_nodes/SequenceNode.hpp>
 
 #include <intlib/detail/any_comparison.hpp>
 
@@ -54,6 +55,8 @@ EvaluationResult Program::first_value(
 	const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	/*
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& vv =
@@ -90,6 +93,8 @@ EvaluationResult Program::last_value(
 	const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	/*
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& vv =
@@ -126,6 +131,8 @@ EvaluationResult Program::evaluate(
 	const ale::ast::ComparisonNode& v, const ale::ast::node_type_e t
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	/*
 	const auto& children = v.get_children();
 

@@ -31,28 +31,39 @@
  *
  ********************************************************************/
 
+#include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::LiteralStringNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	return v.get_value();
 }
 
 EvaluationResult Program::evaluate(const ale::ast::LiteralDecimalNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	return v.get_value();
 }
 
 EvaluationResult
 Program::evaluate(const ale::ast::LiteralUnsignedIntegerNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	static_assert(std::is_same_v<decltype(v.get_value()), uint64_t>);
+
 	return v.get_value();
 }
 
 EvaluationResult Program::evaluate(const ale::ast::LiteralSignedIntegerNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	return v.get_value();
 }
 

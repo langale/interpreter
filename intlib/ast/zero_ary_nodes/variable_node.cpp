@@ -35,20 +35,20 @@
 #include <cassert>
 #endif
 
-#include <ale/logger/Logger.hpp>
-#include <ale/logger/macros.hpp>
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
-
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::VariableNode& v) const
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const std::string& name = v.get_variable_name();
 
 	if (not m_memory.variable_exists(name)) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Variable '{}' is not defined in this scope.",
 			name
@@ -67,7 +67,7 @@ EvaluationResult Program::evaluate(const ale::ast::VariableNode& v) const
 #endif
 
 	if (detail::is_type<void>(res->value)) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Variable '{}' has no value.", name
 		);
 		return EvaluationError{

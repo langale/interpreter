@@ -34,8 +34,7 @@
 #include <optional>
 #include <any>
 
-#include <ale/logger/macros.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_comparison.hpp>
 
 namespace intlib {
@@ -59,7 +58,7 @@ std::optional<bool> any_comparison(
 	case ale::ast::node_type_e::Comparison_Greater_Equal:
 		return any_comparison_greater_than_equal_to(a, b);
 	default:
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Wrong node type '{}' for comparison.", t
 		);
 		return {};

@@ -33,19 +33,20 @@
 
 #include <any>
 
-#include <ale/logger/macros.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::SubscopeModifierNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	m_memory.get_current_scope().push_subscope();
 	for (const auto& w : v.get_children()) {
 		EvaluationResult r = interpret_node(w);
 		if (not r) {
-			ALE_PRINT_LOC(ale::logger::println, "Evaluation of node failed.");
+			INTERPRETER_PRINT_LOC(ale::logger::println, "Evaluation of node failed.");
 			return append_error(
 				std::move(r.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -55,7 +56,7 @@ EvaluationResult Program::evaluate(const ale::ast::SubscopeModifierNode& v)
 
 		const std::any& value = *r;
 		if (value.has_value()) {
-			ALE_PRINT_LOC(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Potentially-ignored return value or expression."
 			);

@@ -31,13 +31,10 @@
  *
  ********************************************************************/
 
-#include <ale/ast/n_ary_nodes/comparison/ComparisonEqualNode.hpp>
-
 #include <optional>
 #include <any>
 
-#include <ale/logger/Logger.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_arithmetic.hpp>
 
 namespace intlib {
@@ -47,6 +44,8 @@ std::optional<std::any> any_arithmetic(
 	const ale::ast::node_type_e t, const std::any& a, const std::any& b
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	switch (t) {
 	case ale::ast::node_type_e::Arithmetic_Addition:
 		return any_arithmetic_addition(a, b);

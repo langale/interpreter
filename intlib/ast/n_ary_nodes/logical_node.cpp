@@ -35,8 +35,7 @@
 #include <ranges>
 #include <any>
 
-#include <ale/logger/macros.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/Program.hpp>
 
@@ -46,6 +45,8 @@ namespace intlib {
 	const ale::ast::node_type_e t, const bool l, const bool r
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return l and r;
 	}
@@ -53,7 +54,7 @@ namespace intlib {
 		return l or r;
 	}
 
-	ALE_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
+	INTERPRETER_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -63,6 +64,8 @@ namespace intlib {
 
 [[nodiscard]] static bool break_when(const ale::ast::node_type_e t)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return false;
 	}
@@ -70,7 +73,7 @@ namespace intlib {
 		return true;
 	}
 
-	ALE_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
+	INTERPRETER_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -84,9 +87,11 @@ EvaluationResult Program::evaluate_logical_node(
 	const std::unique_ptr<ale::ast::Node>& c
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	EvaluationResult res = interpret_node(c);
 	if (not res) {
-		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
 			std::move(res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -96,7 +101,7 @@ EvaluationResult Program::evaluate_logical_node(
 
 	std::any r = std::move(*res);
 	if (not detail::is_type<bool>(r)) {
-		ALE_PRINT_LOC(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Evaluation of node is not a Boolean value."
 		);
 		return append_error(
@@ -111,11 +116,13 @@ EvaluationResult Program::evaluate_logical_node(
 EvaluationResult
 Program::evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e t)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const auto& children = v.get_children();
 
 	EvaluationResult rc = evaluate_logical_node(v, t, children[0]);
 	if (not rc) {
-		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return rc.error();
 	}
 
@@ -131,7 +138,7 @@ Program::evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e t)
 
 		EvaluationResult rv = evaluate_logical_node(v, t, c);
 		if (not rv) {
-			ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+			INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 			return rc.error();
 		}
 

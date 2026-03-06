@@ -34,23 +34,23 @@
 #include <optional>
 #include <any>
 
-#include <ale/logger/macros.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_output.hpp>
-
-#include <intlib/Program.hpp>
 #include <intlib/detail/any_to_bool.hpp>
+#include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const auto& first_child = v.get_first_child();
 	const auto& second_child = v.get_second_child();
 	const auto& third_child = v.get_third_child();
 
 	if (first_child == nullptr) {
-		ALE_PRINT_LOC(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Condition of if statement is null."
 		);
 		return EvaluationError{
@@ -61,7 +61,7 @@ EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 
 	EvaluationResult cond = interpret_node(first_child);
 	if (not cond.has_value()) {
-		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
 			std::move(cond.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -71,7 +71,7 @@ EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 
 	const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
 	if (not cond_bool) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Unhandled variable type '{}'.",
 			detail::get_name(*cond_bool)

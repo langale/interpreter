@@ -31,20 +31,21 @@
  *
  ********************************************************************/
 
-#include <ale/logger/macros.hpp>
-
-#include <intlib/Program.hpp>
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_bool.hpp>
+#include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::NegationNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const auto& child = v.get_child();
 
 	EvaluationResult rr = interpret_node(child);
 	if (not rr.has_value()) {
-		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
 			std::move(rr.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -54,11 +55,11 @@ EvaluationResult Program::evaluate(const ale::ast::NegationNode& v)
 
 	const std::optional<bool> r = detail::any_to_bool(*rr);
 	if (r) {
-		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", *r);
+		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", *r);
 		return not *r;
 	}
 
-	ALE_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
 		detail::get_name(*rr)

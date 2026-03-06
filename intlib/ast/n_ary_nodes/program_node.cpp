@@ -36,6 +36,7 @@
 
 #include <ale/ast/n_ary_nodes/ProgramNode.hpp>
 
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
 
@@ -45,6 +46,8 @@ namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::ProgramNode&)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	return {};
 }
 

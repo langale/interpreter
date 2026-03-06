@@ -36,12 +36,11 @@
 #include <any>
 
 #include <ale/logger/Logger.hpp>
-#include <ale/logger/macros.hpp>
 
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
 #include <intlib/detail/macros.hpp>
-
 #include <intlib/Program.hpp>
 
 namespace intlib {
@@ -49,11 +48,13 @@ namespace intlib {
 std::optional<std::string>
 Program::make_full_variable_name(const ale::ast::SubscriptedVariableNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	std::string full_variable_name = v.get_variable_name();
 	for (const auto& [i, c] : v.get_children() | std::views::enumerate) {
 		const EvaluationResult res = interpret_node(c);
 		if (not res) {
-			ALE_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Failed evaluation of child {} of subscripted variable {}.",
 				i,
@@ -66,7 +67,7 @@ Program::make_full_variable_name(const ale::ast::SubscriptedVariableNode& v)
 		const bool is_uint64 = detail::is_type<uint64_t>(r);
 		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
-			ALE_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Evaluation of child {} of subscripted variable {} is not an "
 				"integral number.",
@@ -91,12 +92,14 @@ Program::make_full_variable_name(const ale::ast::SubscriptedVariableNode& v)
 std::optional<std::vector<int64_t>>
 Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
 	for (const auto& c : v.get_children()) {
 		const std::optional<std::any> res = interpret_node(c);
 		if (not res.has_value()) {
-			ALE_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Failed evaluation of child {} of subscripted variable {}.",
 				i,
@@ -109,7 +112,7 @@ Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v)
 		const bool is_uint64 = detail::is_type<uint64_t>(r);
 		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
-			ALE_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Evaluation of child {} of subscripted variable {} is not an "
 				"integral number.",
@@ -133,11 +136,13 @@ Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v)
 
 EvaluationResult Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const std::optional<std::string> full_variable_name_w =
 		make_full_variable_name(v);
 
 	if (not full_variable_name_w) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Full variable name of subscripted variable {} could not be "
 			"retrieved.",
@@ -155,7 +160,7 @@ EvaluationResult Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
 
 	const std::string& full_variable_name = *full_variable_name_w;
 	if (not m_memory.variable_exists(full_variable_name)) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Variable '{}' is not defined in this scope.",
 			full_variable_name
@@ -176,7 +181,7 @@ EvaluationResult Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
 #endif
 
 	if (detail::is_type<void>(res->value)) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Variable '{}' has no value.", full_variable_name
 		);
 		return EvaluationError{

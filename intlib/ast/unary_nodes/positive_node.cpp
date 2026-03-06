@@ -31,8 +31,7 @@
  *
  ********************************************************************/
 
-#include <ale/logger/macros.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/macros.hpp>
 #include <intlib/Program.hpp>
@@ -41,11 +40,13 @@ namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::PositiveNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const auto& child = v.get_child();
 
 	EvaluationResult rr = interpret_node(child);
 	if (not rr.has_value()) {
-		ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
 			std::move(rr.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -56,23 +57,23 @@ EvaluationResult Program::evaluate(const ale::ast::PositiveNode& v)
 	const std::any& r = *rr;
 	if (detail::is_type<uint64_t>(r)) {
 		const uint64_t ri = std::any_cast<uint64_t>(r);
-		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
+		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
 		return detail::to_int64(ri);
 	}
 
 	if (detail::is_type<int64_t>(r)) {
 		const int64_t ri = std::any_cast<int64_t>(r);
-		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
+		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
 		return ri;
 	}
 
 	if (detail::is_type<double>(r)) {
 		const double ri = std::any_cast<double>(r);
-		ALE_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
+		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
 		return ri;
 	}
 
-	ALE_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
 		detail::get_name(*rr)

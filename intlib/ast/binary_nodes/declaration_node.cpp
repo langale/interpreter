@@ -35,8 +35,7 @@
 #include <cassert>
 #endif
 
-#include <ale/logger/Logger.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
@@ -45,6 +44,8 @@ bool Program::retrieve_variable_names_in_declaration(
 	const ale::ast::SequenceNode& seq, std::vector<std::string>& names
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	/*
 	ale::utils::SequenceNodeIterator iter_seq = make_iterator(seq);
 
@@ -71,6 +72,8 @@ bool Program::retrieve_variable_names_in_declaration(
 	std::vector<std::string>& names
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	/*
 	ale::ast::NAryNodeIterator iter(group);
 
@@ -111,6 +114,8 @@ bool Program::retrieve_variable_names_in_declaration(
 
 EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
 

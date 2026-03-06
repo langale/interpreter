@@ -31,15 +31,14 @@
  *
  ********************************************************************/
 
-#include <intlib/Program.hpp>
-
 #include <optional>
 #include <ranges>
 #include <any>
 
+#include <intlib/logger/macros.hpp>
+#include <intlib/Program.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
-
 #include <intlib/detail/any_arithmetic.hpp>
 
 namespace intlib {
@@ -48,6 +47,8 @@ EvaluationResult Program::evaluate(
 	const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e t
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const auto& children = v.get_children();
 #if defined DEBUG
 	assert(children.size() >= 2);

@@ -34,8 +34,7 @@
 #include <optional>
 #include <any>
 
-#include <ale/logger/Logger.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 
@@ -46,6 +45,8 @@ std::optional<std::any> any_arithmetic_division
 (const std::any& a, const std::any& b)
 noexcept
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if (is_type<uint64_t>(a)) {
 		const uint64_t ai = std::any_cast<uint64_t>(a);
 

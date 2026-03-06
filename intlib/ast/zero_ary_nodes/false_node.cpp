@@ -33,6 +33,7 @@
 
 #include <ale/ast/zero_ary_nodes/FalseNode.hpp>
 
+#include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
 #include <intlib/EvaluationResult.hpp>
 
@@ -40,6 +41,8 @@ namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::FalseNode&)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	return false;
 }
 

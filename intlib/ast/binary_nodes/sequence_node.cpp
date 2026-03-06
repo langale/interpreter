@@ -31,8 +31,7 @@
  *
  ********************************************************************/
 
-#include <ale/logger/macros.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
@@ -40,6 +39,8 @@ namespace intlib {
 ale::utils::SequenceNodeIterator
 Program::make_iterator(const ale::ast::SequenceNode& seq)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	/*
 	const auto& left_child = seq.get_left_child();
 	const auto& right_child = seq.get_right_child();
@@ -73,8 +74,10 @@ Program::make_iterator(const ale::ast::SequenceNode& seq)
 std::optional<std::any>
 Program::get_variable_value(const std::string& var) const
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if (not m_memory.variable_exists(var)) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Trying to use undeclared variable {}.", var
 		);
 		return {};
@@ -84,7 +87,7 @@ Program::get_variable_value(const std::string& var) const
 		m_memory.get_variable(var);
 
 	if (not variable_value.has_value()) {
-		ALE_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Variable {} exists but it does not have a value.",
 			var
@@ -97,6 +100,7 @@ Program::get_variable_value(const std::string& var) const
 
 EvaluationResult Program::evaluate(const ale::ast::SequenceNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	return {};
 }

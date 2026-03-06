@@ -31,15 +31,11 @@
  *
  ********************************************************************/
 
-#include <ale/ast/n_ary_nodes/comparison/ComparisonEqualNode.hpp>
-
 #include <optional>
 #include <string>
 #include <any>
 
-#include <ale/logger/Logger.hpp>
-
-#include <intlib/detail/macros.hpp>
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 
 namespace intlib {
@@ -49,6 +45,8 @@ template <typename left_t, typename right_t>
 [[nodiscard]] static std::optional<bool>
 any_comparison_less_equal(const std::any& left, const std::any& right)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
 		if (detail::is_type<left_t>(left) and detail::is_type<right_t>(right)) {
 			const left_t l = std::any_cast<left_t>(left);
@@ -87,6 +85,8 @@ any_comparison_less_equal_right_numeric(
 	const std::any& left, const std::any& right
 )
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	if (const auto r = any_comparison_less_equal<left_t, bool>(left, right);
 		r.has_value()) {
 		return r;
@@ -106,23 +106,28 @@ any_comparison_less_equal_right_numeric(
 	return {};
 }
 
-std::optional<bool> any_comparison_less_than_equal_to(
-	const std::any& left, const std::any& right
-)
+std::optional<bool>
+any_comparison_less_than_equal_to(const std::any& left, const std::any& right)
 {
-	if (const auto r = any_comparison_less_equal_right_numeric<bool>(left, right);
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	if (const auto r =
+			any_comparison_less_equal_right_numeric<bool>(left, right);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_less_equal_right_numeric<int64_t>(left, right);
+	if (const auto r =
+			any_comparison_less_equal_right_numeric<int64_t>(left, right);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_less_equal_right_numeric<uint64_t>(left, right);
+	if (const auto r =
+			any_comparison_less_equal_right_numeric<uint64_t>(left, right);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_less_equal_right_numeric<double>(left, right);
+	if (const auto r =
+			any_comparison_less_equal_right_numeric<double>(left, right);
 		r.has_value()) {
 		return r;
 	}

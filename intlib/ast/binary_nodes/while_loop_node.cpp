@@ -34,20 +34,21 @@
 #include <optional>
 #include <any>
 
-#include <ale/logger/macros.hpp>
-
-#include <intlib/Program.hpp>
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_bool.hpp>
+#include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
 
 	if (left_child == nullptr) {
-		ALE_PRINT_LOC(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Condition in while loop is missing."
 		);
 		return {};
@@ -57,7 +58,7 @@ EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 	while (not stop) {
 		EvaluationResult cond = interpret_node(left_child);
 		if (not cond) {
-			ALE_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+			INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 			return append_error(
 				std::move(cond.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -67,7 +68,7 @@ EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 
 		const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
 		if (not cond_bool) {
-			ALE_PRINT_LOC(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
@@ -89,7 +90,7 @@ EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 
 			EvaluationResult r = interpret_node(right_child);
 			if (not r) {
-				ALE_PRINT_LOC(
+				INTERPRETER_PRINT_LOC(
 					ale::logger::println,
 					"Evaluation of while loop body failed."
 				);

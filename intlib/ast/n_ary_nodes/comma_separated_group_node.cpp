@@ -31,16 +31,18 @@
  *
  ********************************************************************/
 
-#include <ale/logger/macros.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
 
+#include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::CommaSeparatedGroupNode& v)
 {
-	ALE_PRINT_LOC2(
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Cannot evaluate nodes of type '{}'.",
 		v.get_node_type()

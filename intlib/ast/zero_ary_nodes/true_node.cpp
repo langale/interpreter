@@ -31,18 +31,15 @@
  *
  ********************************************************************/
 
-#if defined DEBUG
-#include <cassert>
-#endif
-
-#include <ale/logger/Logger.hpp>
-
+#include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
 
 EvaluationResult Program::evaluate(const ale::ast::TrueNode&)
 {
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
 	return true;
 }
 
