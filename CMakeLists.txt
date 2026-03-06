@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
-project(aleinterpreter LANGUAGES CXX)
+project(ALE_INTERPRETER LANGUAGES CXX)
 
 # Turn on export of compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # project's version
-set(INTERPRETER_MAJOR 99.99)
-set(INTERPRETER_PATCH 99)
+set(ALE_INTERPRETER_MAJOR 99.99)
+set(ALE_INTERPRETER_PATCH 99)
+set(ALE_INTERPRETER_VERSION "${ALE_INTERPRETER_MAJOR}.${ALE_INTERPRETER_PATCH}")
 
 # ******************************************************************************
 # Custom functions
@@ -34,7 +35,7 @@ function(add_sanitize_option executable option)
 	target_link_options(${executable} PRIVATE -fsanitize=${option})
 endfunction(add_sanitize_option)
 
-function(configure_executable executable)
+function(configure_object executable)
 	# define executable's properties
 	set_target_properties(${executable} PROPERTIES SOVERSION 1)
 	set_target_properties(${executable} PROPERTIES LINKER_LANGUAGE CXX)
@@ -68,6 +69,7 @@ function(configure_executable executable)
 	# ******************************************************************************
 	# Compile-mode dependent flags
 
+	define_symbol(${executable} -DALE_PROJECT_DIRECTORY="${ALE_DIR}")
 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 		add_compile_flag(${executable} -g)
 		add_compile_flag(${executable} -Og)
@@ -109,7 +111,7 @@ function(configure_executable executable)
 	target_include_directories(${executable} PRIVATE ${ALE_DIR})
 	target_include_directories(${executable} PRIVATE ${INTERPRETER_DIR})
 
-endfunction(configure_executable)
+endfunction(configure_object)
 
 # ******************************************************************************
 # Set default build type
@@ -133,6 +135,7 @@ endif()
 
 # ******************************************************************************
 # Use C++23
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -143,33 +146,8 @@ set(INTERPRETER_DIR ${CMAKE_SOURCE_DIR})
 message(STATUS "INTERPRETER_DIR: ${INTERPRETER_DIR}")
 
 # ******************************************************************************
+# Path to ALE's directory
 
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-get_filename_component(INTERPRETER_BUILD_DIR "${CMAKE_BINARY_DIR}" NAME)
-
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-	set(INTERPRETER_LIB_NAME intlib)
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "DebugWithLogs")
-	set(INTERPRETER_LIB_NAME intliblog)
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Profiling")
-	set(INTERPRETER_LIB_NAME intlibprofiling)
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Instrumentation")
-	set(INTERPRETER_LIB_NAME intlibinstrumentation)
-else()
-	set(INTERPRETER_LIB_NAME intliboptimized)
-endif()
-
-set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/${INTERPRETER_BUILD_DIR}/intlib)
-
-message(STATUS "    INTERPRETER_LIB_DIR:  ${INTERPRETER_LIB_DIR}")
-message(STATUS "    INTERPRETER_LIB_NAME: ${INTERPRETER_LIB_NAME}")
-
-# *******************************************************************************
-# External libraries
-
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
-# Looking for ALE
 if (NOT DEFINED ALE_DIR)
 	message(STATUS "ALE's development root directory was not given.")
 	message(STATUS "    Note that even if the library is installed in the system, this interpreter")
@@ -178,26 +156,49 @@ if (NOT DEFINED ALE_DIR)
 	message(STATUS "        -DALE_DIR=/path/to/ale")
 	message(STATUS "    Make sure it is an absolute path!")
 	message(FATAL_ERROR "Please, read the last few lines above and follow the instructions given.")
-else()
-	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-		set(ALE_LIB_NAME ale)
-	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "DebugWithLogs")
-		set(ALE_LIB_NAME alelog)
-	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Profiling")
-		set(ALE_LIB_NAME aleprofiling)
-	elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Instrumentation")
-		set(ALE_LIB_NAME aleinstrumentation)
-	else()
-		set(ALE_LIB_NAME aleoptimized)
-	endif()
-	
-	set(ALE_LIB_DIR ${ALE_DIR}/${INTERPRETER_BUILD_DIR}/ale)
-	
-	message(STATUS "Compile against ALE:")
-	message(STATUS "    ALE_DIR:      ${ALE_DIR}")
-	message(STATUS "    ALE_LIB_DIR:  ${ALE_LIB_DIR}")
-	message(STATUS "    ALE_LIB_NAME: ${ALE_LIB_NAME}")
 endif()
+
+# ******************************************************************************
+# Set external libraries names
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+get_filename_component(BUILD_TYPE_DIR "${CMAKE_BINARY_DIR}" NAME)
+
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+	set(ALE_LIB_NAME ale)
+	set(INTERPRETER_LIB_NAME intlib)
+	set(TESTS_LIB_NAME testslib)
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "DebugWithLogs")
+	set(ALE_LIB_NAME alelog)
+	set(INTERPRETER_LIB_NAME intliblog)
+	set(TESTS_LIB_NAME testsliblog)
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Profiling")
+	set(ALE_LIB_NAME aleprofiling)
+	set(INTERPRETER_LIB_NAME intlibprofiling)
+	set(TESTS_LIB_NAME testslibprofiling)
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Instrumentation")
+	set(ALE_LIB_NAME aleinstrumentation)
+	set(INTERPRETER_LIB_NAME intlibinstrumentation)
+	set(TESTS_LIB_NAME testslibinstrumentation)
+else()
+	set(ALE_LIB_NAME aleoptimized)
+	set(INTERPRETER_LIB_NAME intliboptimized)
+	set(TESTS_LIB_NAME testsliboptimized)
+endif()
+
+set(ALE_LIB_DIR ${ALE_DIR}/${BUILD_TYPE_DIR}/ale)
+message(STATUS "Compile against ALE:")
+message(STATUS "    ALE_DIR:      ${ALE_DIR}")
+message(STATUS "    ALE_LIB_DIR:  ${ALE_LIB_DIR}")
+message(STATUS "    ALE_LIB_NAME: ${ALE_LIB_NAME}")
+
+set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/${BUILD_TYPE_DIR}/intlib)
+message(STATUS "    INTERPRETER_LIB_DIR:  ${INTERPRETER_LIB_DIR}")
+message(STATUS "    INTERPRETER_LIB_NAME: ${INTERPRETER_LIB_NAME}")
+
+set(TESTS_LIB_DIR ${INTERPRETER_DIR}/${BUILD_TYPE_DIR}/tests/lib)
+message(STATUS "    TESTS_LIB_DIR:  ${TESTS_LIB_DIR}")
+message(STATUS "    TESTS_LIB_NAME: ${TESTS_LIB_NAME}")
 
 # *******************************************************************************
 # Build-dependent options
@@ -227,3 +228,4 @@ message(STATUS "    Enable ASAN (-DENABLE_ASAN=ON/OFF)? ${ENABLE_ASAN}")
 
 add_subdirectory(intlib)
 add_subdirectory(interpreter)
+add_subdirectory(tests)

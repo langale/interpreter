@@ -5,8 +5,8 @@ message(STATUS "Configuring interpreter CLI")
 message(STATUS "===========================")
 
 # project declaration
-project(INTERPRETER_CLI VERSION "${INTERPRETER_MAJOR}.${INTERPRETER_PATCH}")
-project(INTERPRETER_CLI DESCRIPTION "A CLI for ALE's interpreter")
+project(ALE_INTERPRETER_CLI VERSION "${ALE_INTERPRETER_VERSION}")
+project(ALE_INTERPRETER_CLI DESCRIPTION "A CLI for ALE's interpreter")
 
 # needed includes to make CMake work
 include(CheckCXXCompilerFlag)
@@ -23,7 +23,7 @@ function(configure_interpreter_executable executable)
 	target_link_libraries(${executable} ${INTERPRETER_LIB_DIR}/lib${INTERPRETER_LIB_NAME}.so)
 	target_link_libraries(${executable} ${ALE_LIB_DIR}/lib${ALE_LIB_NAME}.so)
 
-	configure_executable(${executable})
+	configure_object(${executable})
 
 endfunction(configure_interpreter_executable)
 
