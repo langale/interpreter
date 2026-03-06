@@ -69,7 +69,7 @@ function(configure_object executable)
 	# ******************************************************************************
 	# Compile-mode dependent flags
 
-	define_symbol(${executable} -DALE_PROJECT_DIRECTORY="${ALE_DIR}")
+	define_symbol(${executable} -DINTERPRETER_PROJECT_DIRECTORY="${INTERPRETER_DIR}")
 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 		add_compile_flag(${executable} -g)
 		add_compile_flag(${executable} -Og)
