@@ -49,7 +49,7 @@ namespace detail {
  * @param a std::any value.
  * @returns A reference to an output stream @e os.
  */
-inline std::ostream& operator<< (std::ostream& os, const std::any& a) noexcept
+inline std::ostream& operator<< (std::ostream& os, const std::any& a)
 {
 	const std::string name = demangle_name_type(a.type().name());
 	if (is_type<bool>(name)) {

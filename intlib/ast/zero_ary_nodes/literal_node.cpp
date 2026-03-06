@@ -35,26 +35,24 @@
 
 namespace intlib {
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::LiteralStringNode& v) noexcept
+std::optional<std::any> Program::evaluate(const ale::ast::LiteralStringNode& v)
+{
+	return v.get_value();
+}
+
+std::optional<std::any> Program::evaluate(const ale::ast::LiteralDecimalNode& v)
 {
 	return v.get_value();
 }
 
 std::optional<std::any>
-Program::evaluate(const ale::ast::LiteralDecimalNode& v) noexcept
+Program::evaluate(const ale::ast::LiteralUnsignedIntegerNode& v)
 {
 	return v.get_value();
 }
 
 std::optional<std::any>
-Program::evaluate(const ale::ast::LiteralUnsignedIntegerNode& v) noexcept
-{
-	return v.get_value();
-}
-
-std::optional<std::any>
-Program::evaluate(const ale::ast::LiteralSignedIntegerNode& v) noexcept
+Program::evaluate(const ale::ast::LiteralSignedIntegerNode& v)
 {
 	return v.get_value();
 }

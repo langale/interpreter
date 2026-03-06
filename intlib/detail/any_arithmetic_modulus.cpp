@@ -44,7 +44,7 @@ namespace intlib {
 namespace detail {
 
 std::optional<std::any>
-any_arithmetic_modulus(const std::any& a, const std::any& b) noexcept
+any_arithmetic_modulus(const std::any& a, const std::any& b)
 {
 	if (is_type<uint64_t>(a)) {
 		const uint64_t ai = std::any_cast<uint64_t>(a);

@@ -42,9 +42,8 @@
 
 namespace intlib {
 
-std::string Program::make_full_variable_name(
-	const ale::ast::SubscriptedVariableNode& v
-) noexcept
+std::string
+Program::make_full_variable_name(const ale::ast::SubscriptedVariableNode& v)
 {
 	// using ale::detail::operator<<;
 
@@ -81,7 +80,7 @@ std::string Program::make_full_variable_name(
 }
 
 std::vector<int64_t>
-Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v) noexcept
+Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v)
 {
 	// using ale::detail::operator<<;
 
@@ -119,7 +118,7 @@ Program::get_index_sequence(const ale::ast::SubscriptedVariableNode& v) noexcept
 }
 
 std::optional<std::any>
-Program::evaluate(const ale::ast::SubscriptedVariableNode& v) noexcept
+Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
 {
 	const std::string full_variable_name = make_full_variable_name(v);
 	if (not m_memory.variable_exists(full_variable_name)) {

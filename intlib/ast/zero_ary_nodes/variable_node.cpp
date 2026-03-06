@@ -42,8 +42,7 @@
 
 namespace intlib {
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::VariableNode& v) noexcept
+std::optional<std::any> Program::evaluate(const ale::ast::VariableNode& v)
 {
 	const std::string& name = v.get_variable_name();
 

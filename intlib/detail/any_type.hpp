@@ -46,7 +46,7 @@ namespace detail {
  * @param name Input name from type().name()
  * @returns A more human-readable string for the name of a std::any.
  */
-[[nodiscard]] inline std::string demangle_name_type(const char *name) noexcept
+[[nodiscard]] inline std::string demangle_name_type(const char *name)
 {
 	int status = -4;
 	std::unique_ptr<char, void (*)(void *)> res{
@@ -56,7 +56,7 @@ namespace detail {
 }
 
 /// Returns a 'standardized' name for 'a'.
-[[nodiscard]] inline std::string get_name(const std::any& a) noexcept
+[[nodiscard]] inline std::string get_name(const std::any& a)
 {
 	return demangle_name_type(a.type().name());
 }
@@ -69,7 +69,7 @@ namespace detail {
  * type @e T.
  */
 template <typename type_t>
-[[nodiscard]] bool is_type(const std::string& name) noexcept
+[[nodiscard]] bool is_type(const std::string& name)
 {
 	if constexpr (std::is_same_v<type_t, bool>) {
 		return name == "bool";
@@ -103,7 +103,7 @@ template <typename type_t>
  * of the given type @e T.
  */
 template <typename type_t>
-[[nodiscard]] bool is_type(const std::any& a) noexcept
+[[nodiscard]] bool is_type(const std::any& a)
 {
 	const std::string name = demangle_name_type(a.type().name());
 	return is_type<type_t>(name);

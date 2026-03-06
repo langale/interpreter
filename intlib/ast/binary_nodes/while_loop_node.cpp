@@ -42,9 +42,7 @@
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate
-(const ale::ast::WhileLoopNode& v)
-noexcept
+std::optional<std::any> Program::evaluate(const ale::ast::WhileLoopNode& v)
 {
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
@@ -78,7 +76,9 @@ noexcept
 		stop = not *cond_bool;
 		if (*cond_bool) {
 			// yes, this may produce infinite loops
-			if (right_child == nullptr) { continue; }
+			if (right_child == nullptr) {
+				continue;
+			}
 
 			const std::optional<std::any> r = interpret_node(right_child);
 			if (not r.has_value()) {
@@ -92,4 +92,4 @@ noexcept
 	return std::any{};
 }
 
-} // -- interpreter
+} // namespace intlib

@@ -41,7 +41,7 @@
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate(const ale::ast::TrueNode&) noexcept
+std::optional<std::any> Program::evaluate(const ale::ast::TrueNode&)
 {
 	return {true};
 }

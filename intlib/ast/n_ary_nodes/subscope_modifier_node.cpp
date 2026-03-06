@@ -42,7 +42,7 @@
 namespace intlib {
 
 std::optional<std::any>
-Program::evaluate(const ale::ast::SubscopeModifierNode& v) noexcept
+Program::evaluate(const ale::ast::SubscopeModifierNode& v)
 {
 	// using ale::detail::operator<<;
 

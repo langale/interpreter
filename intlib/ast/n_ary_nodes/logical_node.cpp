@@ -44,7 +44,7 @@ namespace intlib {
 
 [[nodiscard]] bool compute_logical_expression(
 	const ale::ast::node_type_e& t, const bool l, const bool r
-) noexcept
+)
 {
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return l and r;
@@ -57,7 +57,7 @@ namespace intlib {
 	return false;
 }
 
-[[nodiscard]] bool break_when(const ale::ast::node_type_e& t) noexcept
+[[nodiscard]] bool break_when(const ale::ast::node_type_e& t)
 {
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return false;
@@ -74,7 +74,7 @@ std::optional<bool> Program::evaluate_logical_node(
 	const ale::ast::LogicalNode& v,
 	const ale::ast::node_type_e& t,
 	const std::unique_ptr<ale::ast::Node>& c
-) noexcept
+)
 {
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 
@@ -131,7 +131,7 @@ std::optional<bool> Program::evaluate_logical_node(
 
 std::optional<std::any> Program::evaluate(
 	const ale::ast::LogicalNode& v, const ale::ast::node_type_e& t
-) noexcept
+)
 {
 	const auto& children = v.get_children();
 

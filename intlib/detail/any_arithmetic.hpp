@@ -43,32 +43,32 @@ namespace detail {
 
 /// Addition of two std::any values.
 [[nodiscard]] std::optional<std::any>
-any_arithmetic_addition(const std::any& a, const std::any& b) noexcept;
+any_arithmetic_addition(const std::any& a, const std::any& b);
 
 /// Division of two std::any values.
 [[nodiscard]] std::optional<std::any>
-any_arithmetic_division(const std::any& a, const std::any& b) noexcept;
+any_arithmetic_division(const std::any& a, const std::any& b);
 
 /// Exponentiation of two std::any values.
 [[nodiscard]] std::optional<std::any>
-any_arithmetic_exponentiation(const std::any& a, const std::any& b) noexcept;
+any_arithmetic_exponentiation(const std::any& a, const std::any& b);
 
 /// Modulus of two std::any values.
 [[nodiscard]] std::optional<std::any>
-any_arithmetic_modulus(const std::any& a, const std::any& b) noexcept;
+any_arithmetic_modulus(const std::any& a, const std::any& b);
 
 /// Multiplication of two std::any values.
 [[nodiscard]] std::optional<std::any>
-any_arithmetic_multiplication(const std::any& a, const std::any& b) noexcept;
+any_arithmetic_multiplication(const std::any& a, const std::any& b);
 
 /// Subtraction of two std::any values.
 [[nodiscard]] std::optional<std::any>
-any_arithmetic_subtraction(const std::any& a, const std::any& b) noexcept;
+any_arithmetic_subtraction(const std::any& a, const std::any& b);
 
 /// Computes two std::any according to the type of node
 [[nodiscard]] std::optional<std::any> any_arithmetic(
 	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
-) noexcept;
+);
 
 } // namespace detail
 } // namespace intlib

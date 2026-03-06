@@ -48,7 +48,7 @@ namespace detail {
 template <typename left_t, typename right_t>
 [[nodiscard]] static std::optional<bool> any_comparison_greater_than(
 	const std::any& left, const std::any& right
-) noexcept
+)
 {
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
 		if (detail::is_type<left_t>(left) and detail::is_type<right_t>(right)) {
@@ -86,7 +86,7 @@ template <typename left_t>
 [[nodiscard]] static std::optional<bool>
 any_comparison_greater_than_right_numeric(
 	const std::any& left, const std::any& right
-) noexcept
+)
 {
 	if (const auto r = any_comparison_greater_than<left_t, bool>(left, right);
 		r.has_value()) {
@@ -111,7 +111,7 @@ any_comparison_greater_than_right_numeric(
 
 std::optional<bool> any_comparison_greater_than(
 	const std::any& left, const std::any& right
-) noexcept
+)
 {
 	if (const auto r =
 			any_comparison_greater_than_right_numeric<bool>(left, right);

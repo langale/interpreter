@@ -38,7 +38,7 @@
 namespace intlib {
 
 ale::utils::SequenceNodeIterator
-Program::make_iterator(const ale::ast::SequenceNode& seq) noexcept
+Program::make_iterator(const ale::ast::SequenceNode& seq)
 {
 	const auto& left_child = seq.get_left_child();
 	const auto& right_child = seq.get_right_child();
@@ -70,7 +70,7 @@ Program::make_iterator(const ale::ast::SequenceNode& seq) noexcept
 }
 
 std::optional<std::any>
-Program::get_variable_value(const std::string& var) const noexcept
+Program::get_variable_value(const std::string& var) const
 {
 	if (not m_memory.variable_exists(var)) {
 		// ale::error() << ERROR_LOCATION << '\n';
@@ -92,8 +92,7 @@ Program::get_variable_value(const std::string& var) const noexcept
 	return std::move(variable_value->value);
 }
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::SequenceNode& v) noexcept
+std::optional<std::any> Program::evaluate(const ale::ast::SequenceNode& v)
 {
 	// ale::error() << ERROR_LOCATION << '\n';
 	// ale::error()

@@ -39,8 +39,7 @@
 
 namespace intlib {
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::NegationNode& v) noexcept
+std::optional<std::any> Program::evaluate(const ale::ast::NegationNode& v)
 {
 	const auto& child = v.get_child();
 

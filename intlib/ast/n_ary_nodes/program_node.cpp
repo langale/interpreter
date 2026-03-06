@@ -43,8 +43,9 @@
 
 namespace intlib {
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::ProgramNode& v) noexcept
-{ }
+std::optional<std::any> Program::evaluate(const ale::ast::ProgramNode&)
+{
+	return {};
+}
 
 } // namespace intlib

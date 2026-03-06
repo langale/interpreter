@@ -45,7 +45,7 @@ namespace detail {
 
 std::optional<std::any> any_arithmetic(
 	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
-) noexcept
+)
 {
 	switch (t) {
 	case ale::ast::node_type_e::Arithmetic_Addition:

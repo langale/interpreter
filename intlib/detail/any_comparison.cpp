@@ -31,12 +31,10 @@
  *
  ********************************************************************/
 
-#include <ale/ast/n_ary_nodes/comparison/ComparisonEqualNode.hpp>
-
 #include <optional>
 #include <any>
 
-#include <ale/logger/Logger.hpp>
+#include <ale/logger/macros.hpp>
 
 #include <intlib/detail/any_comparison.hpp>
 
@@ -44,8 +42,8 @@ namespace intlib {
 namespace detail {
 
 std::optional<bool> any_comparison(
-	const ale::ast::node_type_e& t, const std::any& a, const std::any& b
-) noexcept
+	const ale::ast::node_type_e t, const std::any& a, const std::any& b
+)
 {
 	switch (t) {
 	case ale::ast::node_type_e::Comparison_Equal:
@@ -60,7 +58,11 @@ std::optional<bool> any_comparison(
 		return any_comparison_greater_than(a, b);
 	case ale::ast::node_type_e::Comparison_Greater_Equal:
 		return any_comparison_greater_than_equal_to(a, b);
-	default: return {};
+	default:
+		ALE_PRINT_LOC2(
+			ale::logger::println, "Wrong node type '{}' for comparison.", t
+		);
+		return {};
 	}
 }
 

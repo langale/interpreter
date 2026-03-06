@@ -41,7 +41,7 @@ namespace intlib {
 
 bool Program::retrieve_variable_names_in_assignation(
 	const ale::ast::SequenceNode& seq, std::vector<std::string>& names
-) noexcept
+)
 {
 	ale::utils::SequenceNodeIterator iter_seq = make_iterator(seq);
 
@@ -78,7 +78,7 @@ bool Program::retrieve_variable_names_in_assignation(
 bool Program::retrieve_variable_names_in_assignation(
 	const ale::ast::CommaSeparatedGroupNode& group,
 	std::vector<std::string>& names
-) noexcept
+)
 {
 	ale::ast::NAryNodeIterator iter(group);
 
@@ -138,8 +138,7 @@ bool Program::retrieve_variable_names_in_assignation(
 	return true;
 }
 
-std::optional<std::any>
-Program::evaluate(const ale::ast::AssignationNode& v) noexcept
+std::optional<std::any> Program::evaluate(const ale::ast::AssignationNode& v)
 {
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
@@ -149,7 +148,7 @@ Program::evaluate(const ale::ast::AssignationNode& v) noexcept
 	assert(right_child != nullptr);
 #endif
 
-	const std::optional<std::any> value = interpret_node(right_child);
+	std::optional<std::any> value = interpret_node(right_child);
 	if (not value.has_value()) {
 		// ale::error() << ERROR_LOCATION << '\n';
 		// ale::error() << "    Evaluation of node failed.\n";

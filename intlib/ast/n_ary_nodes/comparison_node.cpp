@@ -54,7 +54,6 @@ namespace intlib {
 
 std::optional<std::any> Program::first_value
 (const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c)
-noexcept
 {
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& vv =
@@ -86,7 +85,6 @@ noexcept
 
 std::optional<std::any> Program::last_value
 (const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c)
-noexcept
 {
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& vv =
@@ -122,7 +120,6 @@ std::optional<bool> Program::evaluate_variable_sequence_in_comparison
 	const ale::ast::node_type_e& t,
 	const std::unique_ptr<ale::ast::Node>& c
 )
-noexcept
 {
 #if defined DEBUG
 	assert(c->get_node_type() == ale::ast::node_type_e::Sequence);
@@ -172,7 +169,6 @@ noexcept
 
 std::optional<std::any> Program::evaluate
 (const ale::ast::ComparisonNode& v, const ale::ast::node_type_e& t)
-noexcept
 {
 	const auto& children = v.get_children();
 

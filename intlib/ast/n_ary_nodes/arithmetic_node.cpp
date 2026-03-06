@@ -46,7 +46,7 @@ namespace intlib {
 
 std::optional<std::any> Program::evaluate(
 	const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e& t
-) noexcept
+)
 {
 	const auto& children = v.get_children();
 #if defined DEBUG

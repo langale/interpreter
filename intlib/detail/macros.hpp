@@ -37,19 +37,19 @@ namespace intlib {
 namespace detail {
 
 template <typename type_t>
-[[nodiscard]] double to_double(const type_t& x) noexcept
+[[nodiscard]] double to_double(const type_t& x)
 {
 	return static_cast<double>(x);
 }
 
 template <typename type_t>
-[[nodiscard]] uint64_t to_uint64(const type_t& x) noexcept
+[[nodiscard]] uint64_t to_uint64(const type_t& x)
 {
 	return static_cast<uint64_t>(x);
 }
 
 template <typename type_t>
-[[nodiscard]] int64_t to_int64(const type_t& x) noexcept
+[[nodiscard]] int64_t to_int64(const type_t& x)
 {
 	return static_cast<int64_t>(x);
 }

@@ -50,14 +50,14 @@ void Program::add_instructions(std::unique_ptr<ale::ast::Node>&& node) noexcept
 	m_program_node = std::move(node);
 }
 
-void Program::run_program(ale::logger::Stream& os) noexcept
+void Program::run_program(ale::logger::Stream& os)
 {
 	interpret_node(m_program_node);
 }
 
 /* OTHERS */
 
-void Program::print_tree(ale::logger::Stream& os) const noexcept
+void Program::print_tree(ale::logger::Stream& os) const
 {
 	os.out() << "= [fixedsize=false shape=none]\n";
 	os.out() << "'PROGRAM'\n";

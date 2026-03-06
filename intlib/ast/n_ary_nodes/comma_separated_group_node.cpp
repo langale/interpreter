@@ -37,13 +37,12 @@
 
 namespace intlib {
 
-std::optional<std::any> Program::evaluate
-(const ale::ast::CommaSeparatedGroupNode&)
-noexcept
+std::optional<std::any>
+Program::evaluate(const ale::ast::CommaSeparatedGroupNode&)
 {
 	// ale::error() << ERROR_LOCATION << '\n';
 	// ale::error() << "    Comma-separated group nodes cannot be evaluated.\n";
 	return {};
 }
 
-} // -- namespace intlib
+} // namespace intlib
