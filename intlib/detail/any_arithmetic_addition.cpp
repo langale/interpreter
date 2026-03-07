@@ -57,7 +57,11 @@ noexcept
 
 		if (is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return to_int64(ai) + bi;
+			const auto res = to_int64(ai) + bi;
+			if (res > 0) {
+				return to_uint64(res);
+			}
+			return res;
 		}
 
 		if (is_type<double>(b)) {
@@ -73,12 +77,20 @@ noexcept
 
 		if (is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return ai + to_int64(bi);
+			const auto res = ai + to_int64(bi);
+			if (res > 0) {
+				return to_uint64(res);
+			}
+			return res;
 		}
 
 		if (is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return ai + bi;
+			const auto res = ai + bi;
+			if (res > 0) {
+				return to_uint64(res);
+			}
+			return res;
 		}
 
 		if (is_type<double>(b)) {
