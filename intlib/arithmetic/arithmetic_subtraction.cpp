@@ -40,16 +40,15 @@
 namespace intlib {
 namespace arithmetic {
 
-std::any
-arithmetic_subtraction(const std::any& a, const std::any& b) noexcept
+std::any arithmetic_subtraction(const std::any& a, const std::any& b)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	if (detail::is_type<uint64_t>(a)) {
-		const uint64_t ai = std::any_cast<uint64_t>(a);
+		const auto ai = std::any_cast<uint64_t>(a);
 
 		if (detail::is_type<uint64_t>(b)) {
-			const uint64_t bi = std::any_cast<uint64_t>(b);
+			const auto bi = std::any_cast<uint64_t>(b);
 			if (ai < bi) {
 				return detail::to_int64(ai) - detail::to_int64(bi);
 			}
@@ -57,39 +56,43 @@ arithmetic_subtraction(const std::any& a, const std::any& b) noexcept
 		}
 
 		if (detail::is_type<int64_t>(b)) {
-			const int64_t bi = std::any_cast<int64_t>(b);
-			const int64_t r = detail::to_int64(ai) - bi;
+			const auto bi = std::any_cast<int64_t>(b);
+			const auto r = detail::to_int64(ai) - bi;
 			if (r >= 0) {
-				return static_cast<uint64_t>(r);
+				return detail::to_uint64(r);
 			}
 			return r;
 		}
 
 		if (detail::is_type<double>(b)) {
-			const double bd = std::any_cast<double>(b);
+			const auto bd = std::any_cast<double>(b);
 			return detail::to_double(ai) - bd;
 		}
 
-		// UNHANDLED_ANY(ale::error(), b);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Parameter b's type {} is not handled.",
+			detail::get_type_name(b)
+		);
 	}
 
 	if (detail::is_type<int64_t>(a)) {
-		const int64_t ai = std::any_cast<int64_t>(a);
+		const auto ai = std::any_cast<int64_t>(a);
 
 		if (detail::is_type<uint64_t>(b)) {
-			const uint64_t bi = std::any_cast<uint64_t>(b);
-			const int64_t r = ai - detail::to_int64(bi);
+			const auto bi = std::any_cast<uint64_t>(b);
+			const auto r = ai - detail::to_int64(bi);
 			if (r >= 0) {
-				return static_cast<uint64_t>(r);
+				return detail::to_uint64(r);
 			}
 			return r;
 		}
 
 		if (detail::is_type<int64_t>(b)) {
-			const int64_t bi = std::any_cast<int64_t>(b);
-			const int64_t r = ai - bi;
+			const auto bi = std::any_cast<int64_t>(b);
+			const auto r = ai - bi;
 			if (r >= 0) {
-				return static_cast<uint64_t>(r);
+				return detail::to_uint64(r);
 			}
 			return r;
 		}
@@ -98,31 +101,43 @@ arithmetic_subtraction(const std::any& a, const std::any& b) noexcept
 			return detail::to_double(ai) - std::any_cast<double>(b);
 		}
 
-		// UNHANDLED_ANY(ale::error(), b);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Parameter b's type {} is not handled.",
+			detail::get_type_name(b)
+		);
 	}
 
 	if (detail::is_type<double>(a)) {
-		const double ai = std::any_cast<double>(a);
+		const auto ai = std::any_cast<double>(a);
 
 		if (detail::is_type<uint64_t>(b)) {
-			const uint64_t bi = std::any_cast<uint64_t>(b);
+			const auto bi = std::any_cast<uint64_t>(b);
 			return ai - detail::to_double(bi);
 		}
 
 		if (detail::is_type<int64_t>(b)) {
-			const int64_t bi = std::any_cast<int64_t>(b);
+			const auto bi = std::any_cast<int64_t>(b);
 			return ai - detail::to_double(bi);
 		}
 
 		if (detail::is_type<double>(b)) {
-			const double bd = std::any_cast<double>(b);
+			const auto bd = std::any_cast<double>(b);
 			return ai - bd;
 		}
 
-		// UNHANDLED_ANY(ale::error(), b);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Parameter b's type {} is not handled.",
+			detail::get_type_name(b)
+		);
 	}
 
-	// UNHANDLED_ANY(ale::error(), a);
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"Parameter a's type {} is not handled.",
+		detail::get_type_name(a)
+	);
 
 	return {};
 }
