@@ -56,7 +56,7 @@ namespace detail {
 }
 
 /// Returns a 'standardized' name for 'a'.
-[[nodiscard]] inline std::string get_name(const std::any& a)
+[[nodiscard]] inline std::string get_type_name(const std::any& a)
 {
 	return demangle_name_type(a.type().name());
 }

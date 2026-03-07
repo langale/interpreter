@@ -74,12 +74,12 @@ EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Unhandled variable type '{}'.",
-			detail::get_name(*cond_bool)
+			detail::get_type_name(*cond_bool)
 		);
 		return EvaluationError{
 			.error = {evaluation_error_e::Unhandled_Variable_Type},
 			.message = {
-				std::format("Unhandled type '{}'", detail::get_name(*cond_bool))
+				std::format("Unhandled type '{}'", detail::get_type_name(*cond_bool))
 			}
 		};
 	}

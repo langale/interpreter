@@ -76,11 +76,11 @@ EvaluationResult Program::evaluate(const ale::ast::NegativeNode& v)
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
-		detail::get_name(*rr)
+		detail::get_type_name(*rr)
 	);
 	return EvaluationError{
 		.error = {evaluation_error_e::Unhandled_Variable_Type},
-		.message = {std::format("Unhandled type '{}'", detail::get_name(*rr))}
+		.message = {std::format("Unhandled type '{}'", detail::get_type_name(*rr))}
 	};
 }
 

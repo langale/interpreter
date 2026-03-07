@@ -129,9 +129,12 @@ public:
 	/// Calls the appropriate 'evaluate' function for @e v.
 	template <typename node_t, typename... params_t>
 	[[nodiscard]] EvaluationResult
-	call_evaluate(const std::unique_ptr<ale::ast::Node>& v, const params_t&...p)
+	call_evaluate(const std::unique_ptr<ale::ast::Node>& v, params_t&&...p)
 	{
-		return evaluate(*static_cast<const node_t * const>(v.get()), p...);
+		return evaluate(
+			*static_cast<const node_t * const>(v.get()),
+			std::forward<params_t>(p)...
+		);
 	}
 
 	/// Interprets the contents of node @e v and, optionally, returns a result.

@@ -44,7 +44,7 @@
 	std::filesystem::relative(__FILE__, INTERPRETER_PROJECT_DIRECTORY).string()
 
 #define INTERPRETER_ENTER_FUNCTION(func)                                       \
-	ale::logger::AutomaticTab ale_tabulator_variable_do_not_use(               \
+	ale::logger::YellowTab ale_tabulator_variable_do_not_use(                  \
 		INTERPRETER_FILENAME,                                                  \
 		__FUNCTION__,                                                          \
 		__LINE__,                                                              \
