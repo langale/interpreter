@@ -31,8 +31,6 @@
  *
  ********************************************************************/
 
-#include <optional>
-#include <cmath>
 #include <any>
 
 #include <intlib/logger/macros.hpp>
@@ -40,71 +38,81 @@
 #include <intlib/detail/any_type.hpp>
 
 namespace intlib {
-namespace detail {
+namespace arithmetic {
 
-std::optional<std::any> any_arithmetic_multiplication
-(const std::any& a, const std::any& b)
-noexcept
+std::any arithmetic_addition(const std::any& a, const std::any& b) noexcept
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	if (is_type<uint64_t>(a)) {
+	if (detail::is_type<uint64_t>(a)) {
 		const uint64_t ai = std::any_cast<uint64_t>(a);
 
-		if (is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return ai * bi;
+			return ai + bi;
 		}
 
-		if (is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return to_int64(ai) * bi;
+			const auto res = detail::to_int64(ai) + bi;
+			if (res > 0) {
+				return detail::to_uint64(res);
+			}
+			return res;
 		}
 
-		if (is_type<double>(b)) {
+		if (detail::is_type<double>(b)) {
 			const double bd = std::any_cast<double>(b);
-			return to_double(ai) * bd;
+			return detail::to_double(ai) + bd;
 		}
 
 		// UNHANDLED_ANY(ale::error(), b);
 	}
 
-	if (is_type<int64_t>(a)) {
+	if (detail::is_type<int64_t>(a)) {
 		const int64_t ai = std::any_cast<int64_t>(a);
 
-		if (is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return ai * to_int64(bi);
+			const auto res = ai + detail::to_int64(bi);
+			if (res > 0) {
+				return detail::to_uint64(res);
+			}
+			return res;
 		}
 
-		if (is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return ai * bi;
+			const auto res = ai + bi;
+			if (res > 0) {
+				return detail::to_uint64(res);
+			}
+			return res;
 		}
 
-		if (is_type<double>(b)) {
-			return to_double(ai) * std::any_cast<double>(b);
+		if (detail::is_type<double>(b)) {
+			return detail::to_double(ai) + std::any_cast<double>(b);
 		}
 
 		// UNHANDLED_ANY(ale::error(), b);
 	}
 
-	if (is_type<double>(a)) {
+	if (detail::is_type<double>(a)) {
 		const double ai = std::any_cast<double>(a);
 
-		if (is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return ai * to_double(bi);
+			return ai + detail::to_double(bi);
 		}
 
-		if (is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return ai * to_double(bi);
+			return ai + detail::to_double(bi);
 		}
 
-		if (is_type<double>(b)) {
+		if (detail::is_type<double>(b)) {
 			const double bd = std::any_cast<double>(b);
-			return ai * bd;
+			return ai + bd;
 		}
 
 		// UNHANDLED_ANY(ale::error(), b);
@@ -115,5 +123,5 @@ noexcept
 	return {};
 }
 
-} // -- namespace detail
-} // -- namespace intlib
+} // namespace arithmetic
+} // namespace intlib

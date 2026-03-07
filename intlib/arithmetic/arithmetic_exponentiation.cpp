@@ -31,7 +31,6 @@
  *
  ********************************************************************/
 
-#include <optional>
 #include <cmath>
 #include <any>
 
@@ -40,69 +39,68 @@
 #include <intlib/detail/any_type.hpp>
 
 namespace intlib {
-namespace detail {
+namespace arithmetic {
 
-std::optional<std::any>
-any_arithmetic_exponentiation(const std::any& a, const std::any& b)
+std::any arithmetic_exponentiation(const std::any& a, const std::any& b)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	if (is_type<uint64_t>(a)) {
+	if (detail::is_type<uint64_t>(a)) {
 		const uint64_t ai = std::any_cast<uint64_t>(a);
 
-		if (is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
 			return std::pow(ai, bi);
 		}
 
-		if (is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return std::pow(to_int64(ai), bi);
+			return std::pow(detail::to_int64(ai), bi);
 		}
 
-		if (is_type<double>(b)) {
+		if (detail::is_type<double>(b)) {
 			const double bd = std::any_cast<double>(b);
-			return std::pow(to_double(ai), bd);
+			return std::pow(detail::to_double(ai), bd);
 		}
 
 		// UNHANDLED_ANY(ale::error(), b);
 	}
 
-	if (is_type<int64_t>(a)) {
+	if (detail::is_type<int64_t>(a)) {
 		const int64_t ai = std::any_cast<int64_t>(a);
 
-		if (is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return std::pow(ai, to_int64(bi));
+			return std::pow(ai, detail::to_int64(bi));
 		}
 
-		if (is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
 			return std::pow(ai, bi);
 		}
 
-		if (is_type<double>(b)) {
+		if (detail::is_type<double>(b)) {
 			const double bd = std::any_cast<double>(b);
-			return std::pow(to_double(ai), bd);
+			return std::pow(detail::to_double(ai), bd);
 		}
 
 		// UNHANDLED_ANY(ale::error(), b);
 	}
 
-	if (is_type<double>(a)) {
+	if (detail::is_type<double>(a)) {
 		const double ai = std::any_cast<double>(a);
 
-		if (is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(b)) {
 			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return std::pow(ai, to_double(bi));
+			return std::pow(ai, detail::to_double(bi));
 		}
 
-		if (is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(b)) {
 			const int64_t bi = std::any_cast<int64_t>(b);
-			return std::pow(ai, to_double(bi));
+			return std::pow(ai, detail::to_double(bi));
 		}
 
-		if (is_type<double>(b)) {
+		if (detail::is_type<double>(b)) {
 			const double bd = std::any_cast<double>(b);
 			return std::pow(ai, bd);
 		}
@@ -115,5 +113,5 @@ any_arithmetic_exponentiation(const std::any& a, const std::any& b)
 	return {};
 }
 
-} // namespace detail
+} // namespace arithmetic
 } // namespace intlib

@@ -31,58 +31,36 @@
  *
  ********************************************************************/
 
-#include <optional>
-#include <cmath>
 #include <any>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/macros.hpp>
-#include <intlib/detail/any_type.hpp>
+#include <intlib/arithmetic/arithmetic.hpp>
 
 namespace intlib {
-namespace detail {
+namespace arithmetic {
 
-std::optional<std::any>
-any_arithmetic_modulus(const std::any& a, const std::any& b)
+std::any any_arithmetic(
+	const ale::ast::node_type_e t, const std::any& a, const std::any& b
+)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	if (is_type<uint64_t>(a)) {
-		const uint64_t ai = std::any_cast<uint64_t>(a);
-
-		if (is_type<uint64_t>(b)) {
-			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return ai % bi;
-		}
-
-		if (is_type<int64_t>(b)) {
-			const int64_t bi = std::any_cast<int64_t>(b);
-			return to_int64(ai) % bi;
-		}
-
-		// UNHANDLED_ANY(ale::error(), b);
+	switch (t) {
+	case ale::ast::node_type_e::Arithmetic_Addition:
+		return arithmetic_addition(a, b);
+	case ale::ast::node_type_e::Arithmetic_Division:
+		return arithmetic_division(a, b);
+	case ale::ast::node_type_e::Arithmetic_Exponentiation:
+		return arithmetic_exponentiation(a, b);
+	case ale::ast::node_type_e::Arithmetic_Modulus:
+		return arithmetic_modulus(a, b);
+	case ale::ast::node_type_e::Arithmetic_Multiplication:
+		return arithmetic_multiplication(a, b);
+	case ale::ast::node_type_e::Arithmetic_Subtraction:
+		return arithmetic_subtraction(a, b);
+	default: return {};
 	}
-
-	if (is_type<int64_t>(a)) {
-		const int64_t ai = std::any_cast<int64_t>(a);
-
-		if (is_type<uint64_t>(b)) {
-			const uint64_t bi = std::any_cast<uint64_t>(b);
-			return ai % to_int64(bi);
-		}
-
-		if (is_type<int64_t>(b)) {
-			const int64_t bi = std::any_cast<int64_t>(b);
-			return ai % bi;
-		}
-
-		// UNHANDLED_ANY(ale::error(), b);
-	}
-
-	// UNHANDLED_ANY(ale::error(), a);
-
-	return {};
 }
 
-} // namespace detail
+} // namespace arithmetic
 } // namespace intlib
