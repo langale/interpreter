@@ -54,49 +54,69 @@ EvaluationResult Program::evaluate(
 	assert(children.size() >= 2);
 #endif
 
-	/*
 	const auto node_eval =
-		[&](const std::unique_ptr<ale::ast::Node>& c) -> std::optional<std::any>
+		[&](const std::unique_ptr<ale::ast::Node>& c) -> EvaluationResult
 	{
-		const std::optional<std::any> res = interpret_node(c);
-		if (not res.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of node failed in arithmetic node '"
-			// 			 << v.get_operation_string() << "'.\n";
-			return {};
+		EvaluationResult res = interpret_node(c);
+		if (not res) {
+			INTERPRETER_PRINT_LOC(
+				ale::logger::println,
+				"Evaluation of node within arithmetic node failed."
+			);
+			return EvaluationError{
+				.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
+				.message = {"Evaluation of node within arithmetic node failed."}
+			};
 		}
 		if (detail::is_type<void>(*res)) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of node returned a void value.\n";
-			return {};
+			INTERPRETER_PRINT_LOC(
+				ale::logger::println,
+				"Evaluation of node returned a void value."
+			);
+			return EvaluationError{
+				.error = {evaluation_error_e::Evaluation_Of_Node_Is_Void},
+				.message = {"Evaluation of node returned a void value."}
+			};
 		}
-		return res;
+		return std::move(*res);
 	};
 
-	std::optional<std::any> r = node_eval(children[0]);
-	if (not r.has_value()) {
-		return {};
+	EvaluationResult r = node_eval(children[0]);
+	if (not r) {
+		return std::move(r.error());
 	}
+
+	std::optional<std::any> expr_res = *r;
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
-		const std::optional<std::any> rv = node_eval(c);
-		if (not rv.has_value()) {
-			return {};
+
+		EvaluationResult rv = node_eval(c);
+		if (not rv) {
+			return std::move(r.error());
 		}
 
-		r = detail::any_arithmetic(t, *r, *rv);
+		expr_res = detail::any_arithmetic(t, *expr_res, *rv);
 
-		if (not r.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Operation in arithmetic node '"
-			// 			 << v.get_operation_string() << "' failed.\n";
-			return {};
+		if (not r) {
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println,
+				"Arithmetic operation '{}' did not return a value.",
+				v.get_operation_string()
+			);
+			return EvaluationError{
+				.error = {evaluation_error_e::Arithmetic_Operation_Failed},
+				.message = {
+					std::format(
+						"Arithmetic operation '{}' did not return a value.",
+						v.get_operation_string()
+					)
+				}
+			};
 		}
 	}
-	*/
 
-	return 100;
+	return *expr_res;
 }
 
 } // namespace intlib
