@@ -45,38 +45,97 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	if (detail::is_type<uint64_t>(a)) {
-		const uint64_t ai = std::any_cast<uint64_t>(a);
+		const auto ai = std::any_cast<uint64_t>(a);
 
 		if (detail::is_type<uint64_t>(b)) {
-			const uint64_t bi = std::any_cast<uint64_t>(b);
+			const auto bi = std::any_cast<uint64_t>(b);
 			return ai % bi;
 		}
 
 		if (detail::is_type<int64_t>(b)) {
-			const int64_t bi = std::any_cast<int64_t>(b);
+			const auto bi = std::any_cast<int64_t>(b);
 			return detail::to_int64(ai) % bi;
 		}
 
-		// UNHANDLED_ANY(ale::error(), b);
+		if (detail::is_type<double>(b)) {
+			const auto bi = std::any_cast<double>(b);
+			if (bi < 0) {
+				return detail::to_int64(ai) % detail::to_int64(bi);
+			}
+			return ai % detail::to_uint64(bi);
+		}
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Parameter b's type {} is not handled.",
+			detail::get_type_name(b)
+		);
 	}
 
 	if (detail::is_type<int64_t>(a)) {
-		const int64_t ai = std::any_cast<int64_t>(a);
+		const auto ai = std::any_cast<int64_t>(a);
 
 		if (detail::is_type<uint64_t>(b)) {
-			const uint64_t bi = std::any_cast<uint64_t>(b);
+			const auto bi = std::any_cast<uint64_t>(b);
 			return ai % detail::to_int64(bi);
 		}
 
 		if (detail::is_type<int64_t>(b)) {
-			const int64_t bi = std::any_cast<int64_t>(b);
+			const auto bi = std::any_cast<int64_t>(b);
 			return ai % bi;
 		}
 
-		// UNHANDLED_ANY(ale::error(), b);
+		if (detail::is_type<double>(b)) {
+			const auto bi = std::any_cast<double>(b);
+			if (bi < 0) {
+				return ai % detail::to_int64(bi);
+			}
+			return detail::to_uint64(ai) % detail::to_uint64(bi);
+		}
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Parameter b's type {} is not handled.",
+			detail::get_type_name(b)
+		);
 	}
 
-	// UNHANDLED_ANY(ale::error(), a);
+	if (detail::is_type<double>(a)) {
+		const auto ai = std::any_cast<double>(a);
+
+		if (detail::is_type<uint64_t>(b)) {
+			const auto bi = std::any_cast<uint64_t>(b);
+			if (ai < 0) {
+				return detail::to_int64(ai) % detail::to_int64(bi);
+			}
+			return detail::to_uint64(ai) % bi;
+		}
+
+		if (detail::is_type<int64_t>(b)) {
+			const auto bi = std::any_cast<int64_t>(b);
+			return detail::to_int64(ai) % bi;
+		}
+
+		if (detail::is_type<double>(b)) {
+			const auto bi = std::any_cast<double>(b);
+			if (bi < 0 or ai < 0) {
+				return detail::to_int64(ai) % detail::to_int64(bi);
+			}
+			return detail::to_uint64(ai) % detail::to_uint64(bi);
+		}
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Parameter b's type {} is not handled.",
+			detail::get_type_name(b)
+		);
+	}
+
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"Parameter a's type {} is not handled.",
+		detail::get_type_name(a)
+	);
 
 	return {};
 }
