@@ -39,7 +39,7 @@
 #include <intlib/Program.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
-#include <intlib/detail/any_arithmetic.hpp>
+#include <intlib/arithmetic/arithmetic.hpp>
 
 namespace intlib {
 
@@ -86,7 +86,7 @@ EvaluationResult Program::evaluate(
 		return std::move(r.error());
 	}
 
-	std::optional<std::any> expr_res = *r;
+	std::any expr_res = *r;
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
@@ -96,9 +96,9 @@ EvaluationResult Program::evaluate(
 			return std::move(r.error());
 		}
 
-		expr_res = detail::any_arithmetic(t, *expr_res, *rv);
+		expr_res = arithmetic::any_arithmetic(t, expr_res, *rv);
 
-		if (not r) {
+		if (not expr_res.has_value()) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Arithmetic operation '{}' did not return a value.",
@@ -116,7 +116,7 @@ EvaluationResult Program::evaluate(
 		}
 	}
 
-	return *expr_res;
+	return expr_res;
 }
 
 } // namespace intlib
