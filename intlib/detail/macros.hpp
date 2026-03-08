@@ -31,7 +31,9 @@
 
 #pragma once
 
+#include <concepts>
 #include <cstdint>
+#include <any>
 
 namespace intlib {
 namespace detail {
@@ -52,6 +54,15 @@ template <typename type_t>
 [[nodiscard]] int64_t to_int64(const type_t& x)
 {
 	return static_cast<int64_t>(x);
+}
+
+template <std::integral type_t>
+[[nodiscard]] constexpr std::any adapt_type(type_t v) noexcept
+{
+	if (v >= 0) {
+		return detail::to_uint64(v);
+	}
+	return detail::to_int64(v);
 }
 
 } // namespace detail
