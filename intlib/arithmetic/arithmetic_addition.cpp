@@ -46,23 +46,35 @@ std::any arithmetic_addition(const std::any& a, const std::any& b)
 
 	if (detail::is_type<uint64_t>(a)) {
 		const auto ai = std::any_cast<uint64_t>(a);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "First component is uint64_t: {}.", ai
+		);
 
 		if (detail::is_type<uint64_t>(b)) {
 			const auto bi = std::any_cast<uint64_t>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is uint64_t: {}.", bi
+			);
+
 			return ai + bi;
 		}
 
 		if (detail::is_type<int64_t>(b)) {
 			const auto bi = std::any_cast<int64_t>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is int64_t: {}.", bi
+			);
+
 			const auto res = detail::to_int64(ai) + bi;
-			if (res > 0) {
-				return detail::to_uint64(res);
-			}
-			return res;
+			return detail::adapt_type(res);
 		}
 
 		if (detail::is_type<double>(b)) {
-			const auto bd = std::any_cast<double>(b);
+			const double bd = std::any_cast<double>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is double: {}.", bd
+			);
+
 			return detail::to_double(ai) + bd;
 		}
 
@@ -75,27 +87,37 @@ std::any arithmetic_addition(const std::any& a, const std::any& b)
 
 	if (detail::is_type<int64_t>(a)) {
 		const auto ai = std::any_cast<int64_t>(a);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "First component is int64_t: {}.", ai
+		);
 
 		if (detail::is_type<uint64_t>(b)) {
 			const auto bi = std::any_cast<uint64_t>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is uint64_t: {}.", bi
+			);
+
 			const auto res = ai + detail::to_int64(bi);
-			if (res > 0) {
-				return detail::to_uint64(res);
-			}
-			return res;
+			return detail::adapt_type(res);
 		}
 
 		if (detail::is_type<int64_t>(b)) {
 			const auto bi = std::any_cast<int64_t>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is int64_t: {}.", bi
+			);
+
 			const auto res = ai + bi;
-			if (res > 0) {
-				return detail::to_uint64(res);
-			}
-			return res;
+			return detail::adapt_type(res);
 		}
 
 		if (detail::is_type<double>(b)) {
-			return detail::to_double(ai) + std::any_cast<double>(b);
+			const double bd = std::any_cast<double>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is double: {}.", bd
+			);
+
+			return detail::to_double(ai) + bd;
 		}
 
 		INTERPRETER_PRINT_LOC2(
@@ -107,19 +129,34 @@ std::any arithmetic_addition(const std::any& a, const std::any& b)
 
 	if (detail::is_type<double>(a)) {
 		const auto ai = std::any_cast<double>(a);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "First component is double: {}.", ai
+		);
 
 		if (detail::is_type<uint64_t>(b)) {
 			const auto bi = std::any_cast<uint64_t>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is uint64_t: {}.", bi
+			);
+
 			return ai + detail::to_double(bi);
 		}
 
 		if (detail::is_type<int64_t>(b)) {
 			const auto bi = std::any_cast<int64_t>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is int64_t: {}.", bi
+			);
+
 			return ai + detail::to_double(bi);
 		}
 
 		if (detail::is_type<double>(b)) {
-			const auto bd = std::any_cast<double>(b);
+			const double bd = std::any_cast<double>(b);
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Second component is double: {}.", bd
+			);
+
 			return ai + bd;
 		}
 
