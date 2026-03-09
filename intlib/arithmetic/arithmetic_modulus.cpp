@@ -76,9 +76,12 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			);
 
 			if (bd < 0) {
-				return detail::to_int64(ai) % detail::to_int64(bd);
+				const auto res = detail::to_int64(ai) % detail::to_int64(bd);
+				return detail::adapt_type(res);
 			}
-			return ai % detail::to_uint64(bd);
+
+			const auto res = ai % detail::to_uint64(bd);
+			return detail::adapt_type(res);
 		}
 
 		INTERPRETER_PRINT_LOC2(
@@ -121,9 +124,11 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			);
 
 			if (bd < 0) {
-				return ai % detail::to_int64(bd);
+				const auto res = ai % detail::to_int64(bd);
+				return detail::adapt_type(res);
 			}
-			return detail::to_uint64(ai) % detail::to_uint64(bd);
+			const auto res = detail::to_uint64(ai) % detail::to_uint64(bd);
+			return detail::adapt_type(res);
 		}
 
 		INTERPRETER_PRINT_LOC2(
@@ -146,9 +151,11 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			);
 
 			if (ai < 0) {
-				return detail::to_int64(ai) % detail::to_int64(bi);
+				const auto res = detail::to_int64(ai) % detail::to_int64(bi);
+				return detail::adapt_type(res);
 			}
-			return detail::to_uint64(ai) % bi;
+			const auto res = detail::to_uint64(ai) % bi;
+			return detail::adapt_type(res);
 		}
 
 		if (detail::is_type<int64_t>(b)) {
@@ -157,7 +164,8 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 				ale::logger::println, "Second component is int64_t: {}.", bi
 			);
 
-			return detail::to_int64(ai) % bi;
+			const auto res = detail::to_int64(ai) % bi;
+			return detail::adapt_type(res);
 		}
 
 		if (detail::is_type<double>(b)) {
@@ -167,9 +175,11 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			);
 
 			if (bd < 0 or ai < 0) {
-				return detail::to_int64(ai) % detail::to_int64(bd);
+				const auto res = detail::to_int64(ai) % detail::to_int64(bd);
+				return detail::adapt_type(res);
 			}
-			return detail::to_uint64(ai) % detail::to_uint64(bd);
+			const auto res = detail::to_uint64(ai) % detail::to_uint64(bd);
+			return detail::adapt_type(res);
 		}
 
 		INTERPRETER_PRINT_LOC2(
