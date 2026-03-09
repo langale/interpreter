@@ -34,7 +34,7 @@
 
 #include <ale/lexer/lexer.hpp>
 #include <ale/parser/utils/ParseResult.hpp>
-#include <ale/parser/parser.hpp>
+#include <ale/parser/program.hpp>
 #include <ale/logger/Logger.hpp>
 
 #include <intlib/Program.hpp>
