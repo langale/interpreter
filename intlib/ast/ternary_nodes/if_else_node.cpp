@@ -78,22 +78,42 @@ EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 		);
 		return EvaluationError{
 			.error = {evaluation_error_e::Unhandled_Variable_Type},
-			.message = {
-				std::format("Unhandled type '{}'", detail::get_type_name(*cond_bool))
-			}
+			.message = {std::format(
+				"Unhandled type '{}'", detail::get_type_name(*cond_bool)
+			)}
 		};
 	}
 
 	if (*cond_bool) {
-		if (second_child != nullptr) {
-			return interpret_node(second_child);
+		if (second_child == nullptr) {
+			INTERPRETER_PRINT_LOC(
+				ale::logger::println,
+				"Condition is true but the first branch of if statement is "
+				"empty."
+			);
+			return EvaluationError{
+				.error = {evaluation_error_e::If_Statement_First_Branch_Empty},
+				.message = {"Condition is true but the first branch of if "
+							"statement is empty."}
+			};
 		}
-	}
-	else if (third_child != nullptr) {
-		return interpret_node(third_child);
+
+		return interpret_node(second_child);
 	}
 
-	return {};
+	if (third_child == nullptr) {
+		INTERPRETER_PRINT_LOC(
+			ale::logger::println,
+			"Condition is true but the second branch of if statement is empty."
+		);
+		return EvaluationError{
+			.error = {evaluation_error_e::If_Statement_Second_Branch_Empty},
+			.message = {"Condition is true but the second branch of if "
+						"statement is empty."}
+		};
+	}
+
+	return interpret_node(third_child);
 }
 
 } // namespace intlib
