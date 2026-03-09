@@ -1,5 +1,5 @@
 /*********************************************************************
-*
+ *
  * ALE interpreter library -- the base utilities for a command line utility
  * to run Programs written in ALE
  *
