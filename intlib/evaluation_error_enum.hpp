@@ -55,7 +55,9 @@ enum class evaluation_error_e : uint8_t {
 
 	Conversion_To_Bool_Failed,
 
-	If_Statement_Condition_Empty
+	If_Statement_Condition_Empty,
+	If_Statement_First_Branch_Empty,
+	If_Statement_Second_Branch_Empty,
 };
 
 [[nodiscard]] constexpr std::string_view
@@ -83,6 +85,10 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 
 	case evaluation_error_e::If_Statement_Condition_Empty:
 		return "If_Statement_Condition_Empty";
+	case evaluation_error_e::If_Statement_First_Branch_Empty:
+		return "If_Statement_First_Branch_Empty";
+	case evaluation_error_e::If_Statement_Second_Branch_Empty:
+		return "If_Statement_Second_Branch_Empty";
 
 	case evaluation_error_e::Forbidden_Evaluation_Of_Node:
 		return "Forbidden_Evaluation_Of_Node";
