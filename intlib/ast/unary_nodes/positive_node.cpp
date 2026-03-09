@@ -57,19 +57,25 @@ EvaluationResult Program::evaluate(const ale::ast::PositiveNode& v)
 	const std::any& r = *rr;
 	if (detail::is_type<uint64_t>(r)) {
 		const uint64_t ri = std::any_cast<uint64_t>(r);
-		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
-		return detail::to_int64(ri);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Evaluation of node is uint64_t: {}.", ri
+		);
+		return detail::to_uint64(ri);
 	}
 
 	if (detail::is_type<int64_t>(r)) {
 		const int64_t ri = std::any_cast<int64_t>(r);
-		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Evaluation of node is int64_t: {}.", ri
+		);
 		return ri;
 	}
 
 	if (detail::is_type<double>(r)) {
 		const double ri = std::any_cast<double>(r);
-		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", ri);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Evaluation of node is double: {}.", ri
+		);
 		return ri;
 	}
 
@@ -80,7 +86,9 @@ EvaluationResult Program::evaluate(const ale::ast::PositiveNode& v)
 	);
 	return EvaluationError{
 		.error = {evaluation_error_e::Unhandled_Variable_Type},
-		.message = {std::format("Unhandled type '{}'", detail::get_type_name(*rr))}
+		.message = {
+			std::format("Unhandled type '{}'", detail::get_type_name(*rr))
+		}
 	};
 }
 
