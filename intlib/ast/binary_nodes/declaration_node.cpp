@@ -123,44 +123,79 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 	assert(left_child != nullptr);
 #endif
 
-	/*
 	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
 		std::string var_name =
 			static_cast<const ale::ast::VariableNode * const>(left_child.get())
 				->get_variable_name();
 
 		if (m_memory.variable_exists_shallow(var_name)) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Redeclaration of variable '" << var_name
-			// 			 << "'.\n";
-			return {};
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println, "Redeclaration of variable {}.", var_name
+			);
+			return EvaluationError{
+				.error = {evaluation_error_e::Memory_Variable_Already_Exists},
+				.message = {
+					std::format("Redeclaration of variable {}.", var_name)
+				}
+			};
 		}
+
+		std::string var_type = v.get_type();
 
 		// This is a 'declare' node.
 		if (right_child == nullptr) {
-			m_memory.declare_variable(std::move(var_name), {});
-			return std::any{};
+			[[maybe_unused]] const auto res = m_memory.declare_variable(
+				std::move(var_name), {}, std::move(var_type)
+			);
+
+#if defined DEBUG
+			// None of the following errors can happen:
+			// - Variable_Does_Not_Exist, Type_Mismatch, Attempt_To_Assign_Value_To_Constant_Variable:
+			//   This cannot be returned when declaring a variable.
+			// - Variable_Exists:
+			//   This has been ensured will never happen
+			assert(res.has_value());
+#endif
+			return {};
 		}
 
 		std::optional<std::any> value = interpret_node(right_child);
 		if (not value.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of node failed.\n";
-			return {};
+			INTERPRETER_PRINT_LOC(
+				ale::logger::println, "Evaluation of node failed."
+			);
+			return EvaluationError{
+				.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
+				.message = {"Evaluation of node failed."}
+			};
 		}
 
+		memory::AccessResult res;
 		std::any copy = *value;
 		if (v.is_constant()) {
-			m_memory.declare_constant_variable(
-				std::move(var_name), std::move(copy)
+			res = m_memory.declare_constant_variable(
+				std::move(var_name), std::move(copy), std::move(var_type)
 			);
 		}
 		else {
-			m_memory.declare_variable(std::move(var_name), std::move(copy));
+			res = m_memory.declare_variable(
+				std::move(var_name), std::move(copy), std::move(var_type)
+			);
 		}
-		return value;
+
+#if defined DEBUG
+		// None of the following errors can happen:
+		// - Variable_Does_Not_Exist, Type_Mismatch, Attempt_To_Assign_Value_To_Constant_Variable:
+		//   This cannot be returned when declaring a variable.
+		// - Variable_Exists:
+		//   This has been ensured will never happen
+		assert(res.has_value());
+#endif
+
+		return {};
 	}
 
+	/*
 	if (left_child->get_node_type() ==
 		ale::ast::node_type_e::Comma_Separated_Group) {
 		std::vector<std::string> variable_names;
@@ -285,7 +320,8 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 	// ale::error() << "        - a variable sequence\n";
 	// ale::error() << "    Found: '"
 	// 			 << node_type_to_string(left_child->get_node_type()) << "'\n";
-	*/ return {};
+	*/
+	return {};
 }
 
 } // namespace intlib
