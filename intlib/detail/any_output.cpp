@@ -29,18 +29,44 @@
  *
  ********************************************************************/
 
-#pragma once
-
 #include <format>
 #include <any>
 
-struct any_view {
-	const std::any& value;
-};
+#include <intlib/detail/any_output.hpp>
+#include <intlib/detail/any_type.hpp>
 
-template <>
-struct std::formatter<any_view> : std::formatter<std::string> {
-	using OutT = std::format_context::iterator;
+std::formatter<any_view>::OutT std::formatter<any_view>::format(
+	const any_view view, std::format_context& ctx
+) const
+{
+	const std::any& a = view.value;
+	const std::string name = intlib::detail::get_type_name(a);
 
-	OutT format(const any_view view, std::format_context& ctx) const;
-};
+	if (not a.has_value()) {
+		return std::format_to(ctx.out(), "<empty>");
+	}
+
+	if (intlib::detail::is_type<bool>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<bool>(a));
+	}
+
+	if (intlib::detail::is_type<int64_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<int64_t>(a));
+	}
+
+	if (intlib::detail::is_type<uint64_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<uint64_t>(a));
+	}
+
+	if (intlib::detail::is_type<double>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<double>(a));
+	}
+
+	if (intlib::detail::is_type<std::string>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<std::string>(a));
+	}
+
+	return std::format_to(
+		ctx.out(), "Could not write value of type: '{}'.", name
+	);
+}

@@ -31,15 +31,32 @@
  *
  ********************************************************************/
 
-#pragma once
-
 #include <optional>
-#include <any>
+
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/macros.hpp>
 
 namespace intlib {
 namespace detail {
 
-[[nodiscard]] std::optional<bool> any_to_bool(const std::any& a) noexcept;
+std::optional<bool> any_to_bool(const std::any& a) noexcept
+{
+	const std::string type = get_type_name(a);
+
+	if (detail::is_builtin_type<bool>(type)) {
+		return std::any_cast<bool>(a);
+	}
+	if (detail::is_builtin_type<int64_t>(type)) {
+		return std::any_cast<int64_t>(a);
+	}
+	if (detail::is_builtin_type<uint64_t>(type)) {
+		return std::any_cast<uint64_t>(a);
+	}
+	if (detail::is_builtin_type<double>(type)) {
+		return to_int64(std::any_cast<double>(a));
+	}
+	return {};
+}
 
 } // namespace detail
 } // namespace intlib

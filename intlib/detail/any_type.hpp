@@ -31,7 +31,8 @@
 
 #pragma once
 
-#include <cxxabi.h>
+#include <stdfloat>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <any>
@@ -42,23 +43,63 @@ namespace detail {
 /**
  * @brief Demangles the type name of a std::any value.
  *
- * Copied from ChatGPT.
  * @param name Input name from type().name()
  * @returns A more human-readable string for the name of a std::any.
  */
-[[nodiscard]] inline std::string demangle_name_type(const char *name)
-{
-	int status = -4;
-	std::unique_ptr<char, void (*)(void *)> res{
-		abi::__cxa_demangle(name, nullptr, nullptr, &status), std::free
-	};
-	return (status == 0) ? res.get() : name;
-}
+[[nodiscard]] std::string demangle_name_type(const char *name);
 
 /// Returns a 'standardized' name for 'a'.
-[[nodiscard]] inline std::string get_type_name(const std::any& a)
+[[nodiscard]] std::string get_type_name(const std::any& a);
+
+template <typename type_t>
+[[nodiscard]] constexpr bool check_is_builtint_type() noexcept
 {
-	return demangle_name_type(a.type().name());
+	if constexpr (std::is_same_v<type_t, bool>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, int8_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, uint8_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, int16_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, uint16_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, int32_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, uint32_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, int64_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, uint64_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, std::float16_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, std::float32_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, float>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, std::float64_t>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, double>) {
+		return true;
+	}
+	if constexpr (std::is_void_v<type_t>) {
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -69,10 +110,24 @@ namespace detail {
  * type @e T.
  */
 template <typename type_t>
-[[nodiscard]] bool is_type(const std::string& name)
+[[nodiscard]] bool is_builtin_type(const std::string& name)
 {
+	static_assert(check_is_builtint_type<type_t>());
+
 	if constexpr (std::is_same_v<type_t, bool>) {
 		return name == "bool";
+	}
+	else if constexpr (std::is_same_v<type_t, int8_t>) {
+		return name == "char";
+	}
+	else if constexpr (std::is_same_v<type_t, uint8_t>) {
+		return name == "unsigned char";
+	}
+	else if constexpr (std::is_same_v<type_t, int16_t>) {
+		return name == "short";
+	}
+	else if constexpr (std::is_same_v<type_t, uint16_t>) {
+		return name == "unsigned short";
 	}
 	else if constexpr (std::is_same_v<type_t, int32_t>) {
 		return name == "int";
@@ -86,18 +141,37 @@ template <typename type_t>
 	else if constexpr (std::is_same_v<type_t, uint64_t>) {
 		return name == "unsigned long";
 	}
+	else if constexpr (std::is_same_v<type_t, std::float16_t>) {
+		return name == "float16";
+	}
+	else if constexpr (std::is_same_v<type_t, std::float32_t>) {
+		return name == "float32";
+	}
+	else if constexpr (std::is_same_v<type_t, float>) {
+		return name == "float";
+	}
+	else if constexpr (std::is_same_v<type_t, std::float64_t>) {
+		return name == "float64";
+	}
 	else if constexpr (std::is_same_v<type_t, double>) {
 		return name == "double";
-	}
-	else if constexpr (std::is_same_v<type_t, std::string>) {
-		return name == "std::__cxx11::basic_string<char, "
-					   "std::char_traits<char>, std::allocator<char> >";
 	}
 	else if constexpr (std::is_void_v<type_t>) {
 		return name == "void";
 	}
-	else {
-		static_assert(false);
+
+	return false;
+}
+
+template <typename type_t>
+[[nodiscard]] bool is_type(const std::string& name)
+{
+	if constexpr (check_is_builtint_type<type_t>()) {
+		return is_builtin_type<type_t>(name);
+	}
+
+	if constexpr (std::is_same_v<type_t, std::string>) {
+		return name == typeid(std::string).name();
 	}
 
 	return false;

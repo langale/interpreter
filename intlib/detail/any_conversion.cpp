@@ -31,15 +31,67 @@
  *
  ********************************************************************/
 
-#pragma once
-
-#include <optional>
+#include <string>
+#include <array>
 #include <any>
+
+#include <intlib/detail/any_to_numeric.hpp>
 
 namespace intlib {
 namespace detail {
 
-[[nodiscard]] std::optional<bool> any_to_bool(const std::any& a) noexcept;
+static constexpr std::array numeric_types{
+	"u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f16", "f32", "f64"
+};
+
+bool is_type_numeric(const std::string& type) noexcept
+{
+	return std::ranges::find(numeric_types, type) != numeric_types.end();
+}
+
+std::any any_convert_to_type(const std::any& value, const std::string& type)
+{
+	if (is_type_numeric(type)) {
+		if (type == "u8") {
+			return any_to_numeric<uint8_t>(value);
+		}
+		if (type == "i8") {
+			return any_to_numeric<int8_t>(value);
+		}
+
+		if (type == "u16") {
+			return any_to_numeric<uint16_t>(value);
+		}
+		if (type == "i16") {
+			return any_to_numeric<int16_t>(value);
+		}
+
+		if (type == "u32") {
+			return any_to_numeric<uint32_t>(value);
+		}
+		if (type == "i32") {
+			return any_to_numeric<int32_t>(value);
+		}
+
+		if (type == "u64") {
+			return any_to_numeric<uint64_t>(value);
+		}
+		if (type == "i64") {
+			return any_to_numeric<int64_t>(value);
+		}
+
+		if (type == "f16") {
+			return any_to_numeric<std::float16_t>(value);
+		}
+		if (type == "f32") {
+			return any_to_numeric<std::float32_t>(value);
+		}
+		if (type == "f64") {
+			return any_to_numeric<std::float64_t>(value);
+		}
+	}
+	return {};
+}
 
 } // namespace detail
 } // namespace intlib

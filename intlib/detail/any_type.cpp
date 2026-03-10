@@ -29,18 +29,27 @@
  *
  ********************************************************************/
 
-#pragma once
-
-#include <format>
+#include <cxxabi.h>
+#include <memory>
+#include <string>
 #include <any>
 
-struct any_view {
-	const std::any& value;
-};
+namespace intlib {
+namespace detail {
 
-template <>
-struct std::formatter<any_view> : std::formatter<std::string> {
-	using OutT = std::format_context::iterator;
+std::string demangle_name_type(const char *name)
+{
+	int status = -4;
+	std::unique_ptr<char, void (*)(void *)> res{
+		abi::__cxa_demangle(name, nullptr, nullptr, &status), std::free
+	};
+	return (status == 0) ? res.get() : name;
+}
 
-	OutT format(const any_view view, std::format_context& ctx) const;
-};
+std::string get_type_name(const std::any& a)
+{
+	return demangle_name_type(a.type().name());
+}
+
+} // namespace detail
+} // namespace intlib

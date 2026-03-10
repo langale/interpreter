@@ -1,12 +1,14 @@
 /*********************************************************************
  *
- * ALE language -- an interpreted programming language
- * Copyright (C) 2024 - 2026 Lluís Alemany Puig
+ * ALE interpreter library -- the base utilities for a command line utility
+ * to run programs written in ALE
  *
- * This file is part of the implementation of ALE. The full code is
- * available at:
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
- *     https://github.com/langale/ale
+ * This file is part of the implementation of an interpreter for ALE.
+ * The full code is available at:
+ *
+ *     https://github.com/langale/interpreter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -31,16 +33,16 @@
 
 #pragma once
 
-#include <format>
+#include <string>
 #include <any>
 
-struct any_view {
-	const std::any& value;
-};
+namespace intlib {
+namespace detail {
 
-template <>
-struct std::formatter<any_view> : std::formatter<std::string> {
-	using OutT = std::format_context::iterator;
+[[nodiscard]] bool is_type_numeric(const std::string& type) noexcept;
 
-	OutT format(const any_view view, std::format_context& ctx) const;
-};
+[[nodiscard]] std::any
+any_convert_to_type(const std::any& value, const std::string& type);
+
+} // namespace detail
+} // namespace intlib
