@@ -33,6 +33,9 @@
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_bool.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <intlib/detail/any_type.hpp>
+#endif
 #include <intlib/Program.hpp>
 
 namespace intlib {
@@ -55,7 +58,9 @@ EvaluationResult Program::evaluate(const ale::ast::NegationNode& v)
 
 	const std::optional<bool> r = detail::any_to_bool(*rr);
 	if (r) {
-		INTERPRETER_PRINT_LOC2(ale::logger::println, "Evaluation of node: {}.", *r);
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Evaluation of node: {}.", *r
+		);
 		return not *r;
 	}
 
@@ -66,7 +71,9 @@ EvaluationResult Program::evaluate(const ale::ast::NegationNode& v)
 	);
 	return EvaluationError{
 		.error = {evaluation_error_e::Unhandled_Variable_Type},
-		.message = {std::format("Unhandled type '{}'", detail::get_type_name(*rr))}
+		.message = {
+			std::format("Unhandled type '{}'", detail::get_type_name(*rr))
+		}
 	};
 }
 

@@ -182,7 +182,9 @@ EvaluationResult Program::evaluate(const ale::ast::SubscriptedVariableNode& v)
 
 	if (detail::is_type<void>(res->value)) {
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "Variable '{}' has no value.", full_variable_name
+			ale::logger::println,
+			"Variable '{}' has no value.",
+			full_variable_name
 		);
 		return EvaluationError{
 			.error = {evaluation_error_e::Valueless_Variable},

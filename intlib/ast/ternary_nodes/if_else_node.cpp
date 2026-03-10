@@ -32,9 +32,9 @@
  ********************************************************************/
 
 #include <optional>
-#include <any>
 
 #include <intlib/logger/macros.hpp>
+#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/Program.hpp>

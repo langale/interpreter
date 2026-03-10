@@ -55,8 +55,6 @@ Program::evaluate(const ale::ast::LiteralUnsignedIntegerNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	static_assert(std::is_same_v<decltype(v.get_value()), uint64_t>);
-
 	return v.get_value();
 }
 
