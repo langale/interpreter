@@ -118,6 +118,11 @@ public:
 		return m_program_node;
 	}
 
+	[[nodiscard]] const memory::Memory& get_memory() const noexcept
+	{
+		return m_memory;
+	}
+
 	/* OTHER */
 
 	/// Execute this Program.
