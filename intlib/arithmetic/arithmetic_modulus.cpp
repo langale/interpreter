@@ -44,13 +44,16 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	if (detail::is_type<uint64_t>(a)) {
+	const std::string type_a = detail::get_type_name(a);
+	const std::string type_b = detail::get_type_name(b);
+	
+	if (detail::is_type<uint64_t>(type_a)) {
 		const auto ai = std::any_cast<uint64_t>(a);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "First component is uint64_t: {}.", ai
 		);
 
-		if (detail::is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(type_b)) {
 			const auto bi = std::any_cast<uint64_t>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is uint64_t: {}.", bi
@@ -59,7 +62,7 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			return ai % bi;
 		}
 
-		if (detail::is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(type_b)) {
 			const auto bi = std::any_cast<int64_t>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is int64_t: {}.", bi
@@ -69,7 +72,7 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<double>(b)) {
+		if (detail::is_type<double>(type_b)) {
 			const double bd = std::any_cast<double>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is double: {}.", bd
@@ -91,13 +94,13 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 		);
 	}
 
-	if (detail::is_type<int64_t>(a)) {
+	if (detail::is_type<int64_t>(type_a)) {
 		const auto ai = std::any_cast<int64_t>(a);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "First component is int64_t: {}.", ai
 		);
 
-		if (detail::is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(type_b)) {
 			const auto bi = std::any_cast<uint64_t>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is uint64_t: {}.", bi
@@ -107,7 +110,7 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(type_b)) {
 			const auto bi = std::any_cast<int64_t>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is int64_t: {}.", bi
@@ -117,7 +120,7 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<double>(b)) {
+		if (detail::is_type<double>(type_b)) {
 			const double bd = std::any_cast<double>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is double: {}.", bd
@@ -138,13 +141,13 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 		);
 	}
 
-	if (detail::is_type<double>(a)) {
+	if (detail::is_type<double>(type_a)) {
 		const auto ai = std::any_cast<double>(a);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "First component is double: {}.", ai
 		);
 
-		if (detail::is_type<uint64_t>(b)) {
+		if (detail::is_type<uint64_t>(type_b)) {
 			const auto bi = std::any_cast<uint64_t>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is uint64_t: {}.", bi
@@ -158,7 +161,7 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<int64_t>(b)) {
+		if (detail::is_type<int64_t>(type_b)) {
 			const auto bi = std::any_cast<int64_t>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is int64_t: {}.", bi
@@ -168,7 +171,7 @@ std::any arithmetic_modulus(const std::any& a, const std::any& b)
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<double>(b)) {
+		if (detail::is_type<double>(type_b)) {
 			const double bd = std::any_cast<double>(b);
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Second component is double: {}.", bd
