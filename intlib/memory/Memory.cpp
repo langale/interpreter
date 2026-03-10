@@ -36,67 +36,97 @@
 namespace intlib {
 namespace memory {
 
+#define SUCCESSFUL                                                             \
+	return AccessResult { }
+
 /* MODIFIERS */
 
-void Memory::declare_variable(std::string&& s, std::any&& v) noexcept
+AccessResult Memory::declare_variable(
+	std::string&& name, std::any&& value, std::string&& type
+) noexcept
 {
+	AccessResult result;
 	if (is_current_scope_global()) {
-		m_global_scope.declare_variable(std::move(s), std::move(v));
-	}
-	else {
-		m_local_scopes.top().declare_variable(std::move(s), std::move(v));
-	}
-}
-
-void Memory::declare_constant_variable(std::string&& s, std::any&& v) noexcept
-{
-	if (is_current_scope_global()) {
-		m_global_scope.declare_constant_variable(std::move(s), std::move(v));
-	}
-	else {
-		m_local_scopes.top().declare_constant_variable(
-			std::move(s), std::move(v)
+		result = m_global_scope.declare_variable(
+			std::move(name), std::move(value), std::move(type)
 		);
 	}
+	else {
+		result = m_local_scopes.top().declare_variable(
+			std::move(name), std::move(value), std::move(type)
+		);
+	}
+
+	if (not result.has_value()) {
+		return std::unexpected{result.error()};
+	}
+	SUCCESSFUL;
 }
 
-void Memory::set_variable_value(const std::string&, std::any&&) noexcept { }
+AccessResult Memory::declare_constant_variable(
+	std::string&& name, std::any&& value, std::string&& type
+) noexcept
+{
+	AccessResult result;
+	if (is_current_scope_global()) {
+		result = m_global_scope.declare_constant_variable(
+			std::move(name), std::move(value), std::move(type)
+		);
+	}
+	else {
+		result = m_local_scopes.top().declare_constant_variable(
+			std::move(name), std::move(value), std::move(type)
+		);
+	}
+
+	if (not result.has_value()) {
+		return std::unexpected{result.error()};
+	}
+	SUCCESSFUL;
+}
+
+AccessResult Memory::set_variable_value(
+	const std::string&, std::any&&, const std::string&
+) noexcept
+{
+	SUCCESSFUL;
+}
 
 /* GETTERS */
 
 std::optional<VariableValue>
-Memory::get_variable(const std::string& s) const noexcept
+Memory::get_variable(const std::string& name) const noexcept
 {
 	if (num_local_scopes() > 0) {
 		std::optional<VariableValue> scoped =
-			m_local_scopes.top().get_variable(s);
+			m_local_scopes.top().get_variable(name);
 		if (scoped.has_value()) {
 			return scoped;
 		}
 	}
 
-	std::optional<VariableValue> global = m_global_scope.get_variable(s);
+	std::optional<VariableValue> global = m_global_scope.get_variable(name);
 	if (global.has_value()) {
 		return global;
 	}
 	return {};
 }
 
-bool Memory::variable_exists(const std::string& s) const noexcept
+bool Memory::variable_exists(const std::string& name) const noexcept
 {
 	if (is_current_scope_global()) {
-		return m_global_scope.variable_exists(s);
+		return m_global_scope.variable_exists(name);
 	}
-	return m_local_scopes.top().variable_exists(s) or
-		   m_global_scope.variable_exists(s);
+	return m_local_scopes.top().variable_exists(name) or
+		   m_global_scope.variable_exists(name);
 }
 
-bool Memory::variable_exists_shallow(const std::string& s) const noexcept
+bool Memory::variable_exists_shallow(const std::string& name) const noexcept
 {
 	if (is_current_scope_global()) {
-		return m_global_scope.variable_exists_shallow(s);
+		return m_global_scope.variable_exists_shallow(name);
 	}
-	return m_local_scopes.top().variable_exists_shallow(s);
+	return m_local_scopes.top().variable_exists_shallow(name);
 }
 
 } // namespace memory

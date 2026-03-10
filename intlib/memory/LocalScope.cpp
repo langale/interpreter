@@ -33,59 +33,82 @@
 
 #include <intlib/memory/LocalScope.hpp>
 
-#if defined DEBUG
-#include <cassert>
-#endif
-
 namespace intlib {
 namespace memory {
 
+#define SUCCESSFUL                                                             \
+	return AccessResult { }
+
 /* MODIFIERS */
 
-void LocalScope::declare_variable(std::string&& s, std::any&& a) noexcept
+AccessResult LocalScope::declare_variable(
+	std::string&& name, std::any&& value, std::string&& type
+) noexcept
 {
-	Collection::iterator it = find(s);
+	Collection::iterator it = find(name);
 
-#if defined DEBUG
-	assert(it == m_variables.end());
-#endif
+	if (it != m_variables.end()) {
+		return std::unexpected{memory_error_e::Variable_Already_Exists};
+	}
 
 	m_variables.insert(
-		{std::move(s), {.value = std::move(a), .is_constant = false}}
+		{std::move(name),
+		 {.value = std::move(value),
+		  .type = std::move(type),
+		  .is_constant = false}}
 	);
+	SUCCESSFUL;
 }
 
-void LocalScope::declare_constant_variable(std::string&& s, std::any&& a) noexcept
+AccessResult LocalScope::declare_constant_variable(
+	std::string&& name, std::any&& value, std::string&& type
+) noexcept
 {
-	Collection::iterator it = find(s);
+	Collection::iterator it = find(name);
 
-#if defined DEBUG
-	assert(it == m_variables.end());
-#endif
+	if (it != m_variables.end()) {
+		return std::unexpected{memory_error_e::Variable_Already_Exists};
+	}
 
 	m_variables.insert(
-		{std::move(s), {.value = std::move(a), .is_constant = true}}
+		{std::move(name),
+		 {.value = std::move(value),
+		  .type = std::move(type),
+		  .is_constant = true}}
 	);
+	SUCCESSFUL;
 }
 
-void LocalScope::set_variable_value(const std::string& s, std::any&& a) noexcept
+AccessResult LocalScope::set_variable_value(
+	const std::string& name, std::any&& value, const std::string& type
+) noexcept
 {
-	Collection::iterator it = find(s);
+	Collection::iterator it = find(name);
 
-#if defined DEBUG
-	assert(it != m_variables.end());
-	assert(not it->second.is_constant);
-#endif
+	if (it == m_variables.end()) {
+		return std::unexpected{memory_error_e::Variable_Does_Not_Exist};
+	}
 
-	it->second.value = std::move(a);
+	if (it->second.is_constant) {
+		return std::unexpected{
+			memory_error_e::Attempt_To_Assign_Value_To_Constant_Variable
+		};
+	}
+
+	if (it->second.type != type) {
+		return std::unexpected{memory_error_e::Type_Mismatch};
+	}
+
+	it->second.value = std::move(value);
+	SUCCESSFUL;
 }
 
 /* GETTERS */
 
 std::optional<VariableValue>
-LocalScope::get_variable(const std::string& s) const noexcept
+LocalScope::get_variable(const std::string& name) const noexcept
 {
-	const auto it = find(s);
+	const auto it = find(name);
 	if (it == m_variables.end()) {
 		return {};
 	}

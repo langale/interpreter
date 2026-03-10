@@ -33,48 +33,69 @@
 
 #include <intlib/memory/FunctionScope.hpp>
 
-#if defined DEBUG
-#include <cassert>
-#endif
-
 namespace intlib {
 namespace memory {
 
+#define SUCCESSFUL                                                             \
+	return AccessResult { }
+
 /* MODIFIERS */
 
-void FunctionScope::declare_variable(std::string&& s, std::any&& v) noexcept
+AccessResult FunctionScope::declare_variable(
+	std::string&& name, std::any&& value, std::string&& type
+) noexcept
 {
-#if defined DEBUG
-	assert(not m_subscopes.back().variable_exists(s));
-#endif
-	m_subscopes.back().declare_variable(std::move(s), std::move(v));
+	const auto res = m_subscopes.back().declare_variable(
+		std::move(name), std::move(value), std::move(type)
+	);
+
+	if (not res.has_value()) {
+		return std::unexpected{res.error()};
+	}
+	SUCCESSFUL;
 }
 
-void FunctionScope::declare_constant_variable(std::string&& s, std::any&& v) noexcept
+AccessResult FunctionScope::declare_constant_variable(
+	std::string&& name, std::any&& value, std::string&& type
+) noexcept
 {
-#if defined DEBUG
-	assert(not m_subscopes.back().variable_exists(s));
-#endif
-	m_subscopes.back().declare_constant_variable(std::move(s), std::move(v));
+	const auto res = m_subscopes.back().declare_constant_variable(
+		std::move(name), std::move(value), std::move(type)
+	);
+
+	if (not res.has_value()) {
+		return std::unexpected{res.error()};
+	}
+	SUCCESSFUL;
 }
 
-void FunctionScope::set_variable_value(const std::string& s, std::any&& a) noexcept
+AccessResult FunctionScope::set_variable_value(
+	const std::string& name, std::any&& value, const std::string& type
+) noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
-		if (it->variable_exists(s)) {
-			it->set_variable_value(s, std::move(a));
+		if (it->variable_exists(name)) {
+			const auto res =
+				it->set_variable_value(name, std::move(value), type);
+
+			if (not res.has_value()) {
+				return std::unexpected{res.error()};
+			}
+
 			break;
 		}
 	}
+
+	SUCCESSFUL;
 }
 
 /* GETTERS */
 
 std::optional<VariableValue>
-FunctionScope::get_variable(const std::string& s) const noexcept
+FunctionScope::get_variable(const std::string& name) const noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
-		std::optional<VariableValue> r = it->get_variable(s);
+		std::optional<VariableValue> r = it->get_variable(name);
 		if (r.has_value()) {
 			return r;
 		}
@@ -82,19 +103,21 @@ FunctionScope::get_variable(const std::string& s) const noexcept
 	return {};
 }
 
-bool FunctionScope::variable_exists(const std::string& s) const noexcept
+bool FunctionScope::variable_exists(const std::string& name) const noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
-		if (it->variable_exists(s)) {
+		if (it->variable_exists(name)) {
 			return true;
 		}
 	}
 	return false;
 }
 
-bool FunctionScope::variable_exists_shallow(const std::string& s) const noexcept
+bool FunctionScope::variable_exists_shallow(
+	const std::string& name
+) const noexcept
 {
-	return m_subscopes.back().variable_exists(s);
+	return m_subscopes.back().variable_exists(name);
 }
 
 } // namespace memory

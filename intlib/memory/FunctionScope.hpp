@@ -36,6 +36,7 @@
 #include <vector>
 
 #include <intlib/memory/LocalScope.hpp>
+#include <intlib/memory/AccessResult.hpp>
 
 namespace intlib {
 namespace memory {
@@ -74,25 +75,31 @@ public:
 
 	/**
 	 * @brief Sets the value of a non-constant variable to the current scope.
-	 * @param s Name of the variable.
-	 * @param v Value of the variable.
+	 * @param name Name of the variable.
+	 * @param value Value of the variable.
 	 */
-	void declare_variable(std::string&& s, std::any&& v) noexcept;
+	[[nodiscard]] AccessResult declare_variable(
+		std::string&& name, std::any&& value, std::string&& type
+	) noexcept;
 
 	/**
 	 * @brief Sets the value of a constant variable to the current scope.
-	 * @param s Name of the variable.
-	 * @param v Value of the variable.
+	 * @param name Name of the variable.
+	 * @param value Value of the variable.
 	 * @pre Variable @e s does not already exist in the current subscope.
 	 */
-	void declare_constant_variable(std::string&& s, std::any&& v) noexcept;
+	[[nodiscard]] AccessResult declare_constant_variable(
+		std::string&& name, std::any&& value, std::string&& type
+	) noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
-	 * @param s Variable name.
-	 * @param a Value of the variable.
+	 * @param name Variable name.
+	 * @param value Value of the variable.
 	 */
-	void set_variable_value(const std::string& s, std::any&& a) noexcept;
+	[[nodiscard]] AccessResult set_variable_value(
+		const std::string& name, std::any&& value, const std::string& type
+	) noexcept;
 
 	/* GETTERS */
 
@@ -100,16 +107,17 @@ public:
 	 * @brief Get the value of a variable.
 	 *
 	 * This method looks for @e s in @ref m_subscopes in a right-to-left order.
-	 * @param s The name of the variable to look for.
+	 * @param name The name of the variable to look for.
 	 * @returns The value of the variable if it exists.
 	 */
-	std::optional<VariableValue>
-	get_variable(const std::string& s) const noexcept;
+	[[nodiscard]] std::optional<VariableValue>
+	get_variable(const std::string& name) const noexcept;
 
 	/// Does a variable @e s exist?
-	bool variable_exists(const std::string& s) const noexcept;
+	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept;
 	/// Does a variable @e s exist in the current subscope?
-	bool variable_exists_shallow(const std::string& s) const noexcept;
+	[[nodiscard]] bool
+	variable_exists_shallow(const std::string& name) const noexcept;
 
 private:
 

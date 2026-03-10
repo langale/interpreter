@@ -34,9 +34,13 @@
 #pragma once
 
 #include <optional>
+#include <expected>
 #include <string>
 #include <map>
 #include <any>
+
+#include <intlib/memory/memory_error_enum.hpp>
+#include <intlib/memory/AccessResult.hpp>
 
 namespace intlib {
 namespace memory {
@@ -45,8 +49,10 @@ namespace memory {
 struct VariableValue {
 	/// The actual value that the variable holds.
 	std::any value;
+	/// The type of this variable.
+	const std::string type;
 	/// Whether or not the variable is declared with 'const'.
-	bool is_constant;
+	const bool is_constant;
 };
 
 /**
@@ -63,39 +69,45 @@ public:
 
 	/**
 	 * @brief Adds a new non-constant variable to this subscope.
-	 * @param s Variable name.
-	 * @param a Value of the variable.
+	 * @param name Variable name.
+	 * @param value Value of the variable.
 	 */
-	void declare_variable(std::string&& s, std::any&& a) noexcept;
+	[[nodiscard]] AccessResult declare_variable(
+		std::string&& name, std::any&& value, std::string&& type
+	) noexcept;
 
 	/**
 	 * @brief Adds a new constant variable to this subscope.
-	 * @param s Variable name.
-	 * @param a Value of the variable.
+	 * @param name Variable name.
+	 * @param value Value of the variable.
 	 */
-	void declare_constant_variable(std::string&& s, std::any&& a) noexcept;
+	[[nodiscard]] AccessResult declare_constant_variable(
+		std::string&& name, std::any&& value, std::string&& type
+	) noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
-	 * @param s Variable name.
-	 * @param a Value of the variable.
+	 * @param name Variable name.
+	 * @param value Value of the variable.
 	 */
-	void set_variable_value(const std::string& s, std::any&& a) noexcept;
+	[[nodiscard]] AccessResult set_variable_value(
+		const std::string& name, std::any&& value, const std::string& type
+	) noexcept;
 
 	/* GETTERS */
 
 	/**
 	 * @brief Gets the value of a non-constant variable.
-	 * @param s The name of the variable to look for.
+	 * @param name The name of the variable to look for.
 	 * @returns The value of the variable if it exists.
 	 */
-	std::optional<VariableValue>
-	get_variable(const std::string& s) const noexcept;
+	[[nodiscard]] std::optional<VariableValue>
+	get_variable(const std::string& name) const noexcept;
 
 	/// Does variable @e s exist?
-	bool variable_exists(const std::string& s) const noexcept
+	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept
 	{
-		return find(s) != m_variables.end();
+		return find(name) != m_variables.end();
 	}
 
 private:
@@ -104,12 +116,13 @@ private:
 	using Collection = std::map<std::string, VariableValue>;
 
 	/// Find a variable @e s.
-	Collection::const_iterator find(const std::string& s) const noexcept
+	[[nodiscard]] Collection::const_iterator
+	find(const std::string& s) const noexcept
 	{
 		return m_variables.find(s);
 	}
 	/// Find a variable @e s.
-	Collection::iterator find(const std::string& s) noexcept
+	[[nodiscard]] Collection::iterator find(const std::string& s) noexcept
 	{
 		return m_variables.find(s);
 	}
