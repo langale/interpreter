@@ -36,6 +36,9 @@
 #endif
 
 #include <intlib/logger/macros.hpp>
+#include <intlib/detail/any_output.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_conversion.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {
@@ -124,6 +127,15 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 #endif
 
 	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
+
+#if defined DEBUG
+		assert(
+			dynamic_cast<const ale::ast::VariableNode * const>(
+				left_child.get()
+			) != nullptr
+		);
+#endif
+
 		std::string var_name =
 			static_cast<const ale::ast::VariableNode * const>(left_child.get())
 				->get_variable_name();
@@ -159,8 +171,8 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 			return {};
 		}
 
-		std::optional<std::any> value = interpret_node(right_child);
-		if (not value.has_value()) {
+		EvaluationResult res_w = interpret_node(right_child);
+		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
 			);
@@ -170,16 +182,33 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 			};
 		}
 
+		const std::any& value = *res_w;
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
+			detail::get_type_name(value),
+			any_view{value}
+		);
+
+		std::any value_conv = detail::any_convert_to_type(value, var_type);
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Value after conversion to '{}' is: '{}'.",
+			var_type,
+			any_view{value_conv}
+		);
+
 		memory::AccessResult res;
-		std::any copy = *value;
 		if (v.is_constant()) {
 			res = m_memory.declare_constant_variable(
-				std::move(var_name), std::move(copy), std::move(var_type)
+				std::move(var_name), std::move(value_conv), std::move(var_type)
 			);
 		}
 		else {
 			res = m_memory.declare_variable(
-				std::move(var_name), std::move(copy), std::move(var_type)
+				std::move(var_name), std::move(value_conv), std::move(var_type)
 			);
 		}
 
