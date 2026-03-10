@@ -72,7 +72,7 @@
 
 #include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 
-#include <intlib/EvaluationResult.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/memory/Memory.hpp>
 
 namespace intlib {

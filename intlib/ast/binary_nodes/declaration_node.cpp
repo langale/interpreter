@@ -126,8 +126,9 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 	/*
 	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
 		std::string var_name =
-			static_cast<ale::ast::VariableNode *>(left_child.get())
+			static_cast<const ale::ast::VariableNode * const>(left_child.get())
 				->get_variable_name();
+
 		if (m_memory.variable_exists_shallow(var_name)) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error() << "    Redeclaration of variable '" << var_name
@@ -284,8 +285,7 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 	// ale::error() << "        - a variable sequence\n";
 	// ale::error() << "    Found: '"
 	// 			 << node_type_to_string(left_child->get_node_type()) << "'\n";
-	*/
-	return {};
+	*/ return {};
 }
 
 } // namespace intlib

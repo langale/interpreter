@@ -35,7 +35,6 @@
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/Program.hpp>
-#include <intlib/EvaluationResult.hpp>
 
 namespace intlib {
 

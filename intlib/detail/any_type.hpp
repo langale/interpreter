@@ -74,6 +74,12 @@ template <typename type_t>
 	if constexpr (std::is_same_v<type_t, bool>) {
 		return name == "bool";
 	}
+	else if constexpr (std::is_same_v<type_t, int32_t>) {
+		return name == "int";
+	}
+	else if constexpr (std::is_same_v<type_t, uint32_t>) {
+		return name == "unsigned int";
+	}
 	else if constexpr (std::is_same_v<type_t, int64_t>) {
 		return name == "long";
 	}

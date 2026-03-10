@@ -31,8 +31,8 @@
  *
  ********************************************************************/
 
-#include <intlib/evaluation_error_enum.hpp>
-#include <intlib/EvaluationResult.hpp>
+#include <intlib/ast/evaluation_error_enum.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
 
 namespace intlib {
 

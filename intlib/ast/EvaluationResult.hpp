@@ -37,7 +37,7 @@
 #include <vector>
 #include <any>
 
-#include <intlib/evaluation_error_enum.hpp>
+#include <intlib/ast/evaluation_error_enum.hpp>
 
 namespace intlib {
 
