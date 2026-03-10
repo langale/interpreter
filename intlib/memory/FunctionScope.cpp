@@ -31,7 +31,7 @@
  *
  ********************************************************************/
 
-#include <intlib/memory/Scope.hpp>
+#include <intlib/memory/FunctionScope.hpp>
 
 #if defined DEBUG
 #include <cassert>
@@ -42,7 +42,7 @@ namespace memory {
 
 /* MODIFIERS */
 
-void Scope::declare_variable(std::string&& s, std::any&& v) noexcept
+void FunctionScope::declare_variable(std::string&& s, std::any&& v) noexcept
 {
 #if defined DEBUG
 	assert(not m_subscopes.back().variable_exists(s));
@@ -50,7 +50,7 @@ void Scope::declare_variable(std::string&& s, std::any&& v) noexcept
 	m_subscopes.back().declare_variable(std::move(s), std::move(v));
 }
 
-void Scope::declare_constant_variable(std::string&& s, std::any&& v) noexcept
+void FunctionScope::declare_constant_variable(std::string&& s, std::any&& v) noexcept
 {
 #if defined DEBUG
 	assert(not m_subscopes.back().variable_exists(s));
@@ -58,7 +58,7 @@ void Scope::declare_constant_variable(std::string&& s, std::any&& v) noexcept
 	m_subscopes.back().declare_constant_variable(std::move(s), std::move(v));
 }
 
-void Scope::set_variable_value(const std::string& s, std::any&& a) noexcept
+void FunctionScope::set_variable_value(const std::string& s, std::any&& a) noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		if (it->variable_exists(s)) {
@@ -71,7 +71,7 @@ void Scope::set_variable_value(const std::string& s, std::any&& a) noexcept
 /* GETTERS */
 
 std::optional<VariableValue>
-Scope::get_variable(const std::string& s) const noexcept
+FunctionScope::get_variable(const std::string& s) const noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		std::optional<VariableValue> r = it->get_variable(s);
@@ -82,7 +82,7 @@ Scope::get_variable(const std::string& s) const noexcept
 	return {};
 }
 
-bool Scope::variable_exists(const std::string& s) const noexcept
+bool FunctionScope::variable_exists(const std::string& s) const noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		if (it->variable_exists(s)) {
@@ -92,7 +92,7 @@ bool Scope::variable_exists(const std::string& s) const noexcept
 	return false;
 }
 
-bool Scope::variable_exists_shallow(const std::string& s) const noexcept
+bool FunctionScope::variable_exists_shallow(const std::string& s) const noexcept
 {
 	return m_subscopes.back().variable_exists(s);
 }

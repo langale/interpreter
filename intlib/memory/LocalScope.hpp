@@ -33,59 +33,47 @@
 
 #pragma once
 
-#include <vector>
-
-#include <intlib/memory/Subscope.hpp>
+#include <optional>
+#include <string>
+#include <map>
+#include <any>
 
 namespace intlib {
 namespace memory {
 
+/// Data associated to each variable name.
+struct VariableValue {
+	/// The actual value that the variable holds.
+	std::any value;
+	/// Whether or not the variable is declared with 'const'.
+	bool is_constant;
+};
+
 /**
- * @brief The scope class.
+ * @brief Subscope class.
  *
- * A scope is a sequence of subscopes, the last of which is the last subscope
- * created and the first in which variables are looked for and stored in.
+ * This implements a simple association of variable names (std::string) to their
+ * value (@ref interpreter::memory::variable_value). Variables can be constant or
+ * mutable.
  */
-class Scope {
+class LocalScope {
 public:
 
 	/* MODIFIERS */
 
 	/**
-	 * @brief Push a new subscope.
-	 *
-	 * This should be called when entering a sub scope delimited by '{' '}',
-	 * such as when entering an if statement, a loop, ...
+	 * @brief Adds a new non-constant variable to this subscope.
+	 * @param s Variable name.
+	 * @param a Value of the variable.
 	 */
-	void push_subscope() noexcept
-	{
-		m_subscopes.push_back({});
-	}
-	/**
-	 * @brief Pops a subscope.
-	 *
-	 * This should be called when exiting a sub scope delimited by '{' '}',
-	 * such as when leaving an if statement, a loop, ...
-	 */
-	void pop_subscope() noexcept
-	{
-		m_subscopes.pop_back();
-	}
+	void declare_variable(std::string&& s, std::any&& a) noexcept;
 
 	/**
-	 * @brief Sets the value of a non-constant variable to the current scope.
-	 * @param s Name of the variable.
-	 * @param v Value of the variable.
+	 * @brief Adds a new constant variable to this subscope.
+	 * @param s Variable name.
+	 * @param a Value of the variable.
 	 */
-	void declare_variable(std::string&& s, std::any&& v) noexcept;
-
-	/**
-	 * @brief Sets the value of a constant variable to the current scope.
-	 * @param s Name of the variable.
-	 * @param v Value of the variable.
-	 * @pre Variable @e s does not already exist in the current subscope.
-	 */
-	void declare_constant_variable(std::string&& s, std::any&& v) noexcept;
+	void declare_constant_variable(std::string&& s, std::any&& a) noexcept;
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
@@ -97,24 +85,39 @@ public:
 	/* GETTERS */
 
 	/**
-	 * @brief Get the value of a variable.
-	 *
-	 * This method looks for @e s in @ref m_subscopes in a right-to-left order.
+	 * @brief Gets the value of a non-constant variable.
 	 * @param s The name of the variable to look for.
 	 * @returns The value of the variable if it exists.
 	 */
 	std::optional<VariableValue>
 	get_variable(const std::string& s) const noexcept;
 
-	/// Does a variable @e s exist?
-	bool variable_exists(const std::string& s) const noexcept;
-	/// Does a variable @e s exist in the current subscope?
-	bool variable_exists_shallow(const std::string& s) const noexcept;
+	/// Does variable @e s exist?
+	bool variable_exists(const std::string& s) const noexcept
+	{
+		return find(s) != m_variables.end();
+	}
 
 private:
 
-	/// The list of subscopes in this scope.
-	std::vector<Subscope> m_subscopes;
+	/// Useful typedef.
+	using Collection = std::map<std::string, VariableValue>;
+
+	/// Find a variable @e s.
+	Collection::const_iterator find(const std::string& s) const noexcept
+	{
+		return m_variables.find(s);
+	}
+	/// Find a variable @e s.
+	Collection::iterator find(const std::string& s) noexcept
+	{
+		return m_variables.find(s);
+	}
+
+private:
+
+	/// The collection of non-constant variables in this subscope.
+	Collection m_variables;
 };
 
 } // namespace memory

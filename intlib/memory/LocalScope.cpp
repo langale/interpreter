@@ -31,7 +31,7 @@
  *
  ********************************************************************/
 
-#include <intlib/memory/Subscope.hpp>
+#include <intlib/memory/LocalScope.hpp>
 
 #if defined DEBUG
 #include <cassert>
@@ -42,7 +42,7 @@ namespace memory {
 
 /* MODIFIERS */
 
-void Subscope::declare_variable(std::string&& s, std::any&& a) noexcept
+void LocalScope::declare_variable(std::string&& s, std::any&& a) noexcept
 {
 	Collection::iterator it = find(s);
 
@@ -55,7 +55,7 @@ void Subscope::declare_variable(std::string&& s, std::any&& a) noexcept
 	);
 }
 
-void Subscope::declare_constant_variable(std::string&& s, std::any&& a) noexcept
+void LocalScope::declare_constant_variable(std::string&& s, std::any&& a) noexcept
 {
 	Collection::iterator it = find(s);
 
@@ -68,7 +68,7 @@ void Subscope::declare_constant_variable(std::string&& s, std::any&& a) noexcept
 	);
 }
 
-void Subscope::set_variable_value(const std::string& s, std::any&& a) noexcept
+void LocalScope::set_variable_value(const std::string& s, std::any&& a) noexcept
 {
 	Collection::iterator it = find(s);
 
@@ -83,7 +83,7 @@ void Subscope::set_variable_value(const std::string& s, std::any&& a) noexcept
 /* GETTERS */
 
 std::optional<VariableValue>
-Subscope::get_variable(const std::string& s) const noexcept
+LocalScope::get_variable(const std::string& s) const noexcept
 {
 	const auto it = find(s);
 	if (it == m_variables.end()) {

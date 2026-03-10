@@ -38,7 +38,7 @@
 #include <stack>
 #include <any>
 
-#include <intlib/memory/Scope.hpp>
+#include <intlib/memory/FunctionScope.hpp>
 
 namespace intlib {
 namespace memory {
@@ -47,7 +47,8 @@ namespace memory {
  * @brief The memory class
  *
  * This class holds all the variables declared in the program, organized in
- * scopes (@ref interpreter::memory::scope) and subscopes (@ref interpreter::memory::subscope).
+ * function scopes (@ref interpreter::memory::scope) and local scopes
+ * (@ref interpreter::memory::subscope).
  */
 class Memory {
 public:
@@ -94,25 +95,25 @@ public:
 	}
 
 	/// Returns a reference to the current scope.
-	const Scope& get_current_scope() const noexcept
+	const FunctionScope& get_current_scope() const noexcept
 	{
 		return is_current_scope_global() ? m_global_scope
 										 : m_local_scopes.top();
 	}
 	/// Returns a reference to the current scope.
-	Scope& get_current_scope() noexcept
+	FunctionScope& get_current_scope() noexcept
 	{
 		return is_current_scope_global() ? m_global_scope
 										 : m_local_scopes.top();
 	}
 
 	/// Returns a reference to the global scope.
-	const Scope& get_global_scope() const noexcept
+	const FunctionScope& get_global_scope() const noexcept
 	{
 		return m_global_scope;
 	}
 	/// Returns a reference to the global scope.
-	Scope& get_global_scope() noexcept
+	FunctionScope& get_global_scope() noexcept
 	{
 		return m_global_scope;
 	}
@@ -131,10 +132,10 @@ public:
 private:
 
 	/// The global scope of this program.
-	Scope m_global_scope;
+	FunctionScope m_global_scope;
 
 	/// The stack of scopes in available in this memory.
-	std::stack<Scope> m_local_scopes;
+	std::stack<FunctionScope> m_local_scopes;
 };
 
 } // namespace memory
