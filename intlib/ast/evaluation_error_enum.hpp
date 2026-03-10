@@ -58,6 +58,11 @@ enum class evaluation_error_e : uint8_t {
 	If_Statement_Condition_Empty,
 	If_Statement_First_Branch_Empty,
 	If_Statement_Second_Branch_Empty,
+
+	Memory_Variable_Does_Not_Exist,
+	Memory_Variable_Already_Exists,
+	Memory_Type_Mismatch,
+	Memory_Attempt_To_Assign_Value_To_Constant_Variable,
 };
 
 [[nodiscard]] constexpr std::string_view
@@ -95,6 +100,16 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 
 	case evaluation_error_e::Conversion_To_Bool_Failed:
 		return "Conversion_To_Bool_Failed";
+
+	case evaluation_error_e::Memory_Variable_Does_Not_Exist:
+		return "Memory_Variable_Does_Not_Exist";
+	case evaluation_error_e::Memory_Variable_Already_Exists:
+		return "Memory_Variable_Already_Exists";
+	case evaluation_error_e::Memory_Type_Mismatch:
+		return "Memory_Type_Mismatch";
+	case evaluation_error_e::
+		Memory_Attempt_To_Assign_Value_To_Constant_Variable:
+		return "Memory_Attempt_To_Assign_Value_To_Constant_Variable";
 
 	default: return "?";
 	}
