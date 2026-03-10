@@ -34,16 +34,56 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 
 namespace intlib {
 namespace memory {
 
-enum class memory_error_e : int8_t {
+enum class access_error_e : int8_t {
 	Variable_Does_Not_Exist,
 	Variable_Already_Exists,
 	Type_Mismatch,
 	Attempt_To_Assign_Value_To_Constant_Variable,
 };
+
+[[nodiscard]] constexpr std::string_view
+access_error_to_string(const access_error_e r) noexcept
+{
+	switch (r) {
+	case access_error_e::Variable_Does_Not_Exist:
+		return "Variable_Does_Not_Exist";
+	case access_error_e::Variable_Already_Exists:
+		return "Variable_Already_Exists";
+	case access_error_e::Type_Mismatch: return "Type_Mismatch";
+	case access_error_e::Attempt_To_Assign_Value_To_Constant_Variable:
+		return "Attempt_To_Assign_Value_To_Constant_Variable";
+	default: return "?";
+	}
+}
+
+} // namespace memory
+} // namespace intlib
+
+template <>
+struct std::formatter<intlib::memory::access_error_e>
+	: std::formatter<std::string> {
+	auto format(
+		const intlib::memory::access_error_e t, std::format_context& ctx
+	) const
+	{
+		return std::format_to(ctx.out(), "{}", access_error_to_string(t));
+	}
+};
+
+namespace intlib {
+namespace memory {
+
+template <typename stream_t>
+stream_t& operator<< (stream_t& os, const access_error_e t)
+{
+	os << access_error_to_string(t);
+	return os;
+}
 
 } // namespace memory
 } // namespace intlib

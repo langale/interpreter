@@ -48,7 +48,7 @@ AccessResult LocalScope::declare_variable(
 	Collection::iterator it = find(name);
 
 	if (it != m_variables.end()) {
-		return std::unexpected{memory_error_e::Variable_Already_Exists};
+		return std::unexpected{access_error_e::Variable_Already_Exists};
 	}
 
 	m_variables.insert(
@@ -67,7 +67,7 @@ AccessResult LocalScope::declare_constant_variable(
 	Collection::iterator it = find(name);
 
 	if (it != m_variables.end()) {
-		return std::unexpected{memory_error_e::Variable_Already_Exists};
+		return std::unexpected{access_error_e::Variable_Already_Exists};
 	}
 
 	m_variables.insert(
@@ -86,17 +86,17 @@ AccessResult LocalScope::set_variable_value(
 	Collection::iterator it = find(name);
 
 	if (it == m_variables.end()) {
-		return std::unexpected{memory_error_e::Variable_Does_Not_Exist};
+		return std::unexpected{access_error_e::Variable_Does_Not_Exist};
 	}
 
 	if (it->second.is_constant) {
 		return std::unexpected{
-			memory_error_e::Attempt_To_Assign_Value_To_Constant_Variable
+			access_error_e::Attempt_To_Assign_Value_To_Constant_Variable
 		};
 	}
 
 	if (it->second.type != type) {
-		return std::unexpected{memory_error_e::Type_Mismatch};
+		return std::unexpected{access_error_e::Type_Mismatch};
 	}
 
 	it->second.value = std::move(value);

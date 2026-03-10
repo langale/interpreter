@@ -40,7 +40,7 @@
 namespace intlib {
 namespace memory {
 
-using AccessResult = std::expected<void, memory_error_e>;
+using AccessResult = std::expected<void, access_error_e>;
 
 }
 }
