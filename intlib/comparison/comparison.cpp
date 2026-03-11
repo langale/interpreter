@@ -35,7 +35,7 @@
 #include <any>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_comparison.hpp>
+#include <intlib/comparison/comparison.hpp>
 
 namespace intlib {
 namespace detail {
