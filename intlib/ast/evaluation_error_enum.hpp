@@ -48,6 +48,7 @@ enum class evaluation_error_e : uint8_t {
 	Evaluation_Of_Node_Is_Void,
 	Evaluation_Of_Node_While_Loop_Failed,
 	Evaluation_Of_Node_Is_Not_A_Boolean_Value,
+	Evaluation_Of_Node_Is_Not_A_Numeric_Value,
 
 	Arithmetic_Operation_Failed,
 
@@ -84,6 +85,8 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 		return "Evaluation_Of_Node_While_Loop_Failed";
 	case evaluation_error_e::Evaluation_Of_Node_Is_Not_A_Boolean_Value:
 		return "Evaluation_Of_Node_Is_Not_A_Boolean_Value";
+	case evaluation_error_e::Evaluation_Of_Node_Is_Not_A_Numeric_Value:
+		return "Evaluation_Of_Node_Is_Not_A_Numeric_Value";
 
 	case evaluation_error_e::Arithmetic_Operation_Failed:
 		return "Arithmetic_Operation_Failed";
