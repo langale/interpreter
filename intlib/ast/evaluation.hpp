@@ -152,7 +152,7 @@ evaluate(const ale::ast::AssignationNode& v, EvaluationContext& ctx);
 );
 
 [[nodiscard]] EvaluationResult
-evaluate(const ale::ast::DeclarationNode& v, EvaluationContext& ctx);
+evaluate(const ale::ast::DeclarationNode& decl, EvaluationContext& ctx);
 
 [[nodiscard]] EvaluationResult first_value(
 	const ale::ast::ComparisonNode& v,
