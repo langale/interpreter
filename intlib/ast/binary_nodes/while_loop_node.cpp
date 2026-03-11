@@ -48,7 +48,7 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult
-evaluate(const ale::ast::WhileLoopNode& v, EvaluationContext& ctx)
+evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -64,7 +64,7 @@ evaluate(const ale::ast::WhileLoopNode& v, EvaluationContext& ctx)
 
 	bool stop = false;
 	while (not stop) {
-		EvaluationResult cond = interpret_node(left_child, ctx);
+		EvaluationResult cond = interpret_node(ctx, left_child);
 		if (not cond) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Node evaluation failed."
@@ -98,7 +98,7 @@ evaluate(const ale::ast::WhileLoopNode& v, EvaluationContext& ctx)
 				continue;
 			}
 
-			EvaluationResult r = interpret_node(right_child, ctx);
+			EvaluationResult r = interpret_node(ctx, right_child);
 			if (not r) {
 				INTERPRETER_PRINT_LOC(
 					ale::logger::println,

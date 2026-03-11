@@ -99,7 +99,7 @@ EvaluationResult evaluate_logical_node(
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	EvaluationResult res = interpret_node(c, ctx);
+	EvaluationResult res = interpret_node(ctx, c);
 	if (not res) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
@@ -124,8 +124,8 @@ EvaluationResult evaluate_logical_node(
 }
 
 EvaluationResult evaluate(
+EvaluationContext& ctx,
 	const ale::ast::LogicalNode& v,
-	EvaluationContext& ctx,
 	const ale::ast::node_type_e t
 )
 {

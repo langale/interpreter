@@ -40,7 +40,7 @@
 namespace intlib {
 namespace ast {
 
-EvaluationResult evaluate(const ale::ast::FalseNode&, const EvaluationContext&)
+EvaluationResult evaluate(const EvaluationContext&, const ale::ast::FalseNode&)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 

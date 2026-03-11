@@ -45,7 +45,7 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult
-evaluate(const ale::ast::LiteralStringNode& v, const EvaluationContext&)
+evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -53,7 +53,7 @@ evaluate(const ale::ast::LiteralStringNode& v, const EvaluationContext&)
 }
 
 EvaluationResult
-evaluate(const ale::ast::LiteralDecimalNode& v, const EvaluationContext&)
+evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -61,7 +61,7 @@ evaluate(const ale::ast::LiteralDecimalNode& v, const EvaluationContext&)
 }
 
 EvaluationResult evaluate(
-	const ale::ast::LiteralUnsignedIntegerNode& v, const EvaluationContext&
+	const EvaluationContext&, const ale::ast::LiteralUnsignedIntegerNode& v
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -70,7 +70,7 @@ EvaluationResult evaluate(
 }
 
 EvaluationResult
-evaluate(const ale::ast::LiteralSignedIntegerNode& v, const EvaluationContext&)
+evaluate(const EvaluationContext&, const ale::ast::LiteralSignedIntegerNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 

@@ -44,13 +44,13 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult
-evaluate(const ale::ast::SubscopeModifierNode& v, EvaluationContext& ctx)
+evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	ctx.memory.get_current_scope().push_subscope();
 	for (const auto& w : v.get_children()) {
-		EvaluationResult r = interpret_node(w, ctx);
+		EvaluationResult r = interpret_node(ctx, w);
 		if (not r) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."

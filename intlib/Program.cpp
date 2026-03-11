@@ -48,7 +48,7 @@ Program::Program() noexcept
 void Program::run_program(ale::logger::Stream& os)
 {
 	ast::EvaluationContext ctx{.memory = m_memory};
-	[[maybe_unused]] const auto res = ast::interpret_node(m_program_node, ctx);
+	[[maybe_unused]] const auto res = ast::interpret_node(ctx, m_program_node);
 }
 
 /* OTHERS */

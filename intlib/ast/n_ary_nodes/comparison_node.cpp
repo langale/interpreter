@@ -51,8 +51,7 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult first_value(
-	const ale::ast::ComparisonNode& v,
-	EvaluationContext& ctx,
+	EvaluationContext& ctx, const ale::ast::ComparisonNode& v,
 	const std::unique_ptr<ale::ast::Node>& c
 )
 {
@@ -91,8 +90,7 @@ EvaluationResult first_value(
 }
 
 EvaluationResult last_value(
-	const ale::ast::ComparisonNode& v,
-	EvaluationContext& ctx,
+	EvaluationContext& ctx, const ale::ast::ComparisonNode& v,
 	const std::unique_ptr<ale::ast::Node>& c
 )
 {
@@ -131,8 +129,7 @@ EvaluationResult last_value(
 }
 
 EvaluationResult evaluate(
-	const ale::ast::ComparisonNode& v,
-	EvaluationContext& ctx,
+	EvaluationContext& ctx, const ale::ast::ComparisonNode& v,
 	const ale::ast::node_type_e t
 )
 {

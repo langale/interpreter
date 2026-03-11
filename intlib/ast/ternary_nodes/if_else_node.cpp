@@ -45,7 +45,7 @@
 namespace intlib {
 namespace ast {
 
-EvaluationResult evaluate(const ale::ast::IfElseNode& v, EvaluationContext& ctx)
+EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -63,7 +63,7 @@ EvaluationResult evaluate(const ale::ast::IfElseNode& v, EvaluationContext& ctx)
 		};
 	}
 
-	EvaluationResult cond = interpret_node(first_child, ctx);
+	EvaluationResult cond = interpret_node(ctx, first_child);
 	if (not cond.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
@@ -102,7 +102,7 @@ EvaluationResult evaluate(const ale::ast::IfElseNode& v, EvaluationContext& ctx)
 			};
 		}
 
-		return interpret_node(second_child, ctx);
+		return interpret_node(ctx, second_child);
 	}
 
 	if (third_child == nullptr) {
@@ -117,7 +117,7 @@ EvaluationResult evaluate(const ale::ast::IfElseNode& v, EvaluationContext& ctx)
 		};
 	}
 
-	return interpret_node(third_child, ctx);
+	return interpret_node(ctx, third_child);
 }
 
 } // namespace ast

@@ -47,8 +47,8 @@ namespace intlib {
 namespace ast {
 
 bool retrieve_variable_names_in_assignation(
-	const ale::ast::SequenceNode& seq,
 	EvaluationContext& ctx,
+	const ale::ast::SequenceNode& seq,
 	std::vector<std::string>& names
 )
 {
@@ -89,8 +89,8 @@ bool retrieve_variable_names_in_assignation(
 }
 
 bool retrieve_variable_names_in_assignation(
-	const ale::ast::CommaSeparatedGroupNode& group,
 	EvaluationContext& ctx,
+	const ale::ast::CommaSeparatedGroupNode& group,
 	std::vector<std::string>& names
 )
 {
@@ -157,7 +157,7 @@ bool retrieve_variable_names_in_assignation(
 }
 
 EvaluationResult
-evaluate(const ale::ast::AssignationNode& v, EvaluationContext& ctx)
+evaluate(EvaluationContext&, const ale::ast::AssignationNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 

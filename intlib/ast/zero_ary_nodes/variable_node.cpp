@@ -46,7 +46,7 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult
-evaluate(const ale::ast::VariableNode& v, const EvaluationContext& ctx)
+evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 

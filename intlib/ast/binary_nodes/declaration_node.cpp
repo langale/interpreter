@@ -66,7 +66,7 @@ namespace ast {
 	const auto& value_node = decl.get_right_child();
 	std::any value;
 	if (decl.get_node_type() != ale::ast::node_type_e::Declaration_Declare) {
-		EvaluationResult res_w = interpret_node(value_node, ctx);
+		EvaluationResult res_w = interpret_node(ctx, value_node);
 		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
@@ -340,7 +340,7 @@ namespace ast {
 }
 
 EvaluationResult
-evaluate(const ale::ast::DeclarationNode& decl, EvaluationContext& ctx)
+evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 

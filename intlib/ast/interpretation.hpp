@@ -44,7 +44,7 @@ namespace intlib {
 namespace ast {
 
 [[nodiscard]] EvaluationResult interpret_node(
-	const std::unique_ptr<ale::ast::Node>& v, EvaluationContext& ctx
+	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v
 );
 
 } // namespace ast

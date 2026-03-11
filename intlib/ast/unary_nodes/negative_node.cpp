@@ -43,13 +43,13 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult
-evaluate(const ale::ast::NegativeNode& v, EvaluationContext& ctx)
+evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	const auto& child = v.get_child();
 
-	EvaluationResult rr = interpret_node(child, ctx);
+	EvaluationResult rr = interpret_node(ctx, child);
 	if (not rr.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(

@@ -46,7 +46,7 @@ namespace intlib {
 namespace ast {
 
 ale::utils::SequenceNodeIterator
-make_iterator(const ale::ast::SequenceNode& seq, EvaluationContext& ctx)
+make_iterator(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -81,7 +81,7 @@ make_iterator(const ale::ast::SequenceNode& seq, EvaluationContext& ctx)
 }
 
 std::optional<std::any>
-get_variable_value(const std::string& var, EvaluationContext& ctx)
+get_variable_value(EvaluationContext& ctx, const std::string& var)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -108,7 +108,7 @@ get_variable_value(const std::string& var, EvaluationContext& ctx)
 }
 
 EvaluationResult
-evaluate(const ale::ast::SequenceNode& v, EvaluationContext& ctx)
+evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 

@@ -60,7 +60,7 @@ namespace ast {
 	const auto& children = subscripted_variable->get_children();
 	for (const auto& child : children) {
 
-		auto val = interpret_node(child, ctx);
+		auto val = interpret_node(ctx, child);
 		if (not val.has_value()) {
 			return std::move(val.error());
 		}

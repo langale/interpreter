@@ -52,8 +52,8 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult evaluate(
-	const ale::ast::ArithmeticNode& v,
 	EvaluationContext& ctx,
+	const ale::ast::ArithmeticNode& v,
 	const ale::ast::node_type_e t
 )
 {
@@ -67,7 +67,7 @@ EvaluationResult evaluate(
 	const auto node_eval =
 		[&](const std::unique_ptr<ale::ast::Node>& c) -> EvaluationResult
 	{
-		EvaluationResult res = interpret_node(c, ctx);
+		EvaluationResult res = interpret_node(ctx, c);
 		if (not res) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,

@@ -48,14 +48,14 @@ namespace intlib {
 namespace ast {
 
 std::optional<std::string> make_full_variable_name(
-	const ale::ast::SubscriptedVariableNode& v, EvaluationContext& ctx
+	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	std::string full_variable_name = v.get_variable_name();
 	for (const auto& [i, c] : v.get_children() | std::views::enumerate) {
-		const EvaluationResult res = interpret_node(c, ctx);
+		const EvaluationResult res = interpret_node(ctx, c);
 		if (not res) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
@@ -93,7 +93,7 @@ std::optional<std::string> make_full_variable_name(
 }
 
 std::optional<std::vector<int64_t>> get_index_sequence(
-	const ale::ast::SubscriptedVariableNode& v, EvaluationContext& ctx
+	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -101,7 +101,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
 	for (const auto& c : v.get_children()) {
-		const std::optional<std::any> res = interpret_node(c, ctx);
+		const std::optional<std::any> res = interpret_node(ctx, c);
 		if (not res.has_value()) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
@@ -139,12 +139,12 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 }
 
 EvaluationResult
-evaluate(const ale::ast::SubscriptedVariableNode& v, EvaluationContext& ctx)
+evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	const std::optional<std::string> full_variable_name_w =
-		make_full_variable_name(v, ctx);
+		make_full_variable_name(ctx, v);
 
 	if (not full_variable_name_w) {
 		INTERPRETER_PRINT_LOC2(

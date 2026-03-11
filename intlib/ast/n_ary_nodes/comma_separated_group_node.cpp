@@ -50,7 +50,7 @@ namespace intlib {
 namespace ast {
 
 EvaluationResult
-evaluate(const ale::ast::CommaSeparatedGroupNode& v, EvaluationContext& ctx)
+evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
