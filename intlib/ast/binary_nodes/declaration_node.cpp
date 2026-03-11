@@ -52,143 +52,21 @@
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/variable_names.hpp>
 
 namespace intlib {
 namespace ast {
 
-bool retrieve_variable_names_in_declaration(
-	const ale::ast::SequenceNode& seq,
-	std::vector<std::string>& names,
-	EvaluationContext& ctx
+[[nodiscard]] static EvaluationResult compute_value_from_declaration(
+	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	/*
-	ale::utils::SequenceNodeIterator iter_seq = make_iterator(seq);
-
-	while (not iter_seq.end()) {
-		const std::vector<int64_t>& cur_indices =
-			iter_seq.get_current_indices();
-
-		std::string var_name = seq.make_variable_name(cur_indices);
-		if (ctx.memory.variable_exists_shallow(var_name)) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Redeclaration of variable '" << var_name << "'.\n";
-			return false;
-		}
-		names.push_back(std::move(var_name));
-		iter_seq.next_indices();
-	}
-	*/
-
-	return true;
-}
-
-bool retrieve_variable_names_in_declaration(
-	const ale::ast::CommaSeparatedGroupNode& group,
-	std::vector<std::string>& names,
-	EvaluationContext& ctx
-)
-{
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
-
-	/*
-	ale::ast::NAryNodeIterator iter(group);
-
-	while (not iter.end()) {
-		const std::unique_ptr<ale::ast::Node>& c = iter.next_child();
-		if (c->get_node_type() == ale::ast::node_type_e::Variable) {
-
-			std::string var_name =
-				static_cast<ale::ast::VariableNode *>(c.get())
-					->get_variable_name();
-			if (ctx.memory.variable_exists_shallow(var_name)) {
-				// ale::error() << ERROR_LOCATION << '\n';
-				// ale::error() << "    Redeclaration of variable '" << var_name << "'.\n";
-				return false;
-			}
-			names.push_back(std::move(var_name));
-		}
-		else if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
-
-			const bool r = retrieve_variable_names_in_declaration(
-				static_cast<const ale::ast::SequenceNode&>(*c.get()), names
-			);
-
-			if (not r) {
-				return false;
-			}
-		}
-		else {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Child of comma-separated group is neither a "
-			// 				"variable or a variable sequence.\n";
-			return false;
-		}
-	}
-	*/
-	return true;
-}
-
-EvaluationResult
-evaluate(const ale::ast::DeclarationNode& v, EvaluationContext& ctx)
-{
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
-
-	const auto& left_child = v.get_left_child();
-	const auto& right_child = v.get_right_child();
-
-#if defined DEBUG
-	assert(left_child != nullptr);
-#endif
-
-	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
-
-#if defined DEBUG
-		assert(
-			dynamic_cast<const ale::ast::VariableNode * const>(
-				left_child.get()
-			) != nullptr
-		);
-#endif
-
-		std::string var_name =
-			static_cast<const ale::ast::VariableNode * const>(left_child.get())
-				->get_variable_name();
-
-		if (ctx.memory.variable_exists_shallow(var_name)) {
-			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Redeclaration of variable {}.", var_name
-			);
-			return EvaluationError{
-				.error = {evaluation_error_e::Memory_Variable_Already_Exists},
-				.message = {
-					std::format("Redeclaration of variable {}.", var_name)
-				}
-			};
-		}
-
-		std::string var_type = v.get_type();
-
-		// This is a 'declare' node.
-		if (right_child == nullptr) {
-			[[maybe_unused]] const auto res = ctx.memory.declare_variable(
-				std::move(var_name), {}, std::move(var_type)
-			);
-
-#if defined DEBUG
-			// None of the following errors can happen:
-			// - Variable_Does_Not_Exist, Type_Mismatch, Attempt_To_Assign_Value_To_Constant_Variable:
-			//   This cannot be returned when declaring a variable.
-			// - Variable_Exists:
-			//   This has been ensured will never happen
-			assert(res.has_value());
-#endif
-			return {};
-		}
-
-		EvaluationResult res_w = interpret_node(right_child, ctx);
+	const auto& value_node = decl.get_right_child();
+	std::any value;
+	if (decl.get_node_type() != ale::ast::node_type_e::Declaration_Declare) {
+		EvaluationResult res_w = interpret_node(value_node, ctx);
 		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
@@ -198,36 +76,36 @@ evaluate(const ale::ast::DeclarationNode& v, EvaluationContext& ctx)
 				.message = {"Evaluation of node failed."}
 			};
 		}
+		value = std::move(*res_w);
+	}
+	return std::move(value);
+}
 
-		const std::any& value = *res_w;
+[[nodiscard]] static EvaluationResult declare_single_variable(
+	EvaluationContext& ctx,
+	const ale::ast::node_type_e t,
+	std::string&& var_name,
+	std::string&& var_type,
+	const std::any& value
+)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
+	if (ctx.memory.variable_exists_shallow(var_name)) {
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println,
-			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
-			detail::get_type_name(value),
-			any_view{value}
+			ale::logger::println, "Redeclaration of variable {}.", var_name
 		);
+		return EvaluationError{
+			.error = {evaluation_error_e::Memory_Variable_Already_Exists},
+			.message = {std::format("Redeclaration of variable {}.", var_name)}
+		};
+	}
 
-		std::any value_conv = detail::any_convert_to_type(value, var_type);
-
-		INTERPRETER_PRINT_LOC2(
-			ale::logger::println,
-			"Value after conversion to '{}' is: '{}'.",
-			var_type,
-			any_view{value_conv}
+	// This is a 'declare' node.
+	if (t == ale::ast::node_type_e::Declaration_Declare) {
+		[[maybe_unused]] const auto res = ctx.memory.declare_variable(
+			std::move(var_name), {}, std::move(var_type)
 		);
-
-		memory::AccessResult res;
-		if (v.is_constant()) {
-			res = ctx.memory.declare_constant_variable(
-				std::move(var_name), std::move(value_conv), std::move(var_type)
-			);
-		}
-		else {
-			res = ctx.memory.declare_variable(
-				std::move(var_name), std::move(value_conv), std::move(var_type)
-			);
-		}
 
 #if defined DEBUG
 		// None of the following errors can happen:
@@ -237,136 +115,276 @@ evaluate(const ale::ast::DeclarationNode& v, EvaluationContext& ctx)
 		//   This has been ensured will never happen
 		assert(res.has_value());
 #endif
-
 		return {};
 	}
 
-	/*
-	if (left_child->get_node_type() ==
-		ale::ast::node_type_e::Comma_Separated_Group) {
-		std::vector<std::string> variable_names;
-		const bool r = retrieve_variable_names_in_declaration(
-			static_cast<ale::ast::CommaSeparatedGroupNode&>(*left_child.get()),
-			variable_names
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"Type returned from node evaluation is: '{}'. Value is: '{}'.",
+		detail::get_type_name(value),
+		any_view{value}
+	);
+
+	std::any value_conv = detail::any_convert_to_type(value, var_type);
+
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"Value after conversion to '{}' is: '{}'.",
+		var_type,
+		any_view{value_conv}
+	);
+
+	memory::AccessResult res;
+	if (t == ale::ast::node_type_e::Declaration_Const) {
+		res = ctx.memory.declare_constant_variable(
+			std::move(var_name), std::move(value_conv), std::move(var_type)
+		);
+	}
+	else {
+		res = ctx.memory.declare_variable(
+			std::move(var_name), std::move(value_conv), std::move(var_type)
+		);
+	}
+
+#if defined DEBUG
+	// None of the following errors can happen:
+	// - Variable_Does_Not_Exist, Type_Mismatch, Attempt_To_Assign_Value_To_Constant_Variable:
+	//   This cannot be returned when declaring a variable.
+	// - Variable_Exists:
+	//   This has been ensured will never happen
+	assert(res.has_value());
+#endif
+
+	return {};
+}
+
+[[nodiscard]] static EvaluationResult declare_variable(
+	EvaluationContext& ctx,
+	const ale::ast::DeclarationNode& decl,
+	const std::unique_ptr<ale::ast::Node>& variable_node,
+	const std::any& value
+)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+#if defined DEBUG
+	assert(variable_node->get_node_type() == ale::ast::node_type_e::Variable);
+#endif
+
+	std::string var_name =
+		static_cast<const ale::ast::VariableNode * const>(variable_node.get())
+			->get_variable_name();
+
+	std::string var_type = decl.get_type();
+
+	return declare_single_variable(
+		ctx,
+		decl.get_node_type(),
+		std::move(var_name),
+		std::move(var_type),
+		value
+	);
+}
+
+[[nodiscard]] static EvaluationResult declare_subscripted_variable(
+	EvaluationContext& ctx,
+	const ale::ast::DeclarationNode& decl,
+	const std::unique_ptr<ale::ast::Node>& variable,
+	const std::any& value
+)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	EvaluationResult name_w = make_subscripted_variable_name(ctx, variable);
+	if (not name_w.has_value()) {
+		return EvaluationError{
+			.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
+			.message = {"Evaluation of node failed and the name of the "
+						"variable could not be made."}
+		};
+	}
+
+#if defined DEBUG
+	assert(detail::is_type<std::string>(name_w));
+#endif
+
+	std::string var_type = decl.get_type();
+
+	return declare_single_variable(
+		ctx,
+		decl.get_node_type(),
+		std::any_cast<std::string>(*name_w),
+		std::move(var_type),
+		value
+	);
+}
+
+[[nodiscard]] static EvaluationResult declare_variable_sequence(
+	EvaluationContext& ctx,
+	const ale::ast::DeclarationNode& decl,
+	const std::unique_ptr<ale::ast::Node>& sequence,
+	const std::any& value
+)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	auto list_w = make_sequence_variable_names(ctx, sequence);
+	if (not list_w) {
+		return EvaluationError{
+			.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
+			.message = {"Evaluation of node failed and the name of the "
+						"variables in a sequence could not be made."}
+		};
+	}
+
+#if defined DEBUG
+	assert(detail::is_type<std::vector<std::string>>(list_w));
+#endif
+
+	auto list = std::any_cast<std::vector<std::string>>(*list_w);
+
+	for (std::string& var_name : list) {
+		std::string var_type = decl.get_type();
+		auto res_w = declare_single_variable(
+			ctx,
+			decl.get_node_type(),
+			std::move(var_name),
+			std::move(var_type),
+			value
+		);
+		if (not res_w) {
+			return std::move(res_w.error());
+		}
+	}
+
+	return {};
+}
+
+[[nodiscard]] static EvaluationResult declare_variable_sequence(
+	EvaluationContext& ctx,
+	const ale::ast::DeclarationNode& decl,
+	const std::unique_ptr<ale::ast::Node>& sequence
+)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	const auto& variable_list_node_w = decl.get_left_child();
+
+#if defined DEBUG
+	assert(
+		variable_list_node_w->get_node_type() ==
+		ale::ast::node_type_e::Comma_Separated_Group
+	);
+#endif
+
+	EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
+	if (not value_w) {
+		return std::move(value_w.error());
+	}
+	const std::any value = std::move(*value_w);
+	return declare_variable_sequence(ctx, decl, sequence, value);
+}
+
+[[nodiscard]] static EvaluationResult declare_comma_separated_variables(
+	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
+)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	const auto& variable_list_node_w = decl.get_left_child();
+
+#if defined DEBUG
+	assert(
+		variable_list_node_w->get_node_type() ==
+		ale::ast::node_type_e::Comma_Separated_Group
+	);
+#endif
+
+	EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
+	if (not value_w) {
+		return std::move(value_w.error());
+	}
+	const std::any value = std::move(*value_w);
+
+	const auto variable_list_node =
+		static_cast<const ale::ast::CommaSeparatedGroupNode * const>(
+			variable_list_node_w.get()
 		);
 
-		if (not r) {
-			return {};
-		}
+	const auto& children = variable_list_node->get_children();
 
-		// This is a 'declare' node.
-		if (right_child == nullptr) {
-			for (std::string& var_name : variable_names) {
-				ctx.memory.declare_variable(std::move(var_name), {});
-			}
-			return std::any{};
-		}
-
-		std::optional<std::any> value = interpret_node(right_child);
-		if (not value.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of node failed.\n";
-			return {};
-		}
-
-		for (std::string& var_name : variable_names) {
-			std::any copy = *value;
-			if (v.is_constant()) {
-				ctx.memory.declare_constant_variable(
-					std::move(var_name), std::move(copy)
-				);
-			}
-			else {
-				ctx.memory.declare_variable(std::move(var_name), std::move(copy));
+	for (const auto& child : children) {
+		if (child->get_node_type() == ale::ast::node_type_e::Variable) {
+			auto res_w = declare_variable(ctx, decl, child, value);
+			if (not res_w) {
+				return std::move(res_w.error());
 			}
 		}
+		else if (child->get_node_type() == ale::ast::node_type_e::Sequence) {
+			auto res_w = declare_variable_sequence(ctx, decl, child, value);
+			if (not res_w) {
+				return std::move(res_w.error());
+			}
+		}
+		else if (child->get_node_type() ==
+				 ale::ast::node_type_e::Subscripted_Variable) {
 
-		return value;
+			auto res_w = declare_subscripted_variable(ctx, decl, child, value);
+			if (not res_w) {
+				return std::move(res_w.error());
+			}
+		}
+	}
+
+	return {};
+}
+
+EvaluationResult
+evaluate(const ale::ast::DeclarationNode& decl, EvaluationContext& ctx)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	const auto& left_child = decl.get_left_child();
+
+#if defined DEBUG
+	assert(left_child != nullptr);
+#endif
+
+	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
+		const auto& variable_node = decl.get_left_child();
+
+		EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
+		if (not value_w) {
+			return std::move(value_w.error());
+		}
+		std::any value = std::move(*value_w);
+
+		return declare_variable(ctx, decl, variable_node, std::move(value));
+	}
+
+	if (left_child->get_node_type() ==
+		ale::ast::node_type_e::Comma_Separated_Group) {
+
+		return declare_comma_separated_variables(ctx, decl);
 	}
 
 	if (left_child->get_node_type() == ale::ast::node_type_e::Sequence) {
-		std::vector<std::string> variable_names;
-		const bool r = retrieve_variable_names_in_declaration(
-			static_cast<const ale::ast::SequenceNode&>(*left_child.get()),
-			variable_names
-		);
 
-		if (not r) {
-			return {};
-		}
-
-		// This is a 'declare' node.
-		if (right_child == nullptr) {
-			for (std::string& var_name : variable_names) {
-				ctx.memory.declare_variable(std::move(var_name), {});
-			}
-			return std::any{};
-		}
-
-		std::optional<std::any> value = interpret_node(right_child);
-		if (not value.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of node failed.\n";
-			return {};
-		}
-
-		for (std::string& var_name : variable_names) {
-			std::any copy = *value;
-			if (v.is_constant()) {
-				ctx.memory.declare_constant_variable(
-					std::move(var_name), std::move(copy)
-				);
-			}
-			else {
-				ctx.memory.declare_variable(std::move(var_name), std::move(copy));
-			}
-		}
-
-		return value;
+		return declare_variable_sequence(ctx, decl, left_child);
 	}
 
 	if (left_child->get_node_type() ==
 		ale::ast::node_type_e::Subscripted_Variable) {
-		std::string var_name = make_full_variable_name(
-			static_cast<const ale::ast::SubscriptedVariableNode&>(
-				*left_child.get()
-			)
-		);
 
-		// This is a 'declare' node.
-		if (right_child == nullptr) {
-			ctx.memory.declare_variable(std::move(var_name), {});
-			return std::any{};
+		EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
+		if (not value_w) {
+			return std::move(value_w.error());
 		}
+		std::any value = std::move(*value_w);
 
-		std::optional<std::any> value = interpret_node(right_child);
-		if (not value.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error() << "    Evaluation of node failed.\n";
-			return {};
-		}
-
-		std::any copy = *value;
-		if (v.is_constant()) {
-			ctx.memory.declare_constant_variable(
-				std::move(var_name), std::move(copy)
-			);
-		}
-		else {
-			ctx.memory.declare_variable(std::move(var_name), std::move(copy));
-		}
-
-		return value;
+		return declare_subscripted_variable(ctx, decl, left_child, value);
 	}
 
-	// ale::error() << ERROR_LOCATION << '\n';
-	// ale::error() << "    Left handside of declaration is not:\n";
-	// ale::error() << "        - a variable name\n";
-	// ale::error() << "        - a comma-separated group\n";
-	// ale::error() << "        - a variable sequence\n";
-	// ale::error() << "    Found: '"
-	// 			 << node_type_to_string(left_child->get_node_type()) << "'\n";
-	*/
 	return {};
 }
 
