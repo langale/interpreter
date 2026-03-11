@@ -32,10 +32,8 @@
  ********************************************************************/
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_to_bool.hpp>
-#if defined ALE_LOGGING_MESSAGES
 #include <intlib/detail/any_type.hpp>
-#endif
+#include <intlib/detail/any_to_bool.hpp>
 #include <intlib/Program.hpp>
 
 namespace intlib {

@@ -47,7 +47,7 @@
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
 
-#include <intlib/detail/any_comparison.hpp>
+#include <intlib/comparison/comparison.hpp>
 
 namespace intlib {
 
