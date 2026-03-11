@@ -33,20 +33,28 @@
 
 #include <any>
 
+#include <ale/ast/n_ary_nodes/SubscopeModifierNode.hpp>
+
 #include <intlib/logger/macros.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::SubscopeModifierNode& v)
+EvaluationResult
+evaluate(const ale::ast::SubscopeModifierNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	m_memory.get_current_scope().push_subscope();
+	ctx.memory.get_current_scope().push_subscope();
 	for (const auto& w : v.get_children()) {
-		EvaluationResult r = interpret_node(w);
+		EvaluationResult r = interpret_node(w, ctx);
 		if (not r) {
-			INTERPRETER_PRINT_LOC(ale::logger::println, "Evaluation of node failed.");
+			INTERPRETER_PRINT_LOC(
+				ale::logger::println, "Evaluation of node failed."
+			);
 			return append_error(
 				std::move(r.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -62,8 +70,9 @@ EvaluationResult Program::evaluate(const ale::ast::SubscopeModifierNode& v)
 			);
 		}
 	}
-	m_memory.get_current_scope().pop_subscope();
+	ctx.memory.get_current_scope().pop_subscope();
 	return {};
 }
 
+} // namespace ast
 } // namespace intlib

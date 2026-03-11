@@ -31,10 +31,10 @@
  *
  ********************************************************************/
 
-#include <intlib/detail/any_output.hpp>
 #include <ale/logger/Stream.hpp>
 
 #include <intlib/Program.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
 
@@ -47,7 +47,8 @@ Program::Program() noexcept
 
 void Program::run_program(ale::logger::Stream& os)
 {
-	interpret_node(m_program_node);
+	ast::EvaluationContext ctx{.memory = m_memory};
+	[[maybe_unused]] const auto res = ast::interpret_node(m_program_node, ctx);
 }
 
 /* OTHERS */

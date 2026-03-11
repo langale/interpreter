@@ -35,13 +35,21 @@
 #include <cassert>
 #endif
 
+#include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
+#include <ale/ast/binary_nodes/AssignationNode.hpp>
+#include <ale/ast/binary_nodes/SequenceNode.hpp>
+
 #include <intlib/logger/macros.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
+namespace ast {
 
-bool Program::retrieve_variable_names_in_assignation(
-	const ale::ast::SequenceNode& seq, std::vector<std::string>& names
+bool retrieve_variable_names_in_assignation(
+	const ale::ast::SequenceNode& seq,
+	EvaluationContext& ctx,
+	std::vector<std::string>& names
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -54,7 +62,7 @@ bool Program::retrieve_variable_names_in_assignation(
 			iter_seq.get_current_indices();
 
 		std::string var_name = seq.make_variable_name(cur_indices);
-		if (not m_memory.variable_exists(var_name)) {
+		if (not ctx.memory.variable_exists(var_name)) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error()
 			// 	<< "    Trying to set a value to an undeclared variable '"
@@ -63,7 +71,7 @@ bool Program::retrieve_variable_names_in_assignation(
 		}
 
 		const std::optional<memory::VariableValue> var =
-			m_memory.get_variable(var_name);
+			ctx.memory.get_variable(var_name);
 		if (var->is_constant) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error()
@@ -80,8 +88,9 @@ bool Program::retrieve_variable_names_in_assignation(
 	return true;
 }
 
-bool Program::retrieve_variable_names_in_assignation(
+bool retrieve_variable_names_in_assignation(
 	const ale::ast::CommaSeparatedGroupNode& group,
+	EvaluationContext& ctx,
 	std::vector<std::string>& names
 )
 {
@@ -100,7 +109,7 @@ bool Program::retrieve_variable_names_in_assignation(
 				static_cast<ale::ast::VariableNode *>(c.get())
 					->get_variable_name();
 
-			if (not m_memory.variable_exists(var_name)) {
+			if (not ctx.memory.variable_exists(var_name)) {
 				// ale::error() << ERROR_LOCATION << '\n';
 				// ale::error()
 				// 	<< "    Trying to set a value to an undeclared variable '"
@@ -109,7 +118,7 @@ bool Program::retrieve_variable_names_in_assignation(
 			}
 
 			const std::optional<memory::VariableValue> var =
-				m_memory.get_variable(var_name);
+				ctx.memory.get_variable(var_name);
 			if (var->is_constant) {
 				// ale::error() << ERROR_LOCATION << '\n';
 				// ale::error()
@@ -147,7 +156,8 @@ bool Program::retrieve_variable_names_in_assignation(
 	return true;
 }
 
-EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
+EvaluationResult
+evaluate(const ale::ast::AssignationNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -172,7 +182,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 			static_cast<ale::ast::VariableNode *>(left_child.get())
 				->get_variable_name();
 
-		if (not m_memory.variable_exists(var_name)) {
+		if (not ctx.memory.variable_exists(var_name)) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error()
 			// 	<< "    Trying to set a value to an undeclared variable '"
@@ -181,7 +191,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 		}
 
 		const std::optional<memory::VariableValue> var =
-			m_memory.get_variable(var_name);
+			ctx.memory.get_variable(var_name);
 		if (var->is_constant) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error()
@@ -191,7 +201,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 		}
 
 		std::any copy = *value;
-		m_memory.get_current_scope().set_variable_value(
+		ctx.memory.get_current_scope().set_variable_value(
 			var_name, std::move(copy)
 		);
 		return value;
@@ -213,7 +223,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 
 		for (std::string& var_name : variable_names) {
 			std::any copy = *value;
-			m_memory.get_current_scope().set_variable_value(
+			ctx.memory.get_current_scope().set_variable_value(
 				std::move(var_name), std::move(copy)
 			);
 		}
@@ -234,7 +244,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 
 		for (std::string& var_name : variable_names) {
 			std::any copy = *value;
-			m_memory.get_current_scope().set_variable_value(
+			ctx.memory.get_current_scope().set_variable_value(
 				std::move(var_name), std::move(copy)
 			);
 		}
@@ -250,7 +260,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 			)
 		);
 
-		if (not m_memory.variable_exists(var_name)) {
+		if (not ctx.memory.variable_exists(var_name)) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error()
 			// 	<< "    Trying to set a value to an undeclared variable '"
@@ -259,7 +269,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 		}
 
 		const std::optional<memory::VariableValue> var =
-			m_memory.get_variable(var_name);
+			ctx.memory.get_variable(var_name);
 		if (var->is_constant) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error()
@@ -269,7 +279,7 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 		}
 
 		std::any copy = *value;
-		m_memory.get_current_scope().set_variable_value(
+		ctx.memory.get_current_scope().set_variable_value(
 			std::move(var_name), std::move(copy)
 		);
 
@@ -288,4 +298,5 @@ EvaluationResult Program::evaluate(const ale::ast::AssignationNode& v)
 	return {};
 }
 
+} // namespace ast
 } // namespace intlib

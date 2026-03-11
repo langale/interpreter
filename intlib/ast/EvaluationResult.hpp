@@ -40,6 +40,7 @@
 #include <intlib/ast/evaluation_error_enum.hpp>
 
 namespace intlib {
+namespace ast {
 
 struct EvaluationError {
 	std::vector<evaluation_error_e> error;
@@ -52,4 +53,5 @@ struct EvaluationError {
 
 using EvaluationResult = std::expected<std::any, EvaluationError>;
 
+} // namespace ast
 } // namespace intlib

@@ -35,19 +35,24 @@
 #include <cassert>
 #endif
 
+#include <ale/ast/zero_ary_nodes/VariableNode.hpp>
+
 #include <intlib/logger/macros.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/Program.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::VariableNode& v) const
+EvaluationResult
+evaluate(const ale::ast::VariableNode& v, const EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	const std::string& name = v.get_variable_name();
 
-	if (not m_memory.variable_exists(name)) {
+	if (not ctx.memory.variable_exists(name)) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Variable '{}' is not defined in this scope.",
@@ -61,7 +66,7 @@ EvaluationResult Program::evaluate(const ale::ast::VariableNode& v) const
 		};
 	}
 
-	std::optional<memory::VariableValue> res = m_memory.get_variable(name);
+	std::optional<memory::VariableValue> res = ctx.memory.get_variable(name);
 #if defined DEBUG
 	assert(res.has_value());
 #endif
@@ -79,4 +84,5 @@ EvaluationResult Program::evaluate(const ale::ast::VariableNode& v) const
 	return std::move(res->value);
 }
 
+} // namespace ast
 } // namespace intlib

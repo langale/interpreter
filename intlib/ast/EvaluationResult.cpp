@@ -35,6 +35,7 @@
 #include <intlib/ast/EvaluationResult.hpp>
 
 namespace intlib {
+namespace ast {
 
 EvaluationError append_error(
 	EvaluationError&& err, const evaluation_error_e t, std::string&& msg
@@ -45,4 +46,5 @@ EvaluationError append_error(
 	return err;
 }
 
+} // namespace ast
 } // namespace intlib

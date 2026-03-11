@@ -31,19 +31,21 @@
  *
  ********************************************************************/
 
+#include <ale/ast/zero_ary_nodes/literal_nodes/LiteralStringNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralDecimalNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralIntegerNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralUnsignedIntegerNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralSignedIntegerNode.hpp>
+
 #include <intlib/logger/macros.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::LiteralStringNode& v)
-{
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
-
-	return v.get_value();
-}
-
-EvaluationResult Program::evaluate(const ale::ast::LiteralDecimalNode& v)
+EvaluationResult
+evaluate(const ale::ast::LiteralStringNode& v, const EvaluationContext&)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -51,18 +53,29 @@ EvaluationResult Program::evaluate(const ale::ast::LiteralDecimalNode& v)
 }
 
 EvaluationResult
-Program::evaluate(const ale::ast::LiteralUnsignedIntegerNode& v)
+evaluate(const ale::ast::LiteralDecimalNode& v, const EvaluationContext&)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	return v.get_value();
 }
 
-EvaluationResult Program::evaluate(const ale::ast::LiteralSignedIntegerNode& v)
+EvaluationResult evaluate(
+	const ale::ast::LiteralUnsignedIntegerNode& v, const EvaluationContext&
+)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	return v.get_value();
 }
 
+EvaluationResult
+evaluate(const ale::ast::LiteralSignedIntegerNode& v, const EvaluationContext&)
+{
+	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+
+	return v.get_value();
+}
+
+} // namespace ast
 } // namespace intlib

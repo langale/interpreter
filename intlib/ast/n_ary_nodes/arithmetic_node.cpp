@@ -31,20 +31,30 @@
  *
  ********************************************************************/
 
+#if defined DEBUG
+#include <cassert>
+#endif
 #include <optional>
 #include <ranges>
 #include <any>
 
+#include <ale/ast/utils/node_type_enum.hpp>
+#include <ale/ast/n_ary_nodes/ArithmeticNode.hpp>
+
 #include <intlib/logger/macros.hpp>
-#include <intlib/Program.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/arithmetic/arithmetic.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(
-	const ale::ast::ArithmeticNode& v, const ale::ast::node_type_e t
+EvaluationResult evaluate(
+	const ale::ast::ArithmeticNode& v,
+	EvaluationContext& ctx,
+	const ale::ast::node_type_e t
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -57,7 +67,7 @@ EvaluationResult Program::evaluate(
 	const auto node_eval =
 		[&](const std::unique_ptr<ale::ast::Node>& c) -> EvaluationResult
 	{
-		EvaluationResult res = interpret_node(c);
+		EvaluationResult res = interpret_node(c, ctx);
 		if (not res) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
@@ -106,12 +116,10 @@ EvaluationResult Program::evaluate(
 			);
 			return EvaluationError{
 				.error = {evaluation_error_e::Arithmetic_Operation_Failed},
-				.message = {
-					std::format(
-						"Arithmetic operation '{}' did not return a value.",
-						v.get_operation_string()
-					)
-				}
+				.message = {std::format(
+					"Arithmetic operation '{}' did not return a value.",
+					v.get_operation_string()
+				)}
 			};
 		}
 	}
@@ -119,4 +127,5 @@ EvaluationResult Program::evaluate(
 	return expr_res;
 }
 
+} // namespace ast
 } // namespace intlib

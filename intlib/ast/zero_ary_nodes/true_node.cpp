@@ -31,16 +31,21 @@
  *
  ********************************************************************/
 
+#include <ale/ast/zero_ary_nodes/TrueNode.hpp>
+
 #include <intlib/logger/macros.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::TrueNode&)
+EvaluationResult evaluate(const ale::ast::TrueNode&, const EvaluationContext&)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	return true;
 }
 
+} // namespace ast
 } // namespace intlib

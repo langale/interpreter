@@ -35,16 +35,31 @@
 #include <cassert>
 #endif
 
+#include <optional>
+#include <ranges>
+#include <any>
+
+#include <ale/ast/binary_nodes/SequenceNode.hpp>
+#include <ale/ast/binary_nodes/DeclarationNode.hpp>
+#include <ale/ast/zero_ary_nodes/VariableNode.hpp>
+#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
+#include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
+
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_conversion.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
-bool Program::retrieve_variable_names_in_declaration(
-	const ale::ast::SequenceNode& seq, std::vector<std::string>& names
+bool retrieve_variable_names_in_declaration(
+	const ale::ast::SequenceNode& seq,
+	std::vector<std::string>& names,
+	EvaluationContext& ctx
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -57,7 +72,7 @@ bool Program::retrieve_variable_names_in_declaration(
 			iter_seq.get_current_indices();
 
 		std::string var_name = seq.make_variable_name(cur_indices);
-		if (m_memory.variable_exists_shallow(var_name)) {
+		if (ctx.memory.variable_exists_shallow(var_name)) {
 			// ale::error() << ERROR_LOCATION << '\n';
 			// ale::error() << "    Redeclaration of variable '" << var_name << "'.\n";
 			return false;
@@ -70,9 +85,10 @@ bool Program::retrieve_variable_names_in_declaration(
 	return true;
 }
 
-bool Program::retrieve_variable_names_in_declaration(
+bool retrieve_variable_names_in_declaration(
 	const ale::ast::CommaSeparatedGroupNode& group,
-	std::vector<std::string>& names
+	std::vector<std::string>& names,
+	EvaluationContext& ctx
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -87,7 +103,7 @@ bool Program::retrieve_variable_names_in_declaration(
 			std::string var_name =
 				static_cast<ale::ast::VariableNode *>(c.get())
 					->get_variable_name();
-			if (m_memory.variable_exists_shallow(var_name)) {
+			if (ctx.memory.variable_exists_shallow(var_name)) {
 				// ale::error() << ERROR_LOCATION << '\n';
 				// ale::error() << "    Redeclaration of variable '" << var_name << "'.\n";
 				return false;
@@ -115,7 +131,8 @@ bool Program::retrieve_variable_names_in_declaration(
 	return true;
 }
 
-EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
+EvaluationResult
+evaluate(const ale::ast::DeclarationNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -140,7 +157,7 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 			static_cast<const ale::ast::VariableNode * const>(left_child.get())
 				->get_variable_name();
 
-		if (m_memory.variable_exists_shallow(var_name)) {
+		if (ctx.memory.variable_exists_shallow(var_name)) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println, "Redeclaration of variable {}.", var_name
 			);
@@ -156,7 +173,7 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 
 		// This is a 'declare' node.
 		if (right_child == nullptr) {
-			[[maybe_unused]] const auto res = m_memory.declare_variable(
+			[[maybe_unused]] const auto res = ctx.memory.declare_variable(
 				std::move(var_name), {}, std::move(var_type)
 			);
 
@@ -171,7 +188,7 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 			return {};
 		}
 
-		EvaluationResult res_w = interpret_node(right_child);
+		EvaluationResult res_w = interpret_node(right_child, ctx);
 		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
@@ -202,12 +219,12 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 
 		memory::AccessResult res;
 		if (v.is_constant()) {
-			res = m_memory.declare_constant_variable(
+			res = ctx.memory.declare_constant_variable(
 				std::move(var_name), std::move(value_conv), std::move(var_type)
 			);
 		}
 		else {
-			res = m_memory.declare_variable(
+			res = ctx.memory.declare_variable(
 				std::move(var_name), std::move(value_conv), std::move(var_type)
 			);
 		}
@@ -240,7 +257,7 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 		// This is a 'declare' node.
 		if (right_child == nullptr) {
 			for (std::string& var_name : variable_names) {
-				m_memory.declare_variable(std::move(var_name), {});
+				ctx.memory.declare_variable(std::move(var_name), {});
 			}
 			return std::any{};
 		}
@@ -255,12 +272,12 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 		for (std::string& var_name : variable_names) {
 			std::any copy = *value;
 			if (v.is_constant()) {
-				m_memory.declare_constant_variable(
+				ctx.memory.declare_constant_variable(
 					std::move(var_name), std::move(copy)
 				);
 			}
 			else {
-				m_memory.declare_variable(std::move(var_name), std::move(copy));
+				ctx.memory.declare_variable(std::move(var_name), std::move(copy));
 			}
 		}
 
@@ -281,7 +298,7 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 		// This is a 'declare' node.
 		if (right_child == nullptr) {
 			for (std::string& var_name : variable_names) {
-				m_memory.declare_variable(std::move(var_name), {});
+				ctx.memory.declare_variable(std::move(var_name), {});
 			}
 			return std::any{};
 		}
@@ -296,12 +313,12 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 		for (std::string& var_name : variable_names) {
 			std::any copy = *value;
 			if (v.is_constant()) {
-				m_memory.declare_constant_variable(
+				ctx.memory.declare_constant_variable(
 					std::move(var_name), std::move(copy)
 				);
 			}
 			else {
-				m_memory.declare_variable(std::move(var_name), std::move(copy));
+				ctx.memory.declare_variable(std::move(var_name), std::move(copy));
 			}
 		}
 
@@ -318,7 +335,7 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 
 		// This is a 'declare' node.
 		if (right_child == nullptr) {
-			m_memory.declare_variable(std::move(var_name), {});
+			ctx.memory.declare_variable(std::move(var_name), {});
 			return std::any{};
 		}
 
@@ -331,12 +348,12 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 
 		std::any copy = *value;
 		if (v.is_constant()) {
-			m_memory.declare_constant_variable(
+			ctx.memory.declare_constant_variable(
 				std::move(var_name), std::move(copy)
 			);
 		}
 		else {
-			m_memory.declare_variable(std::move(var_name), std::move(copy));
+			ctx.memory.declare_variable(std::move(var_name), std::move(copy));
 		}
 
 		return value;
@@ -353,4 +370,5 @@ EvaluationResult Program::evaluate(const ale::ast::DeclarationNode& v)
 	return {};
 }
 
+} // namespace ast
 } // namespace intlib

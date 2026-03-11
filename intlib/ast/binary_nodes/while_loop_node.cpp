@@ -32,15 +32,23 @@
  ********************************************************************/
 
 #include <optional>
+#include <ranges>
 #include <any>
 
+#include <ale/ast/binary_nodes/WhileLoopNode.hpp>
+
 #include <intlib/logger/macros.hpp>
+#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_bool.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
+EvaluationResult
+evaluate(const ale::ast::WhileLoopNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -56,9 +64,11 @@ EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 
 	bool stop = false;
 	while (not stop) {
-		EvaluationResult cond = interpret_node(left_child);
+		EvaluationResult cond = interpret_node(left_child, ctx);
 		if (not cond) {
-			INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+			INTERPRETER_PRINT_LOC(
+				ale::logger::println, "Node evaluation failed."
+			);
 			return append_error(
 				std::move(cond.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -88,7 +98,7 @@ EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 				continue;
 			}
 
-			EvaluationResult r = interpret_node(right_child);
+			EvaluationResult r = interpret_node(right_child, ctx);
 			if (not r) {
 				INTERPRETER_PRINT_LOC(
 					ale::logger::println,
@@ -106,4 +116,5 @@ EvaluationResult Program::evaluate(const ale::ast::WhileLoopNode& v)
 	return std::any{};
 }
 
+} // namespace ast
 } // namespace intlib

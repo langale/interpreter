@@ -1,7 +1,7 @@
 /*********************************************************************
  *
  * ALE interpreter library -- the base utilities for a command line utility
- * to run programs written in ALE
+ * to run Programs written in ALE
  *
  *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
@@ -10,18 +10,18 @@
  *
  *     https://github.com/langale/interpreter
  *
- * This program is free software: you can redistribute it and/or modify
+ * This Program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This Program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this Program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Contact:
  *
@@ -31,24 +31,45 @@
  *
  ********************************************************************/
 
-#include <optional>
+#pragma once
 
-#include <ale/ast/n_ary_nodes/ProgramNode.hpp>
-
-#include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
-#include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
 namespace ast {
-
-EvaluationResult evaluate(const ale::ast::ProgramNode&, EvaluationContext&)
+template <typename T, typename... Params>
+EvaluationResult make_evaluation_result(Params&&...params)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	using Good = EvaluationResult::value_type;
+	using Bad = EvaluationResult::error_type;
 
-	return {};
+	if constexpr (std::is_same_v<T, Good>) {
+
+		if constexpr (std::is_constructible_v<Good, Params...>) {
+			return EvaluationResult(
+				std::in_place_t{}, std::forward<Params>(params)...
+			);
+		}
+		else {
+			static_assert(false);
+			return {};
+		}
+	}
+	else if constexpr (std::is_same_v<T, Bad>) {
+		if constexpr (std::is_constructible_v<Bad, Params...>) {
+			return EvaluationResult(
+				std::unexpect_t{}, std::forward<Params>(params)...
+			);
+		}
+		else {
+			static_assert(false);
+			return {};
+		}
+	}
+	else {
+		static_assert(false);
+		return {};
+	}
 }
 
 } // namespace ast

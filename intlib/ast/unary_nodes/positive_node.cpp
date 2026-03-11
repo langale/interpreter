@@ -31,20 +31,25 @@
  *
  ********************************************************************/
 
+#include <ale/ast/unary_nodes/PositiveNode.hpp>
+
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/macros.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::PositiveNode& v)
+EvaluationResult
+evaluate(const ale::ast::PositiveNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	const auto& child = v.get_child();
 
-	EvaluationResult rr = interpret_node(child);
+	EvaluationResult rr = interpret_node(child, ctx);
 	if (not rr.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
@@ -92,4 +97,5 @@ EvaluationResult Program::evaluate(const ale::ast::PositiveNode& v)
 	};
 }
 
+} // namespace ast
 } // namespace intlib

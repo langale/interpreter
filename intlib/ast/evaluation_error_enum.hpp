@@ -36,7 +36,7 @@
 #include <format>
 
 namespace intlib {
-
+namespace ast {
 enum class evaluation_error_e : uint8_t {
 	Unhandled_Node_Type,
 	Unhandled_Variable_Type,
@@ -115,21 +115,24 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 	}
 }
 
+} // namespace ast
 } // namespace intlib
 
 template <>
-struct std::formatter<intlib::evaluation_error_e>
+struct std::formatter<intlib::ast::evaluation_error_e>
 	: std::formatter<std::string> {
-	auto
-	format(const intlib::evaluation_error_e t, std::format_context& ctx) const
+	auto format(
+		const intlib::ast::evaluation_error_e t, std::format_context& ctx
+	) const
 	{
 		return std::format_to(
-			ctx.out(), "{}", intlib::evaluation_error_to_string(t)
+			ctx.out(), "{}", intlib::ast::evaluation_error_to_string(t)
 		);
 	}
 };
 
 namespace intlib {
+namespace ast {
 
 template <typename stream_t>
 stream_t& operator<< (stream_t& os, const evaluation_error_e t)
@@ -138,4 +141,5 @@ stream_t& operator<< (stream_t& os, const evaluation_error_e t)
 	return os;
 }
 
+} // namespace ast
 } // namespace intlib

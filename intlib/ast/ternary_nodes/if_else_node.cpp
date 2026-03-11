@@ -33,15 +33,19 @@
 
 #include <optional>
 
+#include <ale/ast/ternary_nodes/IfElseNode.hpp>
+
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_to_bool.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
+EvaluationResult evaluate(const ale::ast::IfElseNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -59,7 +63,7 @@ EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 		};
 	}
 
-	EvaluationResult cond = interpret_node(first_child);
+	EvaluationResult cond = interpret_node(first_child, ctx);
 	if (not cond.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
@@ -98,7 +102,7 @@ EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 			};
 		}
 
-		return interpret_node(second_child);
+		return interpret_node(second_child, ctx);
 	}
 
 	if (third_child == nullptr) {
@@ -113,7 +117,8 @@ EvaluationResult Program::evaluate(const ale::ast::IfElseNode& v)
 		};
 	}
 
-	return interpret_node(third_child);
+	return interpret_node(third_child, ctx);
 }
 
+} // namespace ast
 } // namespace intlib

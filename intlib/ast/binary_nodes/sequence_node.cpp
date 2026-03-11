@@ -31,13 +31,22 @@
  *
  ********************************************************************/
 
+#include <optional>
+#include <ranges>
+#include <any>
+
+#include <ale/ast/binary_nodes/SequenceNode.hpp>
+#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
+
 #include <intlib/logger/macros.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
 
 namespace intlib {
+namespace ast {
 
 ale::utils::SequenceNodeIterator
-Program::make_iterator(const ale::ast::SequenceNode& seq)
+make_iterator(const ale::ast::SequenceNode& seq, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -72,11 +81,11 @@ Program::make_iterator(const ale::ast::SequenceNode& seq)
 }
 
 std::optional<std::any>
-Program::get_variable_value(const std::string& var) const
+get_variable_value(const std::string& var, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	if (not m_memory.variable_exists(var)) {
+	if (not ctx.memory.variable_exists(var)) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Trying to use undeclared variable {}.", var
 		);
@@ -84,7 +93,7 @@ Program::get_variable_value(const std::string& var) const
 	}
 
 	std::optional<memory::VariableValue> variable_value =
-		m_memory.get_variable(var);
+		ctx.memory.get_variable(var);
 
 	if (not variable_value.has_value()) {
 		INTERPRETER_PRINT_LOC2(
@@ -98,11 +107,13 @@ Program::get_variable_value(const std::string& var) const
 	return std::move(variable_value->value);
 }
 
-EvaluationResult Program::evaluate(const ale::ast::SequenceNode& v)
+EvaluationResult
+evaluate(const ale::ast::SequenceNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	return {};
 }
 
+} // namespace ast
 } // namespace intlib

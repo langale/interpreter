@@ -31,14 +31,26 @@
  *
  ********************************************************************/
 
+#if defined DEBUG
+#include <cassert>
+#endif
+#include <optional>
+#include <ranges>
+#include <any>
+
+#include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/detail/any_type.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::evaluate(const ale::ast::CommaSeparatedGroupNode& v)
+EvaluationResult
+evaluate(const ale::ast::CommaSeparatedGroupNode& v, EvaluationContext& ctx)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
@@ -55,4 +67,5 @@ EvaluationResult Program::evaluate(const ale::ast::CommaSeparatedGroupNode& v)
 	};
 }
 
+} // namespace ast
 } // namespace intlib

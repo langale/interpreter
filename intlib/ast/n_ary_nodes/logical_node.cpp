@@ -31,15 +31,24 @@
  *
  ********************************************************************/
 
+#if defined DEBUG
+#include <cassert>
+#endif
 #include <optional>
 #include <ranges>
 #include <any>
 
+#include <ale/ast/utils/node_type_enum.hpp>
+#include <ale/ast/n_ary_nodes/LogicalNode.hpp>
+
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/Program.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
 [[nodiscard]] static bool compute_logical_expression(
 	const ale::ast::node_type_e t, const bool l, const bool r
@@ -81,15 +90,16 @@ namespace intlib {
 	return false;
 }
 
-EvaluationResult Program::evaluate_logical_node(
+EvaluationResult evaluate_logical_node(
 	const ale::ast::LogicalNode& v,
+	EvaluationContext& ctx,
 	const ale::ast::node_type_e t,
 	const std::unique_ptr<ale::ast::Node>& c
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	EvaluationResult res = interpret_node(c);
+	EvaluationResult res = interpret_node(c, ctx);
 	if (not res) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
@@ -113,14 +123,17 @@ EvaluationResult Program::evaluate_logical_node(
 	return r;
 }
 
-EvaluationResult
-Program::evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e t)
+EvaluationResult evaluate(
+	const ale::ast::LogicalNode& v,
+	EvaluationContext& ctx,
+	const ale::ast::node_type_e t
+)
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
 	const auto& children = v.get_children();
 
-	EvaluationResult rc = evaluate_logical_node(v, t, children[0]);
+	EvaluationResult rc = evaluate_logical_node(v, ctx, t, children[0]);
 	if (not rc) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return rc.error();
@@ -136,9 +149,11 @@ Program::evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e t)
 			break;
 		}
 
-		EvaluationResult rv = evaluate_logical_node(v, t, c);
+		EvaluationResult rv = evaluate_logical_node(v, ctx, t, c);
 		if (not rv) {
-			INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+			INTERPRETER_PRINT_LOC(
+				ale::logger::println, "Node evaluation failed."
+			);
 			return rc.error();
 		}
 
@@ -149,4 +164,5 @@ Program::evaluate(const ale::ast::LogicalNode& v, const ale::ast::node_type_e t)
 	return rc_value;
 }
 
+} // namespace ast
 } // namespace intlib

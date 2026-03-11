@@ -31,8 +31,6 @@
  *
  ********************************************************************/
 
-#include <intlib/Program.hpp>
-
 #if defined DEBUG
 #include <cassert>
 #endif
@@ -40,19 +38,22 @@
 #include <ranges>
 #include <any>
 
-#include <ale/ast/binary_nodes/SequenceNode.hpp>
+#include <ale/ast/utils/node_type_enum.hpp>
+#include <ale/ast/n_ary_nodes/ComparisonNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/macros.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
-
-#include <intlib/comparison/comparison.hpp>
+#include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
+namespace ast {
 
-EvaluationResult Program::first_value(
-	const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c
+EvaluationResult first_value(
+	const ale::ast::ComparisonNode& v,
+	EvaluationContext& ctx,
+	const std::unique_ptr<ale::ast::Node>& c
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -89,8 +90,10 @@ EvaluationResult Program::first_value(
 	return true;
 }
 
-EvaluationResult Program::last_value(
-	const ale::ast::ComparisonNode& v, const std::unique_ptr<ale::ast::Node>& c
+EvaluationResult last_value(
+	const ale::ast::ComparisonNode& v,
+	EvaluationContext& ctx,
+	const std::unique_ptr<ale::ast::Node>& c
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -127,8 +130,10 @@ EvaluationResult Program::last_value(
 	return true;
 }
 
-EvaluationResult Program::evaluate(
-	const ale::ast::ComparisonNode& v, const ale::ast::node_type_e t
+EvaluationResult evaluate(
+	const ale::ast::ComparisonNode& v,
+	EvaluationContext& ctx,
+	const ale::ast::node_type_e t
 )
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
@@ -217,4 +222,5 @@ EvaluationResult Program::evaluate(
 	return true;
 }
 
+} // namespace ast
 } // namespace intlib
