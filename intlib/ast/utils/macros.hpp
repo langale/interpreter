@@ -31,21 +31,53 @@
  *
  ********************************************************************/
 
-#include <ale/ast/zero_ary_nodes/FalseNode.hpp>
+#pragma once
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
-#include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/utils/macros.hpp>
 
 namespace intlib {
 namespace ast {
 
-EvaluationResult evaluate(const EvaluationContext&, const ale::ast::FalseNode&)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+enum class result_type_e : int8_t {
+	Good,
+	Bad
+};
 
-	return make_good_evaluation_result(false);
+template <result_type_e res, typename expected_t, typename... params_t>
+expected_t make_expected(params_t&&...params)
+{
+	using Good = expected_t::value_type;
+	using Bad = expected_t::error_type;
+
+	if constexpr (res == result_type_e::Good) {
+		static_assert(std::is_constructible_v<Good, params_t...>);
+		return expected_t(std::in_place_t{}, std::forward<params_t>(params)...);
+	}
+	else if constexpr (res == result_type_e::Bad) {
+		static_assert(std::is_constructible_v<Bad, params_t...>);
+		return expected_t(std::unexpect_t{}, std::forward<params_t>(params)...);
+	}
+	else {
+		static_assert(false);
+	}
+
+	return {};
+}
+
+template <typename... params_t>
+EvaluationResult make_good_evaluation_result(params_t&&...params)
+{
+	return make_expected<result_type_e::Good, EvaluationResult>(
+		std::forward<params_t>(params)...
+	);
+}
+
+template <typename... params_t>
+EvaluationResult make_bad_evaluation_result(params_t&&...params)
+{
+	return make_expected<result_type_e::Bad, EvaluationResult>(
+		std::forward<params_t>(params)...
+	);
 }
 
 } // namespace ast

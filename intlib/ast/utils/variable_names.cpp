@@ -44,6 +44,7 @@
 #include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/detail/any_output.hpp>
@@ -96,18 +97,21 @@ namespace ast {
 				any_view{val}
 			);
 
-			return EvaluationError{
-				.error = {evaluation_error_e::
-							  Evaluation_Of_Node_Is_Not_A_Numeric_Value},
-				.message = {"Evaluation of node is not a numeric value."}
-			};
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::
+								Evaluation_Of_Node_Is_Not_A_Numeric_Value},
+				std::vector<std::string>{
+					"Evaluation of node is not a numeric value."
+				}
+			);
 		}
 
 		const auto idx = std::any_cast<int64_t>(idx_w);
 		INTERPRETER_PRINT_LOC2(ale::logger::println, "Made index {}.", idx);
 		indices.push_back(idx);
 	}
-	return std::any{std::move(indices)};
+
+	return make_good_evaluation_result(std::move(indices));
 }
 
 EvaluationResult make_subscripted_variable_name(
@@ -142,8 +146,9 @@ EvaluationResult make_subscripted_variable_name(
 
 	INTERPRETER_PRINT_LOC(ale::logger::println, "Successfully made indices.");
 
-	const std::any& idxs_w = *res_w;
-	std::vector<int64_t> idxs = std::any_cast<std::vector<int64_t>>(idxs_w);
+	std::any idxs_w = std::move(*res_w);
+	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
+
 	for (const int64_t idx : idxs) {
 		name += "_" + std::to_string(idx);
 	}
@@ -152,7 +157,7 @@ EvaluationResult make_subscripted_variable_name(
 		ale::logger::println, "Name constructed '{}'.", name
 	);
 
-	return std::any{std::move(name)};
+	return make_good_evaluation_result(std::move(name));
 }
 
 EvaluationResult make_sequence_variable_names(
@@ -221,7 +226,7 @@ EvaluationResult make_sequence_variable_names(
 		iter.next_indices();
 	}
 
-	return std::any{std::move(names)};
+	return make_good_evaluation_result(std::move(names));
 }
 
 } // namespace ast

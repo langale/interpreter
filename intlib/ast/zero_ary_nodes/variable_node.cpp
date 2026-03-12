@@ -41,6 +41,7 @@
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/detail/any_type.hpp>
+#include <intlib/ast/utils/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -58,12 +59,12 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 			"Variable '{}' is not defined in this scope.",
 			name
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Valueless_Variable},
-			.message = {
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Valueless_Variable},
+			std::vector{
 				std::format("Variable '{}' is not defined in this scope.", name)
 			}
-		};
+		);
 	}
 
 	std::optional<memory::VariableValue> res = ctx.memory.get_variable(name);
@@ -81,7 +82,7 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 		};
 	}
 
-	return std::move(res->value);
+	return make_good_evaluation_result(std::move(res->value));
 }
 
 } // namespace ast

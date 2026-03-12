@@ -38,6 +38,7 @@
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -64,7 +65,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node: {}.", *r
 		);
-		return not *r;
+		return make_good_evaluation_result(not *r);
 	}
 
 	INTERPRETER_PRINT_LOC2(
@@ -72,12 +73,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 		"Unhandled variable type '{}'.",
 		detail::get_type_name(*rr)
 	);
-	return EvaluationError{
-		.error = {evaluation_error_e::Unhandled_Variable_Type},
-		.message = {
+	return make_bad_evaluation_result(
+		std::vector{evaluation_error_e::Unhandled_Variable_Type},
+		std::vector{
 			std::format("Unhandled type '{}'", detail::get_type_name(*rr))
 		}
-	};
+	);
 }
 
 } // namespace ast

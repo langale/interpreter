@@ -40,6 +40,7 @@
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/utils/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -49,7 +50,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return v.get_value();
+	return make_good_evaluation_result(v.get_value());
 }
 
 EvaluationResult
@@ -57,7 +58,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return v.get_value();
+	return make_good_evaluation_result(v.get_value());
 }
 
 EvaluationResult evaluate(
@@ -66,7 +67,7 @@ EvaluationResult evaluate(
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return v.get_value();
+	return make_good_evaluation_result(v.get_value());
 }
 
 EvaluationResult
@@ -74,7 +75,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralSignedIntegerNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return v.get_value();
+	return make_good_evaluation_result(v.get_value());
 }
 
 } // namespace ast

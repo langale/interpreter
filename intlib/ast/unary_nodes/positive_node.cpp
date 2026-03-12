@@ -38,6 +38,7 @@
 #include <intlib/detail/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -65,7 +66,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is uint64_t: {}.", ri
 		);
-		return detail::to_uint64(ri);
+		return make_good_evaluation_result(detail::to_uint64(ri));
 	}
 
 	if (detail::is_type<int64_t>(r)) {
@@ -73,7 +74,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is int64_t: {}.", ri
 		);
-		return ri;
+		return make_good_evaluation_result(ri);
 	}
 
 	if (detail::is_type<double>(r)) {
@@ -81,7 +82,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is double: {}.", ri
 		);
-		return ri;
+		return make_good_evaluation_result(ri);
 	}
 
 	INTERPRETER_PRINT_LOC2(
@@ -89,12 +90,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 		"Unhandled variable type '{}'.",
 		detail::get_type_name(*rr)
 	);
-	return EvaluationError{
-		.error = {evaluation_error_e::Unhandled_Variable_Type},
-		.message = {
+	return make_bad_evaluation_result(
+		std::vector{evaluation_error_e::Unhandled_Variable_Type},
+		std::vector{
 			std::format("Unhandled type '{}'", detail::get_type_name(*rr))
 		}
-	};
+	);
 }
 
 } // namespace ast

@@ -36,6 +36,7 @@
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/utils/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -44,7 +45,7 @@ EvaluationResult evaluate(const EvaluationContext&, const ale::ast::TrueNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return true;
+	return make_good_evaluation_result(true);
 }
 
 } // namespace ast

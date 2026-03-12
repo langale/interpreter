@@ -53,6 +53,7 @@
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
+#include <intlib/ast/utils/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -71,14 +72,14 @@ namespace ast {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
 			);
-			return EvaluationError{
-				.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
-				.message = {"Evaluation of node failed."}
-			};
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
+				std::vector<std::string>{"Evaluation of node failed."}
+			);
 		}
 		value = std::move(*res_w);
 	}
-	return std::move(value);
+	return make_good_evaluation_result(std::move(value));
 }
 
 [[nodiscard]] static EvaluationResult declare_single_variable(
@@ -103,12 +104,14 @@ namespace ast {
 
 	if (ctx.memory.variable_exists_shallow(var_name)) {
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "    Redeclaration of variable {}.", var_name
+			ale::logger::println,
+			"    Attempt to redeclare variable {}.",
+			var_name
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Memory_Variable_Already_Exists},
-			.message = {std::format("Redeclaration of variable {}.", var_name)}
-		};
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Memory_Variable_Already_Exists},
+			std::vector{std::format("Redeclaration of variable {}.", var_name)}
+		);
 	}
 
 	// This is a 'declare' node.
@@ -125,7 +128,7 @@ namespace ast {
 		//   This has been ensured will never happen
 		assert(res.has_value());
 #endif
-		return {};
+		return make_good_evaluation_result(std::any{});
 	}
 
 	INTERPRETER_PRINT_LOC2(
@@ -171,7 +174,7 @@ namespace ast {
 		variable_name_copy
 	);
 
-	return {};
+	return make_good_evaluation_result(std::any{});
 }
 
 [[nodiscard]] static EvaluationResult declare_variable(
@@ -220,11 +223,11 @@ namespace ast {
 		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "    Could not make the name of the variable."
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
-			.message = {"Evaluation of node failed and the name of the "
-						"variable could not be made."}
-		};
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
+			std::vector<std::string>{"Evaluation of node failed and the name "
+									 "of the variable could not be made."}
+		);
 	}
 
 	const std::any& name_w = *res_w;
@@ -254,11 +257,13 @@ namespace ast {
 
 	auto list_w = make_sequence_variable_names(ctx, sequence);
 	if (not list_w) {
-		return EvaluationError{
-			.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
-			.message = {"Evaluation of node failed and the name of the "
-						"variables in a sequence could not be made."}
-		};
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
+			std::vector<std::string>{
+				"Evaluation of node failed and the name of the variables in a "
+				"sequence could not be made."
+			}
+		);
 	}
 
 #if defined DEBUG
@@ -277,11 +282,11 @@ namespace ast {
 			value
 		);
 		if (not res_w) {
-			return std::move(res_w.error());
+			return make_bad_evaluation_result(std::move(res_w.error()));
 		}
 	}
 
-	return {};
+	return make_good_evaluation_result(std::any{});
 }
 
 [[nodiscard]] static EvaluationResult declare_variable_sequence(
@@ -341,13 +346,13 @@ namespace ast {
 		if (child->get_node_type() == ale::ast::node_type_e::Variable) {
 			auto res_w = declare_variable(ctx, decl, child, value);
 			if (not res_w) {
-				return std::move(res_w.error());
+				return make_bad_evaluation_result(std::move(res_w.error()));
 			}
 		}
 		else if (child->get_node_type() == ale::ast::node_type_e::Sequence) {
 			auto res_w = declare_variable_sequence(ctx, decl, child, value);
 			if (not res_w) {
-				return std::move(res_w.error());
+				return make_bad_evaluation_result(std::move(res_w.error()));
 			}
 		}
 		else if (child->get_node_type() ==
@@ -355,12 +360,12 @@ namespace ast {
 
 			auto res_w = declare_subscripted_variable(ctx, decl, child, value);
 			if (not res_w) {
-				return std::move(res_w.error());
+				return make_bad_evaluation_result(std::move(res_w.error()));
 			}
 		}
 	}
 
-	return {};
+	return make_good_evaluation_result(std::any{});
 }
 
 EvaluationResult
@@ -409,7 +414,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		return declare_subscripted_variable(ctx, decl, left_child, value);
 	}
 
-	return {};
+	return make_good_evaluation_result(std::any{});
 }
 
 } // namespace ast
