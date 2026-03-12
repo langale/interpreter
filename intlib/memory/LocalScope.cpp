@@ -36,8 +36,7 @@
 namespace intlib {
 namespace memory {
 
-#define SUCCESSFUL                                                             \
-	return AccessResult { }
+#define SUCCESSFUL return make_good_access_result()
 
 /* MODIFIERS */
 
@@ -48,7 +47,7 @@ AccessResult LocalScope::declare_variable(
 	Collection::iterator it = find(name);
 
 	if (it != m_variables.end()) {
-		return std::unexpected{access_error_e::Variable_Already_Exists};
+		return make_bad_access_result(access_error_e::Variable_Already_Exists);
 	}
 
 	m_variables.insert(
@@ -67,7 +66,7 @@ AccessResult LocalScope::declare_constant_variable(
 	Collection::iterator it = find(name);
 
 	if (it != m_variables.end()) {
-		return std::unexpected{access_error_e::Variable_Already_Exists};
+		return make_bad_access_result(access_error_e::Variable_Already_Exists);
 	}
 
 	m_variables.insert(
@@ -86,13 +85,13 @@ AccessResult LocalScope::set_variable_value(
 	Collection::iterator it = find(name);
 
 	if (it == m_variables.end()) {
-		return std::unexpected{access_error_e::Variable_Does_Not_Exist};
+		return make_bad_access_result(access_error_e::Variable_Does_Not_Exist);
 	}
 
 	if (it->second.is_constant) {
-		return std::unexpected{
+		return make_bad_access_result(
 			access_error_e::Attempt_To_Assign_Value_To_Constant_Variable
-		};
+		);
 	}
 
 	it->second.value = std::move(value);

@@ -35,6 +35,8 @@
 
 #include <expected>
 
+#include <ale/detail/make_expected.hpp>
+
 #include <intlib/memory/memory_error_enum.hpp>
 
 namespace intlib {
@@ -42,5 +44,19 @@ namespace memory {
 
 using AccessResult = std::expected<void, access_error_e>;
 
+[[nodiscard]] inline AccessResult make_good_access_result()
+{
+	return ale::detail::
+		make_expected<ale::detail::expected_type_e::Good, AccessResult>();
 }
+
+template <typename... params_t>
+[[nodiscard]] AccessResult make_bad_access_result(params_t&&...params)
+{
+	return ale::detail::make_expected<
+		ale::detail::expected_type_e::Bad,
+		AccessResult>(std::forward<params_t>(params)...);
 }
+
+} // namespace memory
+} // namespace intlib

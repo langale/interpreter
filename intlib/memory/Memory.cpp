@@ -36,8 +36,7 @@
 namespace intlib {
 namespace memory {
 
-#define SUCCESSFUL                                                             \
-	return AccessResult { }
+#define SUCCESSFUL return make_good_access_result()
 
 /* MODIFIERS */
 
@@ -58,7 +57,7 @@ AccessResult Memory::declare_variable(
 	}
 
 	if (not result.has_value()) {
-		return std::unexpected{result.error()};
+		return make_bad_access_result(std::move(result.error()));
 	}
 	SUCCESSFUL;
 }
@@ -80,7 +79,7 @@ AccessResult Memory::declare_constant_variable(
 	}
 
 	if (not result.has_value()) {
-		return std::unexpected{result.error()};
+		return make_bad_access_result(std::move(result.error()));
 	}
 	SUCCESSFUL;
 }
@@ -98,7 +97,7 @@ Memory::set_variable_value(const std::string& name, std::any&& value) noexcept
 	}
 
 	if (not result.has_value()) {
-		return std::unexpected{result.error()};
+		return make_bad_access_result(std::move(result.error()));
 	}
 	SUCCESSFUL;
 }

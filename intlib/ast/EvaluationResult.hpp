@@ -37,6 +37,8 @@
 #include <vector>
 #include <any>
 
+#include <ale/detail/make_expected.hpp>
+
 #include <intlib/ast/evaluation_error_enum.hpp>
 
 namespace intlib {
@@ -52,6 +54,22 @@ struct EvaluationError {
 );
 
 using EvaluationResult = std::expected<std::any, EvaluationError>;
+
+template <typename... params_t>
+EvaluationResult make_good_evaluation_result(params_t&&...params)
+{
+	return ale::detail::make_expected<
+		ale::detail::expected_type_e::Good,
+		EvaluationResult>(std::forward<params_t>(params)...);
+}
+
+template <typename... params_t>
+EvaluationResult make_bad_evaluation_result(params_t&&...params)
+{
+	return ale::detail::make_expected<
+		ale::detail::expected_type_e::Bad,
+		EvaluationResult>(std::forward<params_t>(params)...);
+}
 
 } // namespace ast
 } // namespace intlib
