@@ -110,8 +110,5 @@ int main(int argc, char *argv[])
 	std::cout << "---------------\n";
 	std::cout << "Program's evaluation:\n";
 
-
-	std::ofstream fout;
-	ale::logger::Stream stream(true, false, true, std::cout, fout);
-	p.run_program(stream);
+	p.run_program();
 }
