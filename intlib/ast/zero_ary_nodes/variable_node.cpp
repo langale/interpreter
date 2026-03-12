@@ -41,7 +41,7 @@
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/ast/utils/macros.hpp>
+#include <intlib/ast/utils/EvaluationResult.hpp>
 
 namespace intlib {
 namespace ast {

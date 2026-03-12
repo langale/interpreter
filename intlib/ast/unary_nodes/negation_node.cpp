@@ -38,7 +38,7 @@
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
-#include <intlib/ast/utils/macros.hpp>
+#include <intlib/ast/utils/EvaluationResult.hpp>
 
 namespace intlib {
 namespace ast {

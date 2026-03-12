@@ -33,10 +33,12 @@
 
 #pragma once
 
-#include <intlib/ast/EvaluationResult.hpp>
+#include <expected>
+#include <cstdint>
+#include <type_traits>
 
 namespace intlib {
-namespace ast {
+namespace detail {
 
 enum class result_type_e : int8_t {
 	Good,
@@ -64,21 +66,5 @@ expected_t make_expected(params_t&&...params)
 	return {};
 }
 
-template <typename... params_t>
-EvaluationResult make_good_evaluation_result(params_t&&...params)
-{
-	return make_expected<result_type_e::Good, EvaluationResult>(
-		std::forward<params_t>(params)...
-	);
-}
-
-template <typename... params_t>
-EvaluationResult make_bad_evaluation_result(params_t&&...params)
-{
-	return make_expected<result_type_e::Bad, EvaluationResult>(
-		std::forward<params_t>(params)...
-	);
-}
-
-} // namespace ast
+} // namespace detail
 } // namespace intlib

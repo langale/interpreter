@@ -44,7 +44,7 @@
 #include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 
 #include <intlib/ast/interpretation.hpp>
-#include <intlib/ast/utils/macros.hpp>
+#include <intlib/ast/utils/EvaluationResult.hpp>
 #include <intlib/detail/any_type.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/detail/any_output.hpp>

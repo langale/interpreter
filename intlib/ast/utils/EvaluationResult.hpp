@@ -31,21 +31,28 @@
  *
  ********************************************************************/
 
-#include <ale/ast/zero_ary_nodes/FalseNode.hpp>
+#pragma once
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
-#include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/utils/EvaluationResult.hpp>
+#include <intlib/detail/make_expected.hpp>
 
 namespace intlib {
 namespace ast {
 
-EvaluationResult evaluate(const EvaluationContext&, const ale::ast::FalseNode&)
+template <typename... params_t>
+EvaluationResult make_good_evaluation_result(params_t&&...params)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	return detail::make_expected<detail::result_type_e::Good, EvaluationResult>(
+		std::forward<params_t>(params)...
+	);
+}
 
-	return make_good_evaluation_result(false);
+template <typename... params_t>
+EvaluationResult make_bad_evaluation_result(params_t&&...params)
+{
+	return detail::make_expected<detail::result_type_e::Bad, EvaluationResult>(
+		std::forward<params_t>(params)...
+	);
 }
 
 } // namespace ast
