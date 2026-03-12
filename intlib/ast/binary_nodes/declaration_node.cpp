@@ -91,9 +91,19 @@ namespace ast {
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
+#if defined ALE_LOGGING_MESSAGES
+	const std::string variable_name_copy = var_name;
+#endif
+
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"Going to declare variable '{}'.",
+		variable_name_copy
+	);
+
 	if (ctx.memory.variable_exists_shallow(var_name)) {
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "Redeclaration of variable {}.", var_name
+			ale::logger::println, "    Redeclaration of variable {}.", var_name
 		);
 		return EvaluationError{
 			.error = {evaluation_error_e::Memory_Variable_Already_Exists},
@@ -120,7 +130,7 @@ namespace ast {
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
-		"Type returned from node evaluation is: '{}'. Value is: '{}'.",
+		"    Type returned from node evaluation is: '{}'. Value is: '{}'.",
 		detail::get_type_name(value),
 		any_view{value}
 	);
@@ -155,6 +165,12 @@ namespace ast {
 	assert(res.has_value());
 #endif
 
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"    Successfully declared variable '{}'.",
+		variable_name_copy
+	);
+
 	return {};
 }
 
@@ -172,7 +188,7 @@ namespace ast {
 #endif
 
 	std::string var_name =
-		static_cast<const ale::ast::VariableNode * const>(variable_node.get())
+		static_cast<const ale::ast::VariableNode *>(variable_node.get())
 			->get_variable_name();
 
 	std::string var_type = decl.get_type();
@@ -195,8 +211,15 @@ namespace ast {
 {
 	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
 
-	EvaluationResult name_w = make_subscripted_variable_name(ctx, variable);
-	if (not name_w.has_value()) {
+	INTERPRETER_PRINT_LOC(
+		ale::logger::println, "Making the name of the variable."
+	);
+
+	EvaluationResult res_w = make_subscripted_variable_name(ctx, variable);
+	if (not res_w.has_value()) {
+		INTERPRETER_PRINT_LOC(
+			ale::logger::println, "    Could not make the name of the variable."
+		);
 		return EvaluationError{
 			.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
 			.message = {"Evaluation of node failed and the name of the "
@@ -204,6 +227,7 @@ namespace ast {
 		};
 	}
 
+	const std::any& name_w = *res_w;
 #if defined DEBUG
 	assert(detail::is_type<std::string>(name_w));
 #endif
@@ -213,7 +237,7 @@ namespace ast {
 	return declare_single_variable(
 		ctx,
 		decl.get_node_type(),
-		std::any_cast<std::string>(*name_w),
+		std::any_cast<std::string>(name_w),
 		std::move(var_type),
 		value
 	);
@@ -307,7 +331,7 @@ namespace ast {
 	const std::any value = std::move(*value_w);
 
 	const auto variable_list_node =
-		static_cast<const ale::ast::CommaSeparatedGroupNode * const>(
+		static_cast<const ale::ast::CommaSeparatedGroupNode *>(
 			variable_list_node_w.get()
 		);
 
