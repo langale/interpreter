@@ -29,6 +29,7 @@
  *
  ********************************************************************/
 
+#include <stdfloat>
 #include <format>
 #include <any>
 
@@ -50,14 +51,47 @@ std::formatter<any_view>::OutT std::formatter<any_view>::format(
 		return std::format_to(ctx.out(), "{}", std::any_cast<bool>(a));
 	}
 
+	if (intlib::detail::is_type<int8_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<int8_t>(a));
+	}
+	if (intlib::detail::is_type<uint8_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<uint8_t>(a));
+	}
+
+	if (intlib::detail::is_type<int16_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<int16_t>(a));
+	}
+	if (intlib::detail::is_type<uint16_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<uint16_t>(a));
+	}
+
+	if (intlib::detail::is_type<int32_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<int32_t>(a));
+	}
+	if (intlib::detail::is_type<uint32_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<uint32_t>(a));
+	}
+
 	if (intlib::detail::is_type<int64_t>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<int64_t>(a));
 	}
-
 	if (intlib::detail::is_type<uint64_t>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<uint64_t>(a));
 	}
 
+	if (intlib::detail::is_type<float16_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<float16_t>(a));
+	}
+	if (intlib::detail::is_type<float32_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<float32_t>(a));
+	}
+	if (intlib::detail::is_type<float64_t>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<float64_t>(a));
+	}
+
+	if (intlib::detail::is_type<float>(name)) {
+		return std::format_to(ctx.out(), "{}", std::any_cast<float>(a));
+	}
 	if (intlib::detail::is_type<double>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<double>(a));
 	}
