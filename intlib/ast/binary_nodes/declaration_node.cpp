@@ -255,8 +255,10 @@ namespace ast {
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	auto list_w = make_sequence_variable_names(ctx, sequence);
-	if (not list_w) {
+	INTERPRETER_PRINT_LOC(ale::logger::println, "Going to make list of names.");
+
+	auto res_w = make_sequence_variable_names(ctx, sequence);
+	if (not res_w) {
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
 			std::vector<std::string>{
@@ -266,23 +268,40 @@ namespace ast {
 		);
 	}
 
+	INTERPRETER_PRINT_LOC(
+		ale::logger::println, "Successfully made list of names."
+	);
+
+	const std::any& list_w = *res_w;
+
 #if defined DEBUG
 	assert(detail::is_type<std::vector<std::string>>(list_w));
 #endif
 
-	auto list = std::any_cast<std::vector<std::string>>(*list_w);
+	auto list = std::any_cast<std::vector<std::string>>(list_w);
 
 	for (std::string& var_name : list) {
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Declare variable with name '{}'.", var_name
+		);
+
 		std::string var_type = decl.get_type();
-		auto res_w = declare_single_variable(
+		auto declare_res_w = declare_single_variable(
 			ctx,
 			decl.get_node_type(),
 			std::move(var_name),
 			std::move(var_type),
 			value
 		);
-		if (not res_w) {
-			return make_bad_evaluation_result(std::move(res_w.error()));
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"    Successfully declared variable with name '{}'.",
+			var_name
+		);
+
+		if (not declare_res_w) {
+			return make_bad_evaluation_result(std::move(declare_res_w.error()));
 		}
 	}
 
@@ -301,8 +320,7 @@ namespace ast {
 
 #if defined DEBUG
 	assert(
-		variable_list_node_w->get_node_type() ==
-		ale::ast::node_type_e::Comma_Separated_Group
+		variable_list_node_w->get_node_type() == ale::ast::node_type_e::Sequence
 	);
 #endif
 
@@ -380,6 +398,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 #endif
 
 	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Variable.");
 		const auto& variable_node = decl.get_left_child();
 
 		EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
@@ -393,18 +412,19 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 
 	if (left_child->get_node_type() ==
 		ale::ast::node_type_e::Comma_Separated_Group) {
-
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Comma-separated group.");
 		return declare_comma_separated_variables(ctx, decl);
 	}
 
 	if (left_child->get_node_type() == ale::ast::node_type_e::Sequence) {
-
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Variable sequence.");
 		return declare_variable_sequence(ctx, decl, left_child);
 	}
 
 	if (left_child->get_node_type() ==
 		ale::ast::node_type_e::Subscripted_Variable) {
 
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Subscripted variable.");
 		EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
 		if (not value_w) {
 			return std::move(value_w.error());
