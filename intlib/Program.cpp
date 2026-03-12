@@ -35,6 +35,7 @@
 
 #include <intlib/Program.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/EvaluationResult.hpp>
 
 namespace intlib {
 
@@ -45,10 +46,10 @@ Program::Program() noexcept
 
 /* OTHERS */
 
-void Program::run_program(ale::logger::Stream& os)
+ast::EvaluationResult Program::run_program()
 {
 	ast::EvaluationContext ctx{.memory = m_memory};
-	[[maybe_unused]] const auto res = ast::interpret_node(ctx, m_program_node);
+	return ast::interpret_node(ctx, m_program_node);
 }
 
 /* OTHERS */

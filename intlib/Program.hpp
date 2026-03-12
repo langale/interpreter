@@ -36,7 +36,9 @@
 #include <memory>
 
 #include <ale/logger/Stream.hpp>
-#include <intlib/ast/evaluation.hpp>
+#include <ale/ast/Node.hpp>
+
+#include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/memory/Memory.hpp>
 
 namespace intlib {
@@ -90,7 +92,7 @@ public:
 	/* OTHER */
 
 	/// Execute this Program.
-	void run_program(ale::logger::Stream& os);
+	ast::EvaluationResult run_program();
 
 	/// Output a Program in a tree (AST) format to an output stream.
 	void print_tree(ale::logger::Stream& os) const;
