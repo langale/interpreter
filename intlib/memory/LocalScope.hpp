@@ -90,9 +90,8 @@ public:
 	 * @param name Variable name.
 	 * @param value Value of the variable.
 	 */
-	[[nodiscard]] AccessResult set_variable_value(
-		const std::string& name, std::any&& value, const std::string& type
-	) noexcept;
+	[[nodiscard]] AccessResult
+	set_variable_value(const std::string& name, std::any&& value) noexcept;
 
 	/* GETTERS */
 

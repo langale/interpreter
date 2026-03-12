@@ -67,9 +67,8 @@ public:
 	 * @param name Name of the variable.
 	 * @param value Value of the variable.
 	 */
-	[[nodiscard]] AccessResult declare_variable(
-		std::string&& name, std::any&& value, std::string&& type
-	) noexcept;
+	[[nodiscard]] AccessResult
+	declare_variable(std::string&& name, std::any&& value, std::string&& type);
 
 	/**
 	 * @brief Sets the value of a constant variable to the current scope.
@@ -78,16 +77,15 @@ public:
 	 */
 	[[nodiscard]] AccessResult declare_constant_variable(
 		std::string&& name, std::any&& value, std::string&& type
-	) noexcept;
+	);
 
 	/**
 	 * @brief Sets the value of a (non-constant) variable in this subscope.
 	 * @param name Variable name.
 	 * @param value Value of the variable.
 	 */
-	[[nodiscard]] AccessResult set_variable_value(
-		const std::string& name, std::any&& value, const std::string& type
-	) noexcept;
+	[[nodiscard]] AccessResult
+	set_variable_value(const std::string& name, std::any&& value) noexcept;
 
 	/* GETTERS */
 

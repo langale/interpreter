@@ -80,7 +80,7 @@ AccessResult LocalScope::declare_constant_variable(
 }
 
 AccessResult LocalScope::set_variable_value(
-	const std::string& name, std::any&& value, const std::string& type
+	const std::string& name, std::any&& value
 ) noexcept
 {
 	Collection::iterator it = find(name);
@@ -93,10 +93,6 @@ AccessResult LocalScope::set_variable_value(
 		return std::unexpected{
 			access_error_e::Attempt_To_Assign_Value_To_Constant_Variable
 		};
-	}
-
-	if (it->second.type != type) {
-		return std::unexpected{access_error_e::Type_Mismatch};
 	}
 
 	it->second.value = std::move(value);

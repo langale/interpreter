@@ -70,13 +70,12 @@ AccessResult FunctionScope::declare_constant_variable(
 }
 
 AccessResult FunctionScope::set_variable_value(
-	const std::string& name, std::any&& value, const std::string& type
+	const std::string& name, std::any&& value
 ) noexcept
 {
 	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
-			const auto res =
-				it->set_variable_value(name, std::move(value), type);
+			const auto res = it->set_variable_value(name, std::move(value));
 
 			if (not res.has_value()) {
 				return std::unexpected{res.error()};

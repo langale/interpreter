@@ -43,7 +43,7 @@ namespace memory {
 
 AccessResult Memory::declare_variable(
 	std::string&& name, std::any&& value, std::string&& type
-) noexcept
+)
 {
 	AccessResult result;
 	if (is_current_scope_global()) {
@@ -65,7 +65,7 @@ AccessResult Memory::declare_variable(
 
 AccessResult Memory::declare_constant_variable(
 	std::string&& name, std::any&& value, std::string&& type
-) noexcept
+)
 {
 	AccessResult result;
 	if (is_current_scope_global()) {
@@ -85,10 +85,21 @@ AccessResult Memory::declare_constant_variable(
 	SUCCESSFUL;
 }
 
-AccessResult Memory::set_variable_value(
-	const std::string&, std::any&&, const std::string&
-) noexcept
+AccessResult
+Memory::set_variable_value(const std::string& name, std::any&& value) noexcept
 {
+	AccessResult result;
+	if (is_current_scope_global()) {
+		result = m_global_scope.set_variable_value(name, std::move(value));
+	}
+	else {
+		result =
+			m_local_scopes.top().set_variable_value(name, std::move(value));
+	}
+
+	if (not result.has_value()) {
+		return std::unexpected{result.error()};
+	}
 	SUCCESSFUL;
 }
 
