@@ -208,12 +208,39 @@ EvaluationResult make_sequence_variable_names(
 		return std::move(right_idxs_w.error());
 	}
 
+	const std::any& left_idxs = *left_idxs_w;
+	const std::any& right_idxs = *right_idxs_w;
+
 	std::vector<std::string> names;
 
-	ale::utils::SequenceNodeIterator iter(
-		std::any_cast<std::vector<int64_t>>(left_idxs_w),
-		std::any_cast<std::vector<int64_t>>(right_idxs_w)
+	INTERPRETER_PRINT_LOC(
+		ale::logger::println, "Going to construct SequenceNodeIterator."
 	);
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"    Type inside left indices: {}.",
+		detail::get_type_name(left_idxs)
+	);
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println,
+		"    Type inside right indices: {}.",
+		detail::get_type_name(right_idxs)
+	);
+
+#if defined DEBUG
+	assert(detail::is_type<std::vector<int64_t>>(left_idxs));
+	assert(detail::is_type<std::vector<int64_t>>(right_idxs));
+#endif
+
+	ale::utils::SequenceNodeIterator iter(
+		std::any_cast<std::vector<int64_t>>(left_idxs),
+		std::any_cast<std::vector<int64_t>>(right_idxs)
+	);
+
+	INTERPRETER_PRINT_LOC(
+		ale::logger::println, "    Constructed SequenceNodeIterator."
+	);
+
 	while (not iter.end()) {
 		const auto& idxs = iter.get_current_indices();
 
@@ -221,8 +248,12 @@ EvaluationResult make_sequence_variable_names(
 		for (const int64_t idx : idxs) {
 			name += "_" + std::to_string(idx);
 		}
-		names.push_back(std::move(name));
 
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Variable name: {}.", name
+		);
+
+		names.push_back(std::move(name));
 		iter.next_indices();
 	}
 
