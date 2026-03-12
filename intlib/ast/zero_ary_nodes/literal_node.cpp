@@ -47,7 +47,7 @@ namespace ast {
 EvaluationResult
 evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	return v.get_value();
 }
@@ -55,7 +55,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 EvaluationResult
 evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	return v.get_value();
 }
@@ -64,7 +64,7 @@ EvaluationResult evaluate(
 	const EvaluationContext&, const ale::ast::LiteralUnsignedIntegerNode& v
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	return v.get_value();
 }
@@ -72,7 +72,7 @@ EvaluationResult evaluate(
 EvaluationResult
 evaluate(const EvaluationContext&, const ale::ast::LiteralSignedIntegerNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	return v.get_value();
 }

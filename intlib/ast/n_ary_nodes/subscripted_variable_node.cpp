@@ -51,7 +51,7 @@ std::optional<std::string> make_full_variable_name(
 	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	std::string full_variable_name = v.get_variable_name();
 	for (const auto& [i, c] : v.get_children() | std::views::enumerate) {
@@ -96,7 +96,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
@@ -141,7 +141,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const std::optional<std::string> full_variable_name_w =
 		make_full_variable_name(ctx, v);

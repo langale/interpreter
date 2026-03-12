@@ -54,7 +54,7 @@ namespace ast {
 	const ale::ast::node_type_e t, const bool l, const bool r
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return l and r;
@@ -73,7 +73,7 @@ namespace ast {
 
 [[nodiscard]] static bool break_when(const ale::ast::node_type_e t)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return false;
@@ -97,7 +97,7 @@ EvaluationResult evaluate_logical_node(
 	const std::unique_ptr<ale::ast::Node>& c
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	EvaluationResult res = interpret_node(ctx, c);
 	if (not res) {
@@ -129,7 +129,7 @@ EvaluationContext& ctx,
 	const ale::ast::node_type_e t
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& children = v.get_children();
 

@@ -52,7 +52,7 @@ namespace ast {
 EvaluationResult
 evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,

@@ -42,7 +42,7 @@ namespace ast {
 
 EvaluationResult evaluate(const EvaluationContext&, const ale::ast::TrueNode&)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	return true;
 }

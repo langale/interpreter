@@ -46,7 +46,7 @@ namespace ast {
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	ctx.memory.get_current_scope().push_subscope();
 	for (const auto& w : v.get_children()) {

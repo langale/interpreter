@@ -48,7 +48,7 @@ namespace ast {
 ale::utils::SequenceNodeIterator
 make_iterator(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	/*
 	const auto& left_child = seq.get_left_child();
@@ -83,7 +83,7 @@ make_iterator(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 std::optional<std::any>
 get_variable_value(EvaluationContext& ctx, const std::string& var)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	if (not ctx.memory.variable_exists(var)) {
 		INTERPRETER_PRINT_LOC2(
@@ -110,7 +110,7 @@ get_variable_value(EvaluationContext& ctx, const std::string& var)
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	return {};
 }

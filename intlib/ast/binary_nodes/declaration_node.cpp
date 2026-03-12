@@ -61,7 +61,7 @@ namespace ast {
 	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& value_node = decl.get_right_child();
 	std::any value;
@@ -89,7 +89,7 @@ namespace ast {
 	const std::any& value
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 #if defined ALE_LOGGING_MESSAGES
 	const std::string variable_name_copy = var_name;
@@ -181,7 +181,7 @@ namespace ast {
 	const std::any& value
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 #if defined DEBUG
 	assert(variable_node->get_node_type() == ale::ast::node_type_e::Variable);
@@ -209,7 +209,7 @@ namespace ast {
 	const std::any& value
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Making the name of the variable."
@@ -250,7 +250,7 @@ namespace ast {
 	const std::any& value
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	auto list_w = make_sequence_variable_names(ctx, sequence);
 	if (not list_w) {
@@ -290,7 +290,7 @@ namespace ast {
 	const std::unique_ptr<ale::ast::Node>& sequence
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& variable_list_node_w = decl.get_left_child();
 
@@ -313,7 +313,7 @@ namespace ast {
 	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& variable_list_node_w = decl.get_left_child();
 
@@ -366,7 +366,7 @@ namespace ast {
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& left_child = decl.get_left_child();
 

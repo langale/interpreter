@@ -50,7 +50,7 @@ namespace ast {
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();

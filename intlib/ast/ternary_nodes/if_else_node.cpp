@@ -47,7 +47,7 @@ namespace ast {
 
 EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& first_child = v.get_first_child();
 	const auto& second_child = v.get_second_child();

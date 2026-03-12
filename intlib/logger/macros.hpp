@@ -43,6 +43,48 @@
 #define INTERPRETER_FILENAME                                                   \
 	std::filesystem::relative(__FILE__, INTERPRETER_PROJECT_DIRECTORY).string()
 
+#define INTERPRETER_ENTER_AST_FUNCTION(func)                                   \
+	ale::logger::GreenTab ale_tabulator_variable_do_not_use(                   \
+		INTERPRETER_FILENAME,                                                  \
+		__FUNCTION__,                                                          \
+		__LINE__,                                                              \
+		{},                                                                    \
+		[]<typename... types_t>(                                               \
+			std::format_string<types_t...> fmt, types_t&&...args               \
+		)                                                                      \
+		{                                                                      \
+			func(fmt, std::forward<types_t>(args)...);                         \
+		}                                                                      \
+	)
+
+#define INTERPRETER_ENTER_ARITHMETIC_FUNCTION(func)                            \
+	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
+		INTERPRETER_FILENAME,                                                  \
+		__FUNCTION__,                                                          \
+		__LINE__,                                                              \
+		{},                                                                    \
+		[]<typename... types_t>(                                               \
+			std::format_string<types_t...> fmt, types_t&&...args               \
+		)                                                                      \
+		{                                                                      \
+			func(fmt, std::forward<types_t>(args)...);                         \
+		}                                                                      \
+	)
+
+#define INTERPRETER_ENTER_COMPARISON_FUNCTION(func)                            \
+	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
+		INTERPRETER_FILENAME,                                                  \
+		__FUNCTION__,                                                          \
+		__LINE__,                                                              \
+		{},                                                                    \
+		[]<typename... types_t>(                                               \
+			std::format_string<types_t...> fmt, types_t&&...args               \
+		)                                                                      \
+		{                                                                      \
+			func(fmt, std::forward<types_t>(args)...);                         \
+		}                                                                      \
+	)
+
 #define INTERPRETER_ENTER_FUNCTION(func)                                       \
 	ale::logger::YellowTab ale_tabulator_variable_do_not_use(                  \
 		INTERPRETER_FILENAME,                                                  \
@@ -70,6 +112,12 @@
 #else
 
 #define INTERPRETER_FILENAME
+
+#define INTERPRETER_ENTER_AST_FUNCTION(func)
+
+#define INTERPRETER_ENTER_ARITHMETIC_FUNCTION(func)
+
+#define INTERPRETER_ENTER_COMPARISON_FUNCTION(func)
 
 #define INTERPRETER_ENTER_FUNCTION(func)
 

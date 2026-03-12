@@ -42,7 +42,7 @@ namespace arithmetic {
 
 std::any arithmetic_addition(const std::any& a, const std::any& b)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_ARITHMETIC_FUNCTION(ale::logger::println);
 
 	const std::string type_a = detail::get_type_name(a);
 	const std::string type_b = detail::get_type_name(b);

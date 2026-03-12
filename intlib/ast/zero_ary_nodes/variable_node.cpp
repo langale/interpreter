@@ -48,7 +48,7 @@ namespace ast {
 EvaluationResult
 evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const std::string& name = v.get_variable_name();
 

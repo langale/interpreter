@@ -46,7 +46,7 @@ namespace ast {
 
 EvaluationResult evaluate(EvaluationContext&, const ale::ast::ProgramNode&)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	return {};
 }

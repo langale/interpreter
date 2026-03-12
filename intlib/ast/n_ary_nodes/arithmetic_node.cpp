@@ -57,7 +57,7 @@ EvaluationResult evaluate(
 	const ale::ast::node_type_e t
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& children = v.get_children();
 #if defined DEBUG

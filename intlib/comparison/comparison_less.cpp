@@ -45,7 +45,7 @@ template <typename T, typename U>
 [[nodiscard]] static std::optional<bool>
 any_comparison_less_than(const std::any& left, const std::any& right) noexcept
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
 
 	if constexpr (std::equality_comparable_with<T, U>) {
 		if (detail::is_type<T>(left) and detail::is_type<U>(right)) {
@@ -77,7 +77,7 @@ template <typename Left>
 	const std::any& left, const std::any& right
 ) noexcept
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
 
 	if (auto r = any_comparison_less_than<Left, bool>(left, right);
 		r.has_value()) {
@@ -101,7 +101,7 @@ template <typename Left>
 std::optional<bool>
 any_comparison_less_than(const std::any& left, const std::any& right) noexcept
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
 
 	if (auto r = any_comparison_less_than_right_numeric<bool>(left, right);
 		r.has_value()) {

@@ -52,7 +52,7 @@ bool retrieve_variable_names_in_assignation(
 	std::vector<std::string>& names
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	/*
 	ale::utils::SequenceNodeIterator iter_seq = make_iterator(seq);
@@ -94,7 +94,7 @@ bool retrieve_variable_names_in_assignation(
 	std::vector<std::string>& names
 )
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	/*
 	ale::ast::NAryNodeIterator iter(group);
@@ -159,7 +159,7 @@ bool retrieve_variable_names_in_assignation(
 EvaluationResult
 evaluate(EvaluationContext&, const ale::ast::AssignationNode& v)
 {
-	INTERPRETER_ENTER_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
