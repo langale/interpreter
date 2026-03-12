@@ -36,7 +36,6 @@
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/utils/EvaluationResult.hpp>
 
 namespace intlib {
 namespace ast {

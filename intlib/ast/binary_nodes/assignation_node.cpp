@@ -48,7 +48,6 @@
 #include <intlib/detail/any_output.hpp>
 #endif
 #include <intlib/ast/EvaluationResult.hpp>
-#include <intlib/ast/utils/EvaluationResult.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>

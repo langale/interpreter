@@ -53,7 +53,6 @@
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
-#include <intlib/ast/utils/EvaluationResult.hpp>
 
 namespace intlib {
 namespace ast {
