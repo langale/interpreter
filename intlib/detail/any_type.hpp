@@ -170,11 +170,7 @@ template <typename type_t>
 		return is_builtin_type<type_t>(name);
 	}
 
-	if constexpr (std::is_same_v<type_t, std::string>) {
-		return name == demangle_name_type(typeid(std::string).name());
-	}
-
-	return false;
+	return name == demangle_name_type(typeid(type_t).name());
 }
 
 /**
