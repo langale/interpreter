@@ -118,7 +118,7 @@ template <typename type_t>
 		return name == "bool";
 	}
 	else if constexpr (std::is_same_v<type_t, int8_t>) {
-		return name == "char";
+		return name == "signed char";
 	}
 	else if constexpr (std::is_same_v<type_t, uint8_t>) {
 		return name == "unsigned char";
@@ -171,7 +171,7 @@ template <typename type_t>
 	}
 
 	if constexpr (std::is_same_v<type_t, std::string>) {
-		return name == typeid(std::string).name();
+		return name == demangle_name_type(typeid(std::string).name());
 	}
 
 	return false;
@@ -187,7 +187,7 @@ template <typename type_t>
 template <typename type_t>
 [[nodiscard]] bool is_type(const std::any& a)
 {
-	const std::string name = demangle_name_type(a.type().name());
+	const std::string name = get_type_name(a);
 	return is_type<type_t>(name);
 }
 
