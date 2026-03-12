@@ -78,6 +78,13 @@ namespace ast {
 			);
 		}
 		value = std::move(*res_w);
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"    Type returned from node evaluation is: '{}'. Value is: '{}'.",
+			detail::get_type_name(value),
+			any_view{value}
+		);
 	}
 	return make_good_evaluation_result(std::move(value));
 }
@@ -130,13 +137,6 @@ namespace ast {
 #endif
 		return make_good_evaluation_result(std::any{});
 	}
-
-	INTERPRETER_PRINT_LOC2(
-		ale::logger::println,
-		"    Type returned from node evaluation is: '{}'. Value is: '{}'.",
-		detail::get_type_name(value),
-		any_view{value}
-	);
 
 	std::any value_conv = detail::any_convert_to_type(value, var_type);
 
@@ -407,7 +407,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		}
 		std::any value = std::move(*value_w);
 
-		return declare_variable(ctx, decl, variable_node, std::move(value));
+		return declare_variable(ctx, decl, variable_node, value);
 	}
 
 	if (left_child->get_node_type() ==
