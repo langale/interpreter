@@ -36,6 +36,7 @@
 #endif
 #include <memory>
 #include <string>
+#include <ranges>
 
 #include <ale/ast/Node.hpp>
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
@@ -44,7 +45,11 @@
 
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/detail/any_type.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <intlib/detail/any_output.hpp>
+#endif
 #include <intlib/detail/any_to_numeric.hpp>
+#include <intlib/logger/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -56,17 +61,41 @@ namespace ast {
 	const ale::ast::SubscriptedVariableNode * const subscripted_variable
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+
 	std::vector<int64_t> indices;
 	const auto& children = subscripted_variable->get_children();
-	for (const auto& child : children) {
 
-		auto val = interpret_node(ctx, child);
-		if (not val.has_value()) {
-			return std::move(val.error());
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println, "Variable has {} subindices.", children.size()
+	);
+
+	for (const auto& [i, child] : children | std::views::enumerate) {
+
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Made index for child {}.", i
+		);
+
+		auto val_w = interpret_node(ctx, child);
+		if (not val_w.has_value()) {
+			return std::move(val_w.error());
 		}
 
+		INTERPRETER_PRINT_LOC(
+			ale::logger::println, "Successfully evaluated child."
+		);
+
+		const std::any& val = *val_w;
 		const std::any idx_w = detail::any_to_numeric<int64_t>(val);
+
 		if (not idx_w.has_value()) {
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println,
+				"Could not convert node evaluation '{}' into a numeric "
+				"int64_t.",
+				any_view{val}
+			);
+
 			return EvaluationError{
 				.error = {evaluation_error_e::
 							  Evaluation_Of_Node_Is_Not_A_Numeric_Value},
@@ -75,6 +104,7 @@ namespace ast {
 		}
 
 		const auto idx = std::any_cast<int64_t>(idx_w);
+		INTERPRETER_PRINT_LOC2(ale::logger::println, "Made index {}.", idx);
 		indices.push_back(idx);
 	}
 	return std::any{std::move(indices)};
@@ -85,6 +115,8 @@ EvaluationResult make_subscripted_variable_name(
 	const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+
 #if defined DEBUG
 	assert(
 		subscripted_variable_w->get_node_type() ==
@@ -98,15 +130,27 @@ EvaluationResult make_subscripted_variable_name(
 		);
 
 	std::string name = subscripted_variable->get_variable_name();
-	auto idxs_w = get_indices(ctx, subscripted_variable);
-	if (not idxs_w.has_value()) {
-		return std::move(idxs_w.error());
+
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println, "Make indices for variable {}.", name
+	);
+
+	auto res_w = get_indices(ctx, subscripted_variable);
+	if (not res_w.has_value()) {
+		return std::move(res_w.error());
 	}
 
+	INTERPRETER_PRINT_LOC(ale::logger::println, "Successfully made indices.");
+
+	const std::any& idxs_w = *res_w;
 	std::vector<int64_t> idxs = std::any_cast<std::vector<int64_t>>(idxs_w);
 	for (const int64_t idx : idxs) {
 		name += "_" + std::to_string(idx);
 	}
+
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println, "Name constructed '{}'.", name
+	);
 
 	return std::any{std::move(name)};
 }
@@ -115,6 +159,8 @@ EvaluationResult make_sequence_variable_names(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& sequence_w
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+
 #if defined DEBUG
 	assert(sequence_w->get_node_type() == ale::ast::node_type_e::Sequence);
 #endif

@@ -46,7 +46,8 @@ namespace intlib {
 namespace ast {
 
 [[nodiscard]] EvaluationResult make_subscripted_variable_name(
-	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
+	EvaluationContext& ctx,
+	const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
 );
 
 [[nodiscard]] EvaluationResult make_sequence_variable_names(
