@@ -36,7 +36,7 @@
 #include <vector>
 
 #include <intlib/memory/LocalScope.hpp>
-#include <intlib/memory/AccessResult.hpp>
+#include <intlib/memory/VariableValue.hpp>
 
 namespace intlib {
 namespace memory {
@@ -52,15 +52,17 @@ public:
 
 	/* MODIFIERS */
 
+	void initialize();
+
 	/**
 	 * @brief Push a new subscope.
 	 *
 	 * This should be called when entering a sub scope delimited by '{' '}',
 	 * such as when entering an if statement, a loop, ...
 	 */
-	void push_subscope() noexcept
+	void push_local_scope() noexcept
 	{
-		m_subscopes.push_back({});
+		m_local_scopes.emplace_back(LocalScope{});
 	}
 	/**
 	 * @brief Pops a subscope.
@@ -68,37 +70,31 @@ public:
 	 * This should be called when exiting a sub scope delimited by '{' '}',
 	 * such as when leaving an if statement, a loop, ...
 	 */
-	void pop_subscope() noexcept
+	void pop_local_scope() noexcept
 	{
-		m_subscopes.pop_back();
+		m_local_scopes.pop_back();
 	}
 
 	/**
 	 * @brief Sets the value of a non-constant variable to the current scope.
-	 * @param name Name of the variable.
-	 * @param value Value of the variable.
+	 * @param name The name of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The type of the variable to create.
+	 * @pre The variable does not exist.
 	 */
-	[[nodiscard]] AccessResult declare_variable(
-		std::string&& name, std::any&& value, std::string&& type
-	) noexcept;
+	void
+	declare_variable(std::string&& name, std::any&& value, std::string&& type);
 
 	/**
-	 * @brief Sets the value of a constant variable to the current scope.
-	 * @param name Name of the variable.
-	 * @param value Value of the variable.
-	 * @pre Variable @e s does not already exist in the current subscope.
+	 * @brief Sets the value of a non-constant variable to the current scope.
+	 * @param name The name of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The type of the variable to create.
+	 * @pre The variable does not exist.
 	 */
-	[[nodiscard]] AccessResult declare_constant_variable(
+	void declare_constant_variable(
 		std::string&& name, std::any&& value, std::string&& type
-	) noexcept;
-
-	/**
-	 * @brief Sets the value of a (non-constant) variable in this subscope.
-	 * @param name Variable name.
-	 * @param value Value of the variable.
-	 */
-	[[nodiscard]] AccessResult
-	set_variable_value(const std::string& name, std::any&& value) noexcept;
+	);
 
 	/* GETTERS */
 
@@ -107,21 +103,31 @@ public:
 	 *
 	 * This method looks for @e s in @ref m_subscopes in a right-to-left order.
 	 * @param name The name of the variable to look for.
-	 * @returns The value of the variable if it exists.
+	 * @pre The variable exists.
 	 */
-	[[nodiscard]] std::optional<VariableValue>
+	[[nodiscard]] const VariableValue&
 	get_variable(const std::string& name) const noexcept;
 
-	/// Does a variable @e s exist?
+	/**
+	 * @brief Get the value of a variable.
+	 *
+	 * This method looks for @e s in @ref m_subscopes in a right-to-left order.
+	 * @param name The name of the variable to look for.
+	 * @pre The variable exists.
+	 */
+	[[nodiscard]] VariableValue& get_variable(const std::string& name) noexcept;
+
+	/// Does a variable exist?
 	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept;
-	/// Does a variable @e s exist in the current subscope?
+
+	/// Does a variable exist in the current subscope?
 	[[nodiscard]] bool
 	variable_exists_shallow(const std::string& name) const noexcept;
 
 private:
 
 	/// The list of subscopes in this scope.
-	std::vector<LocalScope> m_subscopes;
+	std::vector<LocalScope> m_local_scopes;
 };
 
 } // namespace memory

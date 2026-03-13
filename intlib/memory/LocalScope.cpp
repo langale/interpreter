@@ -31,82 +31,86 @@
  *
  ********************************************************************/
 
+#if defined DEBUG
+#include <cassert>
+#endif
+
+#include <intlib/logger/macros.hpp>
 #include <intlib/memory/LocalScope.hpp>
 
 namespace intlib {
 namespace memory {
 
-#define SUCCESSFUL return make_good_access_result()
-
 /* MODIFIERS */
 
-AccessResult LocalScope::declare_variable(
+void LocalScope::initialize() { }
+
+void LocalScope::declare_variable(
 	std::string&& name, std::any&& value, std::string&& type
-) noexcept
+)
 {
-	Collection::iterator it = find(name);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
 
-	if (it != m_variables.end()) {
-		return make_bad_access_result(access_error_e::Variable_Already_Exists);
-	}
+	const auto it = find(name);
 
-	m_variables.insert(
-		{std::move(name),
-		 {.value = std::move(value),
-		  .type = std::move(type),
-		  .is_constant = false}}
+#if defined DEBUG
+	assert(it == m_variables.end());
+#endif
+
+	m_variables.emplace(
+		std::pair<std::string, VariableValue>{
+			std::move(name),
+			{.value = std::move(value),
+			 .type = std::move(type),
+			 .is_constant = false}
+		}
 	);
-	SUCCESSFUL;
 }
 
-AccessResult LocalScope::declare_constant_variable(
+void LocalScope::declare_constant_variable(
 	std::string&& name, std::any&& value, std::string&& type
-) noexcept
+)
 {
-	Collection::iterator it = find(name);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
 
-	if (it != m_variables.end()) {
-		return make_bad_access_result(access_error_e::Variable_Already_Exists);
-	}
+	const auto it = find(name);
 
-	m_variables.insert(
-		{std::move(name),
-		 {.value = std::move(value),
-		  .type = std::move(type),
-		  .is_constant = true}}
+#if defined DEBUG
+	assert(it == m_variables.end());
+#endif
+
+	m_variables.emplace(
+		std::pair<std::string, VariableValue>{
+			std::move(name),
+			{.value = std::move(value),
+			 .type = std::move(type),
+			 .is_constant = true}
+		}
 	);
-	SUCCESSFUL;
-}
-
-AccessResult LocalScope::set_variable_value(
-	const std::string& name, std::any&& value
-) noexcept
-{
-	Collection::iterator it = find(name);
-
-	if (it == m_variables.end()) {
-		return make_bad_access_result(access_error_e::Variable_Does_Not_Exist);
-	}
-
-	if (it->second.is_constant) {
-		return make_bad_access_result(
-			access_error_e::Attempt_To_Assign_Value_To_Constant_Variable
-		);
-	}
-
-	it->second.value = std::move(value);
-	SUCCESSFUL;
 }
 
 /* GETTERS */
 
-std::optional<VariableValue>
+const VariableValue&
 LocalScope::get_variable(const std::string& name) const noexcept
 {
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
 	const auto it = find(name);
-	if (it == m_variables.end()) {
-		return {};
-	}
+#if defined DEBUG
+	assert(it != m_variables.end());
+#endif
+	return it->second;
+}
+
+VariableValue& LocalScope::get_variable(const std::string& name) noexcept
+{
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	const auto it = find(name);
+#if defined DEBUG
+	assert(it != m_variables.end());
+#endif
 	return it->second;
 }
 

@@ -33,27 +33,15 @@
 
 #pragma once
 
-#include <optional>
-#include <expected>
 #include <string>
 #include <map>
 #include <any>
 
 #include <intlib/memory/memory_error_enum.hpp>
-#include <intlib/memory/AccessResult.hpp>
+#include <intlib/memory/VariableValue.hpp>
 
 namespace intlib {
 namespace memory {
-
-/// Data associated to each variable name.
-struct VariableValue {
-	/// The actual value that the variable holds.
-	std::any value;
-	/// The type of this variable.
-	const std::string type;
-	/// Whether or not the variable is declared with 'const'.
-	const bool is_constant;
-};
 
 /**
  * @brief Subscope class.
@@ -67,43 +55,47 @@ public:
 
 	/* MODIFIERS */
 
+	void initialize();
+
 	/**
-	 * @brief Adds a new non-constant variable to this subscope.
-	 * @param name Variable name.
-	 * @param value Value of the variable.
+	 * @brief Adds a new mutable variable to this subscope.
+	 * @param name The name of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The type of the variable to create.
+	 * @pre The variable does not exist.
 	 */
-	[[nodiscard]] AccessResult declare_variable(
-		std::string&& name, std::any&& value, std::string&& type
-	) noexcept;
+	void
+	declare_variable(std::string&& name, std::any&& value, std::string&& type);
 
 	/**
 	 * @brief Adds a new constant variable to this subscope.
-	 * @param name Variable name.
-	 * @param value Value of the variable.
+	 * @param name The name of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The type of the variable to create.
+	 * @pre The variable does not exist.
 	 */
-	[[nodiscard]] AccessResult declare_constant_variable(
+	void declare_constant_variable(
 		std::string&& name, std::any&& value, std::string&& type
-	) noexcept;
-
-	/**
-	 * @brief Sets the value of a (non-constant) variable in this subscope.
-	 * @param name Variable name.
-	 * @param value Value of the variable.
-	 */
-	[[nodiscard]] AccessResult
-	set_variable_value(const std::string& name, std::any&& value) noexcept;
+	);
 
 	/* GETTERS */
 
 	/**
-	 * @brief Gets the value of a non-constant variable.
-	 * @param name The name of the variable to look for.
-	 * @returns The value of the variable if it exists.
+	 * @brief Returns the value of variable @e s.
+	 * @param name The name of the variable to create.
+	 * @pre The variable exists.
 	 */
-	[[nodiscard]] std::optional<VariableValue>
+	[[nodiscard]] const VariableValue&
 	get_variable(const std::string& name) const noexcept;
 
-	/// Does variable @e s exist?
+	/**
+	 * @brief Returns the value of variable @e s.
+	 * @param name The name of the variable to create.
+	 * @pre The variable exists.
+	 */
+	[[nodiscard]] VariableValue& get_variable(const std::string& name) noexcept;
+
+	/// Does a variable exist?
 	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept
 	{
 		return find(name) != m_variables.end();
@@ -114,16 +106,16 @@ private:
 	/// Useful typedef.
 	using Collection = std::map<std::string, VariableValue>;
 
-	/// Find a variable @e s.
+	/// Find a variable.
 	[[nodiscard]] Collection::const_iterator
-	find(const std::string& s) const noexcept
+	find(const std::string& name) const noexcept
 	{
-		return m_variables.find(s);
+		return m_variables.find(name);
 	}
-	/// Find a variable @e s.
-	[[nodiscard]] Collection::iterator find(const std::string& s) noexcept
+	/// Find a variable.
+	[[nodiscard]] Collection::iterator find(const std::string& name) noexcept
 	{
-		return m_variables.find(s);
+		return m_variables.find(name);
 	}
 
 private:

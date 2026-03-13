@@ -33,13 +33,11 @@
 
 #pragma once
 
-#include <optional>
 #include <string>
 #include <stack>
-#include <any>
 
 #include <intlib/memory/FunctionScope.hpp>
-#include <intlib/memory/AccessResult.hpp>
+#include <intlib/memory/VariableValue.hpp>
 
 namespace intlib {
 namespace memory {
@@ -56,72 +54,62 @@ public:
 
 	/* MODIFIERS */
 
-	/// Initializes this scope.
-	void initialize() noexcept
-	{
-		m_global_scope.push_subscope();
-	}
+	/// Initializes the memory.
+	void initialize() noexcept;
 
 	/**
 	 * @brief Sets the value of a non-constant variable to the current scope.
-	 * @param name Name of the variable.
-	 * @param value Value of the variable.
+	 * @param name The name of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The type of the variable to create.
+	 * @pre The variable does not exist.
 	 */
-	[[nodiscard]] AccessResult
+	void
 	declare_variable(std::string&& name, std::any&& value, std::string&& type);
 
 	/**
 	 * @brief Sets the value of a constant variable to the current scope.
-	 * @param name Name of the variable.
-	 * @param value Value of the variable.
-	 */
-	[[nodiscard]] AccessResult declare_constant_variable(
+	 * @param name The name of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The type of the variable to create.
+	 * @pre The variable does not exist.
+	*/
+	void declare_constant_variable(
 		std::string&& name, std::any&& value, std::string&& type
 	);
 
-	/**
-	 * @brief Sets the value of a (non-constant) variable in this subscope.
-	 * @param name Variable name.
-	 * @param value Value of the variable.
-	 */
-	[[nodiscard]] AccessResult
-	set_variable_value(const std::string& name, std::any&& value) noexcept;
-
 	/* GETTERS */
 
-	/// Returns the value of variable @e s if it exists.
-	[[nodiscard]] std::optional<VariableValue>
+	/**
+	 * @brief Returns the value of variable @e s.
+	 * @pre The variable exists.
+	 */
+	[[nodiscard]] const VariableValue&
 	get_variable(const std::string& name) const noexcept;
+
+	/**
+	 * @brief Returns the value of variable @e s.
+	 * @pre The variable exists.
+	 */
+	[[nodiscard]] VariableValue& get_variable(const std::string& name) noexcept;
 
 	/// Returns the number of scopes.
 	[[nodiscard]] std::size_t num_local_scopes() const noexcept
 	{
-		return m_local_scopes.size();
+		return m_function_scopes.size();
 	}
 
-	/// Returns a reference to the current scope.
-	[[nodiscard]] const FunctionScope& get_current_scope() const noexcept
-	{
-		return is_current_scope_global() ? m_global_scope
-										 : m_local_scopes.top();
-	}
-	/// Returns a reference to the current scope.
-	[[nodiscard]] FunctionScope& get_current_scope() noexcept
-	{
-		return is_current_scope_global() ? m_global_scope
-										 : m_local_scopes.top();
-	}
-
-	/// Returns a reference to the global scope.
-	[[nodiscard]] const FunctionScope& get_global_scope() const noexcept
+	[[nodiscard]] LocalScope& get_global_scope() noexcept
 	{
 		return m_global_scope;
 	}
-	/// Returns a reference to the global scope.
-	[[nodiscard]] FunctionScope& get_global_scope() noexcept
+	[[nodiscard]] const LocalScope& get_global_scope() const noexcept
 	{
 		return m_global_scope;
 	}
+
+	[[nodiscard]] FunctionScope& get_current_scope() noexcept;
+	[[nodiscard]] const FunctionScope& get_current_scope() const noexcept;
 
 	/// Does a variable @e s exist?
 	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept;
@@ -137,11 +125,10 @@ public:
 
 private:
 
-	/// The global scope of this program.
-	FunctionScope m_global_scope;
+	LocalScope m_global_scope;
 
 	/// The stack of scopes in available in this memory.
-	std::stack<FunctionScope> m_local_scopes;
+	std::stack<FunctionScope> m_function_scopes;
 };
 
 } // namespace memory

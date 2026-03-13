@@ -31,79 +31,91 @@
  *
  ********************************************************************/
 
+#if defined DEBUG
+#include <cassert>
+#endif
+
+#include <intlib/logger/macros.hpp>
 #include <intlib/memory/FunctionScope.hpp>
 
 namespace intlib {
 namespace memory {
 
-#define SUCCESSFUL return make_good_access_result()
-
 /* MODIFIERS */
 
-AccessResult FunctionScope::declare_variable(
-	std::string&& name, std::any&& value, std::string&& type
-) noexcept
+void FunctionScope::initialize()
 {
-	const auto res = m_subscopes.back().declare_variable(
-		std::move(name), std::move(value), std::move(type)
-	);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
 
-	if (not res.has_value()) {
-		return make_bad_access_result(std::move(res.error()));
-	}
-	SUCCESSFUL;
+	m_local_scopes.emplace_back(LocalScope{});
 }
 
-AccessResult FunctionScope::declare_constant_variable(
+void FunctionScope::declare_variable(
 	std::string&& name, std::any&& value, std::string&& type
-) noexcept
+)
 {
-	const auto res = m_subscopes.back().declare_constant_variable(
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	m_local_scopes.back().declare_variable(
 		std::move(name), std::move(value), std::move(type)
 	);
-
-	if (not res.has_value()) {
-		return make_bad_access_result(std::move(res.error()));
-	}
-	SUCCESSFUL;
 }
 
-AccessResult FunctionScope::set_variable_value(
-	const std::string& name, std::any&& value
-) noexcept
+void FunctionScope::declare_constant_variable(
+	std::string&& name, std::any&& value, std::string&& type
+)
 {
-	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
-		if (it->variable_exists(name)) {
-			const auto res = it->set_variable_value(name, std::move(value));
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
 
-			if (not res.has_value()) {
-				return make_bad_access_result(std::move(res.error()));
-			}
-
-			break;
-		}
-	}
-
-	SUCCESSFUL;
+	m_local_scopes.back().declare_constant_variable(
+		std::move(name), std::move(value), std::move(type)
+	);
 }
 
 /* GETTERS */
 
-std::optional<VariableValue>
+const VariableValue&
 FunctionScope::get_variable(const std::string& name) const noexcept
 {
-	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
-		std::optional<VariableValue> r = it->get_variable(name);
-		if (r.has_value()) {
-			return r;
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
+		if (it->variable_exists(name)) {
+			return it->get_variable(name);
 		}
 	}
-	return {};
+
+#if defined DEBUG
+	assert(false);
+#endif
+
+	// so the compiler does not cry in release compilations
+	return empty_variable;
+}
+
+VariableValue& FunctionScope::get_variable(const std::string& name) noexcept
+{
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
+		if (it->variable_exists(name)) {
+			return it->get_variable(name);
+		}
+	}
+
+#if defined DEBUG
+	assert(false);
+#endif
+
+	// so the compiler does not cry in release compilations
+	return empty_variable;
 }
 
 bool FunctionScope::variable_exists(const std::string& name) const noexcept
 {
-	for (auto it = m_subscopes.rbegin(); it != m_subscopes.rend(); ++it) {
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
 			return true;
 		}
@@ -115,7 +127,9 @@ bool FunctionScope::variable_exists_shallow(
 	const std::string& name
 ) const noexcept
 {
-	return m_subscopes.back().variable_exists(name);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	return m_local_scopes.back().variable_exists(name);
 }
 
 } // namespace memory

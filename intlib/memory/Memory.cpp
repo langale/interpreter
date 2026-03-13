@@ -31,112 +31,120 @@
  *
  ********************************************************************/
 
+#if defined DEBUG
+#include <cassert>
+#endif
+
+#include <intlib/logger/macros.hpp>
 #include <intlib/memory/Memory.hpp>
 
 namespace intlib {
 namespace memory {
 
-#define SUCCESSFUL return make_good_access_result()
-
 /* MODIFIERS */
 
-AccessResult Memory::declare_variable(
+void Memory::initialize() noexcept
+{
+	m_global_scope.initialize();
+}
+
+void Memory::declare_variable(
 	std::string&& name, std::any&& value, std::string&& type
 )
 {
-	AccessResult result;
-	if (is_current_scope_global()) {
-		result = m_global_scope.declare_variable(
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	if (not is_current_scope_global()) {
+		m_function_scopes.top().declare_variable(
 			std::move(name), std::move(value), std::move(type)
 		);
 	}
 	else {
-		result = m_local_scopes.top().declare_variable(
+		m_global_scope.declare_variable(
 			std::move(name), std::move(value), std::move(type)
 		);
 	}
-
-	if (not result.has_value()) {
-		return make_bad_access_result(std::move(result.error()));
-	}
-	SUCCESSFUL;
 }
 
-AccessResult Memory::declare_constant_variable(
+void Memory::declare_constant_variable(
 	std::string&& name, std::any&& value, std::string&& type
 )
 {
-	AccessResult result;
-	if (is_current_scope_global()) {
-		result = m_global_scope.declare_constant_variable(
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	if (not is_current_scope_global()) {
+		m_function_scopes.top().declare_constant_variable(
 			std::move(name), std::move(value), std::move(type)
 		);
 	}
 	else {
-		result = m_local_scopes.top().declare_constant_variable(
+		m_global_scope.declare_constant_variable(
 			std::move(name), std::move(value), std::move(type)
 		);
 	}
-
-	if (not result.has_value()) {
-		return make_bad_access_result(std::move(result.error()));
-	}
-	SUCCESSFUL;
-}
-
-AccessResult
-Memory::set_variable_value(const std::string& name, std::any&& value) noexcept
-{
-	AccessResult result;
-	if (is_current_scope_global()) {
-		result = m_global_scope.set_variable_value(name, std::move(value));
-	}
-	else {
-		result =
-			m_local_scopes.top().set_variable_value(name, std::move(value));
-	}
-
-	if (not result.has_value()) {
-		return make_bad_access_result(std::move(result.error()));
-	}
-	SUCCESSFUL;
 }
 
 /* GETTERS */
 
-std::optional<VariableValue>
+const VariableValue&
 Memory::get_variable(const std::string& name) const noexcept
 {
-	if (num_local_scopes() > 0) {
-		std::optional<VariableValue> scoped =
-			m_local_scopes.top().get_variable(name);
-		if (scoped.has_value()) {
-			return scoped;
-		}
-	}
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
 
-	std::optional<VariableValue> global = m_global_scope.get_variable(name);
-	if (global.has_value()) {
-		return global;
+	if (not is_current_scope_global()) {
+		return m_function_scopes.top().get_variable(name);
 	}
-	return {};
+	return m_global_scope.get_variable(name);
+}
+
+VariableValue& Memory::get_variable(const std::string& name) noexcept
+{
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	if (not is_current_scope_global()) {
+		return m_function_scopes.top().get_variable(name);
+	}
+	return m_global_scope.get_variable(name);
+}
+
+FunctionScope& Memory::get_current_scope() noexcept
+{
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+#if defined DEBUG
+	assert(not is_current_scope_global());
+#endif
+	return m_function_scopes.top();
+}
+
+const FunctionScope& Memory::get_current_scope() const noexcept
+{
+#if defined DEBUG
+	assert(not is_current_scope_global());
+#endif
+	return m_function_scopes.top();
 }
 
 bool Memory::variable_exists(const std::string& name) const noexcept
 {
-	if (is_current_scope_global()) {
-		return m_global_scope.variable_exists(name);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	if (not is_current_scope_global()) {
+		return m_function_scopes.top().variable_exists(name)
+				   ? true
+				   : m_global_scope.variable_exists(name);
 	}
-	return m_local_scopes.top().variable_exists(name) or
-		   m_global_scope.variable_exists(name);
+	return m_global_scope.variable_exists(name);
 }
 
 bool Memory::variable_exists_shallow(const std::string& name) const noexcept
 {
-	if (is_current_scope_global()) {
-		return m_global_scope.variable_exists_shallow(name);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+
+	if (not is_current_scope_global()) {
+		return m_function_scopes.top().variable_exists_shallow(name);
 	}
-	return m_local_scopes.top().variable_exists_shallow(name);
+	return m_global_scope.variable_exists(name);
 }
 
 } // namespace memory
