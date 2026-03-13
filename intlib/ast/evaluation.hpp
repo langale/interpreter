@@ -75,7 +75,6 @@ get_variable_value(const std::string& var);
 [[nodiscard]] EvaluationResult evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ArithmeticNode& v,
-
 	const ale::ast::node_type_e t
 );
 
@@ -154,18 +153,6 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& v);
 
 [[nodiscard]] EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl);
-
-[[nodiscard]] EvaluationResult first_value(
-	EvaluationContext& ctx,
-	const ale::ast::ComparisonNode& v,
-	const std::unique_ptr<ale::ast::Node>& c
-);
-
-[[nodiscard]] EvaluationResult last_value(
-	EvaluationContext& ctx,
-	const ale::ast::ComparisonNode& v,
-	const std::unique_ptr<ale::ast::Node>& c
-);
 
 [[nodiscard]] ale::utils::SequenceNodeIterator
 make_iterator(EvaluationContext& ctx, const ale::ast::SequenceNode& v);
