@@ -85,6 +85,20 @@
 		}                                                                      \
 	)
 
+#define INTERPRETER_ENTER_MEMORY_FUNCTION(func)                                \
+	ale::logger::PurpleTab ale_tabulator_variable_do_not_use(                  \
+		INTERPRETER_FILENAME,                                                  \
+		__FUNCTION__,                                                          \
+		__LINE__,                                                              \
+		{},                                                                    \
+		[]<typename... types_t>(                                               \
+			std::format_string<types_t...> fmt, types_t&&...args               \
+		)                                                                      \
+		{                                                                      \
+			func(fmt, std::forward<types_t>(args)...);                         \
+		}                                                                      \
+	)
+
 #define INTERPRETER_ENTER_FUNCTION(func)                                       \
 	ale::logger::YellowTab ale_tabulator_variable_do_not_use(                  \
 		INTERPRETER_FILENAME,                                                  \
@@ -118,6 +132,8 @@
 #define INTERPRETER_ENTER_ARITHMETIC_FUNCTION(func)
 
 #define INTERPRETER_ENTER_COMPARISON_FUNCTION(func)
+
+#define INTERPRETER_ENTER_MEMORY_FUNCTION(func)
 
 #define INTERPRETER_ENTER_FUNCTION(func)
 
