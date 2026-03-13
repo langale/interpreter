@@ -39,103 +39,129 @@
 #include <any>
 
 #include <ale/ast/utils/node_type_enum.hpp>
+#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 #include <ale/ast/n_ary_nodes/ComparisonNode.hpp>
+#include <ale/ast/binary_nodes/SequenceNode.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_output.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/comparison/comparison.hpp>
 
 namespace intlib {
 namespace ast {
 
-EvaluationResult first_value(
-	EvaluationContext& ctx, const ale::ast::ComparisonNode& v,
-	const std::unique_ptr<ale::ast::Node>& c
+EvaluationResult get_first_value(
+	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	/*
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
-		const ale::ast::SequenceNode& vv =
-			static_cast<const ale::ast::SequenceNode&>(*c.get());
-
-		const ale::utils::SequenceNodeIterator iter = make_iterator(vv);
+		const auto& vv = static_cast<const ale::ast::SequenceNode&>(*c.get());
+		const ale::utils::SequenceNodeIterator iter = make_iterator(ctx, vv);
 		const std::vector<int64_t>& current_idx = iter.get_first_indices();
 		const std::string var = vv.make_variable_name(current_idx);
 
-		std::optional<std::any> value = get_variable_value(var);
-		if (not value.has_value()) {
-			return {};
+		if (not ctx.memory.variable_exists(var)) {
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println,
+				"Attempted to access undeclared variable '{}'.",
+				var
+			);
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::Memory_Variable_Does_Not_Exist},
+				std::vector{std::format(
+					"Attempted to access undeclared variable '{}'.", var
+				)}
+			);
 		}
 
-		return value;
+		auto access_res = ctx.memory.get_variable(var);
+#if defined DEBUG
+		assert(access_res.has_value());
+#endif
+
+		memory::VariableValue variable = std::move(*access_res);
+		return make_good_evaluation_result(std::move(variable.value));
 	}
 
-	std::optional<std::any> value = interpret_node(c);
-	if (not value.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error()
-		// 	<< "    Evaluation of node failed in '"
-		// 	<< v.get_operation_string()
-		// 	<< "' comparison node.\n";
-		return {};
+	EvaluationResult value_w = interpret_node(ctx, c);
+	if (not value_w.has_value()) {
+		INTERPRETER_PRINT_LOC(
+			ale::logger::println, "Evaluation of node failed."
+		);
+		return append_error(
+			std::move(value_w.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			"Evaluation of node did not produce any value."
+		);
 	}
-	return value;
-	*/
 
-	return true;
+	return make_good_evaluation_result(std::move(*value_w));
 }
 
-EvaluationResult last_value(
-	EvaluationContext& ctx, const ale::ast::ComparisonNode& v,
-	const std::unique_ptr<ale::ast::Node>& c
-)
+EvaluationResult
+get_last_value(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	/*
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
-		const ale::ast::SequenceNode& vv =
-			static_cast<const ale::ast::SequenceNode&>(*c.get());
-
-		const ale::utils::SequenceNodeIterator iter = make_iterator(vv);
+		const auto& vv = static_cast<const ale::ast::SequenceNode&>(*c.get());
+		const ale::utils::SequenceNodeIterator iter = make_iterator(ctx, vv);
 		const std::vector<int64_t>& current_idx = iter.get_last_indices();
 		const std::string var = vv.make_variable_name(current_idx);
 
-		std::optional<std::any> value = get_variable_value(var);
-		if (not value.has_value()) {
-			return {};
+		if (not ctx.memory.variable_exists(var)) {
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println,
+				"Attempted to access undeclared variable '{}'.",
+				var
+			);
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::Memory_Variable_Does_Not_Exist},
+				std::vector{std::format(
+					"Attempted to access undeclared variable '{}'.", var
+				)}
+			);
 		}
 
-		return value;
+		auto access_res = ctx.memory.get_variable(var);
+#if defined DEBUG
+		assert(access_res.has_value());
+#endif
+
+		memory::VariableValue variable = std::move(*access_res);
+		return make_good_evaluation_result(std::move(variable.value));
 	}
 
-	std::optional<std::any> value = interpret_node(c);
-	if (not value.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error()
-		// 	<< "    Evaluation of node failed in '"
-		// 	<< v.get_operation_string()
-		// 	<< "' comparison node.\n";
-		return {};
+	EvaluationResult value_w = interpret_node(ctx, c);
+	if (not value_w.has_value()) {
+		INTERPRETER_PRINT_LOC(
+			ale::logger::println, "Evaluation of node failed."
+		);
+		return append_error(
+			std::move(value_w.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			"Evaluation of node did not produce any value."
+		);
 	}
-	return value;
-	*/
 
-	return true;
+	return make_good_evaluation_result(std::move(*value_w));
 }
 
 EvaluationResult evaluate(
-	EvaluationContext& ctx, const ale::ast::ComparisonNode& v,
+	EvaluationContext& ctx,
+	const ale::ast::ComparisonNode& v,
 	const ale::ast::node_type_e t
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	/*
 	const auto& children = v.get_children();
 
 #if defined DEBUG
@@ -143,78 +169,84 @@ EvaluationResult evaluate(
 #endif
 
 	if (children[0]->get_node_type() == ale::ast::node_type_e::Sequence) {
-		const std::optional<bool> res =
-			evaluate_variable_sequence_in_comparison(v, t, children[0]);
-		if (not res.has_value()) {
-			return {};
+		EvaluationResult res_w = interpret_node(ctx, children[0]);
+		if (not res_w.has_value()) {
+			return make_bad_evaluation_result(std::move(res_w).error());
 		}
-#if defined DEBUG
-		assert(detail::is_type<bool>(*res));
-#endif
 
-		if (not *res) {
+		const std::any& res = *res_w;
+#if defined DEBUG
+		assert(detail::is_type<bool>(res));
+#endif
+		const bool res_bool = std::any_cast<bool>(res);
+		if (not res_bool) {
 			return false;
 		}
 	}
 
-	std::optional<std::any> previous = last_value(v, children[0]);
-
-	if (not previous.has_value()) {
-		// ale::error() << ERROR_LOCATION << '\n';
-		// ale::error()
-		// 	<< "    Evaluation of node failed in '"
-		// 	<< v.get_operation_string()
-		// 	<< "' comparison node.\n";
-		return {};
+	std::any previous;
+	{
+		EvaluationResult last_w = get_last_value(ctx, children[0]);
+		if (not last_w.has_value()) {
+			return make_bad_evaluation_result(std::move(last_w.error()));
+		}
+		previous = std::move(*last_w);
 	}
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
-		std::optional<std::any> current = first_value(v, c);
-		if (not current.has_value()) {
-			// ale::error() << ERROR_LOCATION << '\n';
-			// ale::error()
-			// 	<< "    Evaluation of node failed in '"
-			// 	<< v.get_operation_string()
-			// 	<< "' comparison node.\n";
-			return {};
+
+		EvaluationResult current_w = get_first_value(ctx, c);
+		if (not current_w.has_value()) {
+			return make_bad_evaluation_result(std::move(current_w.error()));
+		}
+		std::any current = std::move(*current_w);
+
+		const std::optional<bool> comparison_result =
+			detail::any_comparison(t, previous, current);
+
+		if (not comparison_result.has_value()) {
+			INTERPRETER_PRINT_LOC2(
+				ale::logger::println,
+				"Could not compare two std::any values: '{}' and '{}'.",
+				any_view{previous},
+				any_view{current}
+			);
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::Comparison_Operation_Failed},
+				std::vector{std::format(
+					"Could not compare two std::any values: '{}' and '{}'.",
+					any_view{previous},
+					any_view{current}
+				)}
+			);
 		}
 
-		{
-			const std::optional<bool> comparison_result =
-				detail::any_comparison(t, *previous, *current);
-			if (not comparison_result.has_value()) {
-				// ale::error() << ERROR_LOCATION << '\n';
-				// ale::error()
-				// 	<< "    No pair was matched for '"
-				// 	<< v.get_operation_string()
-				// 	<< "' comparison.\n";
-				// ale::error() << "    Left:  " << *previous << '\n';
-				// ale::error() << "    Right: " << *current << '\n';
-				return {};
-			}
-			if (not *comparison_result) {
-				return false;
-			}
+		if (not *comparison_result) {
+			return false;
 		}
 
 		if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
-			std::optional<bool> res =
-				evaluate_variable_sequence_in_comparison(v, t, c);
-			if (not res.has_value()) {
-				return {};
+			EvaluationResult res_w = interpret_node(ctx, children[0]);
+			if (not res_w.has_value()) {
+				return make_bad_evaluation_result(std::move(res_w).error());
 			}
-			if (not *res) {
+
+			const std::any& res = *res_w;
+#if defined DEBUG
+			assert(detail::is_type<bool>(res));
+#endif
+			const bool res_bool = std::any_cast<bool>(res);
+			if (not res_bool) {
 				return false;
 			}
 
-			previous = last_value(v, c);
+			previous = get_last_value(ctx, c);
 		}
 		else {
 			previous = std::move(current);
 		}
 	}
-	*/
 
 	return true;
 }
