@@ -73,7 +73,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 		);
 	}
 
-	const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
+	const std::optional cond_bool = detail::any_to_bool(*cond);
 	if (not cond_bool) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,

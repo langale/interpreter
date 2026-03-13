@@ -43,7 +43,7 @@
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_conversion.hpp>
+#include <intlib/detail/any_to_bool.hpp>
 #include <intlib/detail/any_output.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
@@ -108,7 +108,7 @@ EvaluationResult evaluate_logical_node(
 		);
 	}
 
-	std::any r = std::move(*res);
+	const std::any r = std::move(*res);
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println, "Evaluation of node '{}'", any_view{r}
 	);
@@ -124,12 +124,8 @@ EvaluationResult evaluate_logical_node(
 		);
 	}
 
-	std::any r_conv = detail::any_convert_to_type(r, "bool");
-	INTERPRETER_PRINT_LOC2(
-		ale::logger::println, "Evaluation of node '{}'", any_view{r_conv}
-	);
-
-	if (detail::is_type<void>(r_conv)) {
+	std::optional r_conv = detail::any_to_bool(r);
+	if (not r_conv) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Evaluation of node '{}' could not be converted to a Boolean value "
@@ -144,7 +140,7 @@ EvaluationResult evaluate_logical_node(
 		);
 	}
 
-	return make_good_evaluation_result(std::move(r_conv));
+	return make_good_evaluation_result(*r_conv);
 }
 
 EvaluationResult evaluate(

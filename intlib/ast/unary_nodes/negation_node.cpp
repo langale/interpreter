@@ -59,7 +59,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 		);
 	}
 
-	const std::optional<bool> r = detail::any_to_bool(*rr);
+	const std::optional r = detail::any_to_bool(*rr);
 	if (r) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node: {}.", *r

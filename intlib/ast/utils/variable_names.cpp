@@ -86,9 +86,9 @@ namespace ast {
 		);
 
 		const std::any& val = *val_w;
-		const std::any idx_w = detail::any_to_numeric<int64_t>(val);
+		const std::optional idx_w = detail::any_to_numeric<int64_t>(val);
 
-		if (not idx_w.has_value()) {
+		if (not idx_w) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Could not convert node evaluation '{}' into a numeric "
@@ -105,7 +105,7 @@ namespace ast {
 			);
 		}
 
-		const auto idx = std::any_cast<int64_t>(idx_w);
+		const auto idx = *idx_w;
 		INTERPRETER_PRINT_LOC2(ale::logger::println, "Made index {}.", idx);
 		indices.push_back(idx);
 	}

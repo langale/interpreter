@@ -76,7 +76,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 			);
 		}
 
-		const std::optional<bool> cond_bool = detail::any_to_bool(*cond);
+		const std::optional cond_bool = detail::any_to_bool(*cond);
 		if (not cond_bool) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
