@@ -51,6 +51,7 @@ enum class evaluation_error_e : uint8_t {
 	Evaluation_Of_Node_Is_Not_A_Numeric_Value,
 
 	Arithmetic_Operation_Failed,
+	Comparison_Operation_Failed,
 
 	Forbidden_Evaluation_Of_Node,
 
@@ -90,6 +91,8 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 
 	case evaluation_error_e::Arithmetic_Operation_Failed:
 		return "Arithmetic_Operation_Failed";
+	case evaluation_error_e::Comparison_Operation_Failed:
+		return "Comparison_Operation_Failed";
 
 	case evaluation_error_e::If_Statement_Condition_Empty:
 		return "If_Statement_Condition_Empty";
