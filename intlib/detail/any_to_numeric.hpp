@@ -47,6 +47,20 @@ template <numeric_c to_type_t>
 {
 	const std::string name = get_type_name(a);
 
+	if (is_builtin_type<bool>(name)) {
+		return static_cast<to_type_t>(std::any_cast<bool>(a));
+	}
+
+	if (is_builtin_type<char>(name)) {
+		return static_cast<to_type_t>(std::any_cast<char>(a));
+	}
+	if (is_builtin_type<unsigned char>(name)) {
+		return static_cast<to_type_t>(std::any_cast<unsigned char>(a));
+	}
+	if (is_builtin_type<signed char>(name)) {
+		return static_cast<to_type_t>(std::any_cast<signed char>(a));
+	}
+
 	if (is_builtin_type<uint8_t>(name)) {
 		return static_cast<to_type_t>(std::any_cast<uint8_t>(a));
 	}

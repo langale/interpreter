@@ -57,6 +57,15 @@ template <typename type_t>
 	if constexpr (std::is_same_v<type_t, bool>) {
 		return true;
 	}
+	if constexpr (std::is_same_v<type_t, char>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, unsigned char>) {
+		return true;
+	}
+	if constexpr (std::is_same_v<type_t, signed char>) {
+		return true;
+	}
 	if constexpr (std::is_same_v<type_t, int8_t>) {
 		return true;
 	}

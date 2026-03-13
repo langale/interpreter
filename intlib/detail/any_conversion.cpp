@@ -41,7 +41,21 @@ namespace intlib {
 namespace detail {
 
 static constexpr std::array numeric_types{
-	"u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f16", "f32", "f64"
+	"bool",
+	"char",
+	"unsigned char",
+	"signed char",
+	"u8",
+	"i8",
+	"u16",
+	"i16",
+	"u32",
+	"i32",
+	"u64",
+	"i64",
+	"f16",
+	"f32",
+	"f64"
 };
 
 bool is_type_numeric(const std::string& type) noexcept
@@ -52,6 +66,20 @@ bool is_type_numeric(const std::string& type) noexcept
 std::any any_convert_to_type(const std::any& value, const std::string& type)
 {
 	if (is_type_numeric(type)) {
+		if (type == "bool") {
+			return any_to_numeric<bool>(value);
+		}
+
+		if (type == "char") {
+			return any_to_numeric<char>(value);
+		}
+		if (type == "unsigned char") {
+			return any_to_numeric<unsigned char>(value);
+		}
+		if (type == "signed char") {
+			return any_to_numeric<signed char>(value);
+		}
+
 		if (type == "u8") {
 			return any_to_numeric<uint8_t>(value);
 		}
