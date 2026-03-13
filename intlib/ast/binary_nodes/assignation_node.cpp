@@ -96,10 +96,7 @@ namespace ast {
 		ale::logger::println, "Going to assign variable '{}'.", var_name
 	);
 
-	std::optional<memory::VariableValue> var_in_memory =
-		ctx.memory.get_variable(var_name);
-
-	if (not var_in_memory) {
+	if (not ctx.memory.variable_exists(var_name)) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Attempted to assign a value to non-existent variable {}.",
@@ -113,7 +110,10 @@ namespace ast {
 			)}
 		);
 	}
-	if (var_in_memory->is_constant) {
+
+	auto& var_in_memory = ctx.memory.get_variable(var_name);
+
+	if (var_in_memory.is_constant) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Attempted to assign a value to constant variable {}.",
@@ -131,35 +131,28 @@ namespace ast {
 	}
 
 	std::any value_conv =
-		detail::any_convert_to_type(value, var_in_memory->type);
+		detail::any_convert_to_type(value, var_in_memory.type);
 
 	if (detail::is_type<void>(value_conv)) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Could not convert value '{}' to a value of type '{}'.",
 			any_view{value},
-			var_in_memory->type
+			var_in_memory.type
 		);
 	}
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Value after conversion to '{}' is: '{}'.",
-		var_in_memory->type,
+		var_in_memory.type,
 		any_view{value_conv}
 	);
 
-	[[maybe_unused]] const auto assignation_res =
-		ctx.memory.set_variable_value(var_name, std::move(value_conv));
-
-#if defined DEBUG
-	assert(assignation_res.has_value());
-#endif
+	var_in_memory.value = std::move(value_conv);
 
 	INTERPRETER_PRINT_LOC2(
-		ale::logger::println,
-		"Successfully assigned variable '{}'.",
-		var_name
+		ale::logger::println, "Successfully assigned variable '{}'.", var_name
 	);
 
 	return make_good_evaluation_result(std::any{});

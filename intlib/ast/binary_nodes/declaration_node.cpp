@@ -80,7 +80,7 @@ namespace ast {
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
-			"    Type returned from node evaluation is: '{}'. Value is: '{}'.",
+			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
 			detail::get_type_name(value),
 			any_view{value}
 		);
@@ -110,9 +110,7 @@ namespace ast {
 
 	if (ctx.memory.variable_exists_shallow(var_name)) {
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println,
-			"    Attempt to redeclare variable {}.",
-			var_name
+			ale::logger::println, "Attempt to redeclare variable {}.", var_name
 		);
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::Memory_Variable_Already_Exists},
@@ -122,18 +120,9 @@ namespace ast {
 
 	// This is a 'declare' node.
 	if (t == ale::ast::node_type_e::Declaration_Declare) {
-		[[maybe_unused]] const auto res = ctx.memory.declare_variable(
+		ctx.memory.declare_variable(
 			std::move(var_name), {}, std::move(var_type)
 		);
-
-#if defined DEBUG
-		// None of the following errors can happen:
-		// - Variable_Does_Not_Exist, Type_Mismatch, Attempt_To_Assign_Value_To_Constant_Variable:
-		//   This cannot be returned when declaring a variable.
-		// - Variable_Exists:
-		//   This has been ensured will never happen
-		assert(res.has_value());
-#endif
 		return make_good_evaluation_result(std::any{});
 	}
 
@@ -146,30 +135,20 @@ namespace ast {
 		any_view{value_conv}
 	);
 
-	memory::AccessResult res;
 	if (t == ale::ast::node_type_e::Declaration_Const) {
-		res = ctx.memory.declare_constant_variable(
+		ctx.memory.declare_constant_variable(
 			std::move(var_name), std::move(value_conv), std::move(var_type)
 		);
 	}
 	else {
-		res = ctx.memory.declare_variable(
+		ctx.memory.declare_variable(
 			std::move(var_name), std::move(value_conv), std::move(var_type)
 		);
 	}
 
-#if defined DEBUG
-	// None of the following errors can happen:
-	// - Variable_Does_Not_Exist, Type_Mismatch, Attempt_To_Assign_Value_To_Constant_Variable:
-	//   This cannot be returned when declaring a variable.
-	// - Variable_Exists:
-	//   This has been ensured will never happen
-	assert(res.has_value());
-#endif
-
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
-		"    Successfully declared variable '{}'.",
+		"Successfully declared variable '{}'.",
 		variable_name_copy
 	);
 
@@ -220,7 +199,7 @@ namespace ast {
 	EvaluationResult res_w = make_subscripted_variable_name(ctx, variable);
 	if (not res_w.has_value()) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "    Could not make the name of the variable."
+			ale::logger::println, "Could not make the name of the variable."
 		);
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
@@ -295,7 +274,7 @@ namespace ast {
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
-			"    Successfully declared variable with name '{}'.",
+			"Successfully declared variable with name '{}'.",
 			var_name
 		);
 

@@ -48,7 +48,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	ctx.memory.get_current_scope().push_subscope();
+	ctx.memory.get_current_scope().push_local_scope();
 	for (const auto& w : v.get_children()) {
 		EvaluationResult r = interpret_node(ctx, w);
 		if (not r) {
@@ -70,7 +70,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 			);
 		}
 	}
-	ctx.memory.get_current_scope().pop_subscope();
+	ctx.memory.get_current_scope().pop_local_scope();
 	return {};
 }
 

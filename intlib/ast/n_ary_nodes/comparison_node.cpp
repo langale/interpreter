@@ -81,13 +81,8 @@ EvaluationResult get_first_value(
 			);
 		}
 
-		auto access_res = ctx.memory.get_variable(var);
-#if defined DEBUG
-		assert(access_res.has_value());
-#endif
-
-		memory::VariableValue variable = std::move(*access_res);
-		return make_good_evaluation_result(std::move(variable.value));
+		auto& variable = ctx.memory.get_variable(var);
+		return make_good_evaluation_result(variable.value);
 	}
 
 	EvaluationResult value_w = interpret_node(ctx, c);
@@ -130,13 +125,8 @@ get_last_value(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 			);
 		}
 
-		auto access_res = ctx.memory.get_variable(var);
-#if defined DEBUG
-		assert(access_res.has_value());
-#endif
-
-		memory::VariableValue variable = std::move(*access_res);
-		return make_good_evaluation_result(std::move(variable.value));
+		auto& variable = ctx.memory.get_variable(var);
+		return make_good_evaluation_result(variable.value);
 	}
 
 	EvaluationResult value_w = interpret_node(ctx, c);
