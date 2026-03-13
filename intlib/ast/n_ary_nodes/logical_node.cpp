@@ -43,6 +43,8 @@
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_conversion.hpp>
+#include <intlib/detail/any_output.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
@@ -91,10 +93,7 @@ namespace ast {
 }
 
 EvaluationResult evaluate_logical_node(
-	const ale::ast::LogicalNode& v,
-	EvaluationContext& ctx,
-	const ale::ast::node_type_e t,
-	const std::unique_ptr<ale::ast::Node>& c
+	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -110,21 +109,46 @@ EvaluationResult evaluate_logical_node(
 	}
 
 	std::any r = std::move(*res);
-	if (not detail::is_type<bool>(r)) {
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println, "Evaluation of node '{}'", any_view{r}
+	);
+
+	if (detail::is_type<void>(r)) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Evaluation of node is not a Boolean value."
+			ale::logger::println, "Evaluation of node failed."
 		);
 		return append_error(
 			std::move(res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
-			"Evaluation of node is not a Boolean value."
+			"Evaluation of node did not produce any value."
 		);
 	}
-	return r;
+
+	std::any r_conv = detail::any_convert_to_type(r, "bool");
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println, "Evaluation of node '{}'", any_view{r_conv}
+	);
+
+	if (detail::is_type<void>(r_conv)) {
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println,
+			"Evaluation of node '{}' could not be converted to a Boolean value "
+			"'{}'.",
+			any_view{r},
+			any_view{r_conv}
+		);
+		return append_error(
+			std::move(res.error()),
+			evaluation_error_e::Conversion_To_Bool_Failed,
+			"Evaluation of node could not be converted to a Boolean value."
+		);
+	}
+
+	return make_good_evaluation_result(std::move(r_conv));
 }
 
 EvaluationResult evaluate(
-EvaluationContext& ctx,
+	EvaluationContext& ctx,
 	const ale::ast::LogicalNode& v,
 	const ale::ast::node_type_e t
 )
@@ -133,7 +157,7 @@ EvaluationContext& ctx,
 
 	const auto& children = v.get_children();
 
-	EvaluationResult rc = evaluate_logical_node(v, ctx, t, children[0]);
+	EvaluationResult rc = evaluate_logical_node(ctx, children.at(0));
 	if (not rc) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return rc.error();
@@ -149,7 +173,7 @@ EvaluationContext& ctx,
 			break;
 		}
 
-		EvaluationResult rv = evaluate_logical_node(v, ctx, t, c);
+		EvaluationResult rv = evaluate_logical_node(ctx, c);
 		if (not rv) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Node evaluation failed."
