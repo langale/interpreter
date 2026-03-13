@@ -43,7 +43,8 @@ namespace intlib {
 namespace detail {
 
 template <numeric_c to_type_t>
-[[nodiscard]] std::any any_to_numeric(const std::any& a) noexcept
+[[nodiscard]] std::optional<to_type_t>
+any_to_numeric(const std::any& a) noexcept
 {
 	const std::string name = get_type_name(a);
 

@@ -36,6 +36,7 @@
 #include <any>
 
 #include <intlib/detail/any_to_numeric.hpp>
+#include <intlib/detail/any_to_bool.hpp>
 
 namespace intlib {
 namespace detail {
@@ -63,59 +64,66 @@ bool is_type_numeric(const std::string& type) noexcept
 	return std::ranges::find(numeric_types, type) != numeric_types.end();
 }
 
+#define OPTIONAL_TO_ANY(func, value)                                           \
+	const auto o = func(value);                                                \
+	if (o) {                                                                   \
+		return std::any{*o};                                                   \
+	}                                                                          \
+	return {};
+
 std::any any_convert_to_type(const std::any& value, const std::string& type)
 {
-	if (is_type_numeric(type)) {
-		if (type == "bool") {
-			return any_to_numeric<bool>(value);
-		}
+	if (type == "bool") {
+		OPTIONAL_TO_ANY(any_to_bool, value);
+	}
 
+	if (is_type_numeric(type)) {
 		if (type == "char") {
-			return any_to_numeric<char>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<char>, value);
 		}
 		if (type == "unsigned char") {
-			return any_to_numeric<unsigned char>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<unsigned char>, value);
 		}
 		if (type == "signed char") {
-			return any_to_numeric<signed char>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<signed char>, value);
 		}
 
 		if (type == "u8") {
-			return any_to_numeric<uint8_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint8_t>, value);
 		}
 		if (type == "i8") {
-			return any_to_numeric<int8_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<int8_t>, value);
 		}
 
 		if (type == "u16") {
-			return any_to_numeric<uint16_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint16_t>, value);
 		}
 		if (type == "i16") {
-			return any_to_numeric<int16_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<int16_t>, value);
 		}
 
 		if (type == "u32") {
-			return any_to_numeric<uint32_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint32_t>, value);
 		}
 		if (type == "i32") {
-			return any_to_numeric<int32_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<int32_t>, value);
 		}
 
 		if (type == "u64") {
-			return any_to_numeric<uint64_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint64_t>, value);
 		}
 		if (type == "i64") {
-			return any_to_numeric<int64_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<int64_t>, value);
 		}
 
 		if (type == "f16") {
-			return any_to_numeric<std::float16_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<std::float16_t>, value);
 		}
 		if (type == "f32") {
-			return any_to_numeric<std::float32_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<std::float32_t>, value);
 		}
 		if (type == "f64") {
-			return any_to_numeric<std::float64_t>(value);
+			OPTIONAL_TO_ANY(any_to_numeric<std::float64_t>, value);
 		}
 	}
 	return {};
