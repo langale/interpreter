@@ -44,6 +44,8 @@ std::optional<bool> any_comparison(
 	const ale::ast::node_type_e t, const std::any& a, const std::any& b
 )
 {
+	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
+
 	switch (t) {
 	case ale::ast::node_type_e::Comparison_Equal:
 		return any_comparison_equal(a, b);
