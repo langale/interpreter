@@ -33,7 +33,6 @@
 
 #pragma once
 
-#include <optional>
 #include <memory>
 #include <string>
 
@@ -44,6 +43,16 @@
 
 namespace intlib {
 namespace ast {
+
+void append_variable_name(
+	std::string& name, const std::vector<int64_t>& indices
+);
+[[nodiscard]] std::string make_variable_name(
+	const std::string& name, const std::vector<int64_t>& indices
+);
+
+[[nodiscard]] std::string
+get_variable_name(const ale::ast::SequenceNode& sequence);
 
 [[nodiscard]] EvaluationResult make_subscripted_variable_name(
 	EvaluationContext& ctx,

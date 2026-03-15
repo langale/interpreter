@@ -113,6 +113,30 @@ namespace ast {
 	return make_good_evaluation_result(std::move(indices));
 }
 
+void append_variable_name(std::string& name, const std::vector<int64_t>& idxs)
+{
+	for (const int64_t idx : idxs) {
+		name += "_" + std::to_string(idx);
+	}
+}
+
+std::string
+make_variable_name(const std::string& name, const std::vector<int64_t>& indices)
+{
+	std::string n = name;
+	append_variable_name(n, indices);
+	return n;
+}
+
+[[nodiscard]] std::string
+get_variable_name(const ale::ast::SequenceNode& sequence)
+{
+	return dynamic_cast<ale::ast::SubscriptedVariableNode *>(
+			   sequence.get_left_child().get()
+	)
+		->get_variable_name();
+}
+
 EvaluationResult make_subscripted_variable_name(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
@@ -146,11 +170,9 @@ EvaluationResult make_subscripted_variable_name(
 	INTERPRETER_PRINT_LOC(ale::logger::println, "Successfully made indices.");
 
 	std::any idxs_w = std::move(*res_w);
-	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
 
-	for (const int64_t idx : idxs) {
-		name += "_" + std::to_string(idx);
-	}
+	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
+	append_variable_name(name, idxs);
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println, "Name constructed '{}'.", name
@@ -244,9 +266,7 @@ EvaluationResult make_sequence_variable_names(
 		const auto& idxs = iter.get_current_indices();
 
 		std::string name = left_subscripted_variable->get_variable_name();
-		for (const int64_t idx : idxs) {
-			name += "_" + std::to_string(idx);
-		}
+		append_variable_name(name, idxs);
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Variable name: {}.", name

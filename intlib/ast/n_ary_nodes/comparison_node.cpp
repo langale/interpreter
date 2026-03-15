@@ -50,6 +50,7 @@
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/comparison/comparison.hpp>
 
 namespace intlib {
@@ -64,8 +65,10 @@ EvaluationResult get_first_value(
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const auto& vv = static_cast<const ale::ast::SequenceNode&>(*c.get());
 		const ale::utils::SequenceNodeIterator iter = make_iterator(ctx, vv);
-		const std::vector<int64_t>& current_idx = iter.get_first_indices();
-		const std::string var = vv.make_variable_name(current_idx);
+		const std::vector<int64_t>& current_idxs = iter.get_first_indices();
+
+		std::string var = get_variable_name(vv);
+		append_variable_name(var, current_idxs);
 
 		if (not ctx.memory.variable_exists(var)) {
 			INTERPRETER_PRINT_LOC2(
@@ -108,8 +111,10 @@ get_last_value(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 	if (c->get_node_type() == ale::ast::node_type_e::Sequence) {
 		const auto& vv = static_cast<const ale::ast::SequenceNode&>(*c.get());
 		const ale::utils::SequenceNodeIterator iter = make_iterator(ctx, vv);
-		const std::vector<int64_t>& current_idx = iter.get_last_indices();
-		const std::string var = vv.make_variable_name(current_idx);
+		const std::vector<int64_t>& current_idxs = iter.get_last_indices();
+
+		std::string var = get_variable_name(vv);
+		append_variable_name(var, current_idxs);
 
 		if (not ctx.memory.variable_exists(var)) {
 			INTERPRETER_PRINT_LOC2(
