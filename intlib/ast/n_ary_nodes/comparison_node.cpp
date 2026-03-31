@@ -100,10 +100,10 @@ EvaluationResult evaluate(
 		}
 		std::any current = std::move(*current_w);
 
-		const std::optional<bool> comparison_result =
+		const std::optional<bool> comparison_result_w =
 			detail::any_comparison(t, previous, current);
 
-		if (not comparison_result.has_value()) {
+		if (not comparison_result_w.has_value()) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Could not compare two std::any values: '{}' and '{}'.",
@@ -120,7 +120,7 @@ EvaluationResult evaluate(
 			);
 		}
 
-		if (not *comparison_result) {
+		if (not *comparison_result_w) {
 			return false;
 		}
 		previous = std::move(current);

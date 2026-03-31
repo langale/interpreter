@@ -123,7 +123,7 @@ namespace ast {
 		ctx.memory.declare_variable(
 			std::move(var_name), {}, std::move(var_type)
 		);
-		return make_good_evaluation_result(std::any{});
+		return make_good_evaluation_result();
 	}
 
 	std::any value_conv = detail::any_convert_to_type(value, var_type);
@@ -152,7 +152,7 @@ namespace ast {
 		variable_name_copy
 	);
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 [[nodiscard]] static EvaluationResult declare_variable(
@@ -283,7 +283,7 @@ namespace ast {
 		}
 	}
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 [[nodiscard]] static EvaluationResult declare_variable_sequence(
@@ -361,7 +361,7 @@ namespace ast {
 		}
 	}
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 EvaluationResult
@@ -412,7 +412,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		return declare_subscripted_variable(ctx, decl, left_child, value);
 	}
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 } // namespace ast

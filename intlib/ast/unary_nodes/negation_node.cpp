@@ -49,33 +49,33 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 
 	const auto& child = v.get_child();
 
-	EvaluationResult rr = interpret_node(ctx, child);
-	if (not rr.has_value()) {
+	EvaluationResult res_w = interpret_node(ctx, child);
+	if (not res_w.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
-			std::move(rr.error()),
+			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::optional r = detail::any_to_bool(*rr);
-	if (r) {
+	const std::optional res_bool_w = detail::any_to_bool(*res_w);
+	if (res_bool_w) {
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "Evaluation of node: {}.", *r
+			ale::logger::println, "Evaluation of node: {}.", *res_bool_w
 		);
-		return make_good_evaluation_result(not *r);
+		return make_good_evaluation_result(not *res_bool_w);
 	}
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
-		detail::get_type_name(*rr)
+		detail::get_type_name(*res_w)
 	);
 	return make_bad_evaluation_result(
 		std::vector{evaluation_error_e::Unhandled_Variable_Type},
 		std::vector{
-			std::format("Unhandled type '{}'", detail::get_type_name(*rr))
+			std::format("Unhandled type '{}'", detail::get_type_name(*res_w))
 		}
 	);
 }

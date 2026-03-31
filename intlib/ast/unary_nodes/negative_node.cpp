@@ -49,35 +49,35 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 
 	const auto& child = v.get_child();
 
-	EvaluationResult rr = interpret_node(ctx, child);
-	if (not rr.has_value()) {
+	EvaluationResult res_w = interpret_node(ctx, child);
+	if (not res_w.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
-			std::move(rr.error()),
+			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::any& r = *rr;
-	if (detail::is_type<uint64_t>(r)) {
-		const uint64_t ri = std::any_cast<uint64_t>(r);
+	const std::any& res = *res_w;
+	if (detail::is_type<uint64_t>(res)) {
+		const uint64_t ri = std::any_cast<uint64_t>(res);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is uint64_t: {}.", ri
 		);
 		return make_good_evaluation_result(-detail::to_int64(ri));
 	}
 
-	if (detail::is_type<int64_t>(r)) {
-		const int64_t ri = std::any_cast<int64_t>(r);
+	if (detail::is_type<int64_t>(res)) {
+		const int64_t ri = std::any_cast<int64_t>(res);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is int64_t: {}.", ri
 		);
 		return make_good_evaluation_result(detail::adapt_type(-ri));
 	}
 
-	if (detail::is_type<double>(r)) {
-		const double ri = std::any_cast<double>(r);
+	if (detail::is_type<double>(res)) {
+		const double ri = std::any_cast<double>(res);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is double: {}.", ri
 		);
@@ -87,12 +87,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
-		detail::get_type_name(*rr)
+		detail::get_type_name(*res_w)
 	);
 	return make_bad_evaluation_result(
 		std::vector{evaluation_error_e::Unhandled_Variable_Type},
 		std::vector{
-			std::format("Unhandled type '{}'", detail::get_type_name(*rr))
+			std::format("Unhandled type '{}'", detail::get_type_name(*res_w))
 		}
 	);
 }

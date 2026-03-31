@@ -32,8 +32,6 @@
  ********************************************************************/
 
 #include <optional>
-#include <ranges>
-#include <any>
 
 #include <ale/ast/binary_nodes/WhileLoopNode.hpp>
 
@@ -59,53 +57,54 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Condition in while loop is missing."
 		);
-		return {};
+		return make_good_evaluation_result();
 	}
 
 	bool stop = false;
 	while (not stop) {
-		EvaluationResult cond = interpret_node(ctx, left_child);
-		if (not cond) {
+		EvaluationResult cond_w = interpret_node(ctx, left_child);
+		if (not cond_w) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Node evaluation failed."
 			);
 			return append_error(
-				std::move(cond.error()),
+				std::move(cond_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				"Node evaluation failed"
 			);
 		}
 
-		const std::optional cond_bool = detail::any_to_bool(*cond);
-		if (not cond_bool) {
+		const std::optional cond_res_w = detail::any_to_bool(*cond_w);
+		if (not cond_res_w) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
 			);
 			return append_error(
-				std::move(cond.error()),
+				std::move(cond_w.error()),
 				evaluation_error_e::Conversion_To_Bool_Failed,
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
 			);
 		}
 
-		stop = not *cond_bool;
-		if (*cond_bool) {
-			// yes, this may produce infinite loops
+		stop = not *cond_res_w;
+		if (*cond_res_w) {
+
 			if (right_child == nullptr) {
+				// yes, this may produce infinite loops
 				continue;
 			}
 
-			EvaluationResult r = interpret_node(ctx, right_child);
-			if (not r) {
+			EvaluationResult res_w = interpret_node(ctx, right_child);
+			if (not res_w) {
 				INTERPRETER_PRINT_LOC(
 					ale::logger::println,
 					"Evaluation of while loop body failed."
 				);
 				return append_error(
-					std::move(cond.error()),
+					std::move(cond_w.error()),
 					evaluation_error_e::Evaluation_Of_Node_While_Loop_Failed,
 					"Evaluation of while loop body failed."
 				);
@@ -113,7 +112,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		}
 	}
 
-	return std::any{};
+	return make_good_evaluation_result();
 }
 
 } // namespace ast

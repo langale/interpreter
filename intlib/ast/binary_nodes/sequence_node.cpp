@@ -89,22 +89,21 @@ get_variable_value(EvaluationContext& ctx, const std::string& var)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Trying to use undeclared variable {}.", var
 		);
-		return {};
+		return std::optional<std::any>{};
 	}
 
-	std::optional<memory::VariableValue> variable_value =
-		ctx.memory.get_variable(var);
+	memory::VariableValue& variable = ctx.memory.get_variable(var);
 
-	if (not variable_value.has_value()) {
+	if (not variable.value.has_value()) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Variable {} exists but it does not have a value.",
 			var
 		);
-		return {};
+		return std::optional<std::any>{};
 	}
 
-	return std::move(variable_value->value);
+	return std::optional{std::move(variable.value)};
 }
 
 EvaluationResult
@@ -112,7 +111,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return {};
+	return make_good_evaluation_result();
 }
 
 } // namespace ast

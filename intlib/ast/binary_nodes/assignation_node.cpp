@@ -155,7 +155,7 @@ namespace ast {
 		ale::logger::println, "Successfully assigned variable '{}'.", var_name
 	);
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 [[nodiscard]] static EvaluationResult assign_variable(
@@ -262,7 +262,7 @@ namespace ast {
 		}
 	}
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 [[nodiscard]] static EvaluationResult assign_variable_sequence(
@@ -340,7 +340,7 @@ namespace ast {
 		}
 	}
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 EvaluationResult
@@ -393,7 +393,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assignation)
 		return assign_subscripted_variable(ctx, left_child, value);
 	}
 
-	return make_good_evaluation_result(std::any{});
+	return make_good_evaluation_result();
 }
 
 } // namespace ast

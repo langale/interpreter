@@ -31,15 +31,12 @@
  *
  ********************************************************************/
 
-#if defined DEBUG
-#include <cassert>
-#endif
 #include <optional>
 #include <ranges>
-#include <any>
 
 #include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
+#include <ale/ast/utils/node_type_to_string.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
@@ -59,12 +56,12 @@ evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 		"Cannot evaluate nodes of type '{}'.",
 		v.get_node_type()
 	);
-	return EvaluationError{
-		.error = {evaluation_error_e::Forbidden_Evaluation_Of_Node},
-		.message = {std::format(
+	return make_bad_evaluation_result(
+		std::vector{evaluation_error_e::Forbidden_Evaluation_Of_Node},
+		std::vector{std::format(
 			"Cannot evaluate nodes of type '{}'.", v.get_node_type()
 		)}
-	};
+	);
 }
 
 } // namespace ast

@@ -67,8 +67,8 @@ EvaluationResult evaluate(
 	const auto node_eval =
 		[&](const std::unique_ptr<ale::ast::Node>& c) -> EvaluationResult
 	{
-		EvaluationResult res = interpret_node(ctx, c);
-		if (not res) {
+		EvaluationResult res_w = interpret_node(ctx, c);
+		if (not res_w) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Evaluation of node within arithmetic node failed."
@@ -78,7 +78,7 @@ EvaluationResult evaluate(
 				.message = {"Evaluation of node within arithmetic node failed."}
 			};
 		}
-		if (detail::is_type<void>(*res)) {
+		if (detail::is_type<void>(*res_w)) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Evaluation of node returned a void value."
@@ -88,22 +88,22 @@ EvaluationResult evaluate(
 				.message = {"Evaluation of node returned a void value."}
 			};
 		}
-		return std::move(*res);
+		return std::move(*res_w);
 	};
 
-	EvaluationResult r = node_eval(children[0]);
-	if (not r) {
-		return std::move(r.error());
+	EvaluationResult res_w = node_eval(children[0]);
+	if (not res_w) {
+		return std::move(res_w.error());
 	}
 
-	std::any expr_res = *r;
+	std::any expr_res = *res_w;
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
 		EvaluationResult rv = node_eval(c);
 		if (not rv) {
-			return std::move(r.error());
+			return std::move(res_w.error());
 		}
 
 		expr_res = arithmetic::any_arithmetic(t, expr_res, *rv);

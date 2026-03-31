@@ -50,19 +50,19 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 
 	ctx.memory.get_current_scope().push_local_scope();
 	for (const auto& w : v.get_children()) {
-		EvaluationResult r = interpret_node(ctx, w);
-		if (not r) {
+		EvaluationResult res_w = interpret_node(ctx, w);
+		if (not res_w) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
 			);
 			return append_error(
-				std::move(r.error()),
+				std::move(res_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				"Node evaluation failed"
 			);
 		}
 
-		const std::any& value = *r;
+		const std::any& value = *res_w;
 		if (value.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
@@ -71,7 +71,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 		}
 	}
 	ctx.memory.get_current_scope().pop_local_scope();
-	return {};
+	return make_good_evaluation_result();
 }
 
 } // namespace ast

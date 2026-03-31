@@ -63,32 +63,32 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 		};
 	}
 
-	EvaluationResult cond = interpret_node(ctx, first_child);
-	if (not cond.has_value()) {
+	EvaluationResult cond_w = interpret_node(ctx, first_child);
+	if (not cond_w.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
-			std::move(cond.error()),
+			std::move(cond_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::optional cond_bool = detail::any_to_bool(*cond);
-	if (not cond_bool) {
+	const std::optional cond_bool_w = detail::any_to_bool(*cond_w);
+	if (not cond_bool_w) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Unhandled variable type '{}'.",
-			detail::get_type_name(*cond_bool)
+			detail::get_type_name(*cond_bool_w)
 		);
 		return EvaluationError{
 			.error = {evaluation_error_e::Unhandled_Variable_Type},
 			.message = {std::format(
-				"Unhandled type '{}'", detail::get_type_name(*cond_bool)
+				"Unhandled type '{}'", detail::get_type_name(*cond_bool_w)
 			)}
 		};
 	}
 
-	if (*cond_bool) {
+	if (*cond_bool_w) {
 		if (second_child == nullptr) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,

@@ -36,6 +36,7 @@
 #include <ale/ast/binary_nodes/declaration_nodes/DeclarationConstNode.hpp>
 #include <ale/ast/binary_nodes/declaration_nodes/DeclarationLetNode.hpp>
 #include <ale/ast/binary_nodes/declaration_nodes/DeclarationDeclareNode.hpp>
+#include <ale/ast/utils/node_type_to_string.hpp>
 
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/evaluation.hpp>
