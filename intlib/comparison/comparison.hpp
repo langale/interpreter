@@ -41,33 +41,26 @@
 namespace intlib {
 namespace detail {
 
-/// Equal (==) comparison of two std::any.
 [[nodiscard]] std::optional<bool>
 any_comparison_equal(const std::any& a, const std::any& b);
 
-/// Not-Equal (!=) comparison of two std::any.
 [[nodiscard]] std::optional<bool>
 any_comparison_not_equal(const std::any& a, const std::any& b);
 
-/// Less than (<) comparison of two std::any.
 [[nodiscard]] std::optional<bool>
 any_comparison_less_than(const std::any& a, const std::any& b);
 
-/// Less than or equal to (<=) comparison of two std::any.
 [[nodiscard]] std::optional<bool> any_comparison_less_than_equal_to(
 	const std::any& a, const std::any& b
 );
 
-/// Greater than (>) comparison of two std::any.
 [[nodiscard]] std::optional<bool>
 any_comparison_greater_than(const std::any& a, const std::any& b);
 
-/// Greater than or equal to (>=) comparison of two std::any.
 [[nodiscard]] std::optional<bool> any_comparison_greater_than_equal_to(
 	const std::any& a, const std::any& b
 );
 
-/// Compares two std::any according to the type of node
 [[nodiscard]] std::optional<bool> any_comparison(
 	const ale::ast::node_type_e t, const std::any& a, const std::any& b
 );
