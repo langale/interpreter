@@ -43,36 +43,38 @@ namespace detail {
 
 template <typename left_t, typename right_t>
 [[nodiscard]] static std::optional<bool>
-any_comparison_equal(const std::any& left, const std::any& right)
+any_comparison_equal(const std::any& left_w, const std::any& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
 
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
-		if (is_type<left_t>(left) and is_type<right_t>(right)) {
-			const left_t l = std::any_cast<left_t>(left);
-			const right_t r = std::any_cast<right_t>(right);
+		if (is_type<left_t>(left_w) and is_type<right_t>(right_w)) {
+			const auto left = std::any_cast<left_t>(left_w);
+			const auto right = std::any_cast<right_t>(right_w);
 			if constexpr (std::is_floating_point_v<left_t> or
 						  std::is_floating_point_v<right_t>) {
-				typedef std::conditional_t<
+
+				using F = std::conditional_t<
 					std::is_floating_point_v<left_t>,
 					left_t,
-					right_t>
-					F;
-				const F _l = static_cast<F>(l);
-				const F _r = static_cast<F>(r);
-				return _l == _r;
+					right_t>;
+
+				const auto l = static_cast<F>(left);
+				const auto r = static_cast<F>(right);
+				return l == r;
 			}
 			else if (std::is_integral_v<left_t> and
 					 std::is_integral_v<right_t>) {
-				typedef std::
-					conditional_t<std::is_signed_v<left_t>, left_t, right_t>
-						I;
-				const I _l = static_cast<I>(l);
-				const I _r = static_cast<I>(r);
-				return _l == _r;
+
+				using I = std::
+					conditional_t<std::is_signed_v<left_t>, left_t, right_t>;
+
+				const auto l = static_cast<I>(left);
+				const auto r = static_cast<I>(right);
+				return l == r;
 			}
 			else {
-				return l == r;
+				return left == right;
 			}
 		}
 	}
@@ -80,25 +82,24 @@ any_comparison_equal(const std::any& left, const std::any& right)
 }
 
 template <typename left_t>
-[[nodiscard]] static std::optional<bool> any_comparison_equal_right_numeric(
-	const std::any& left, const std::any& right
-)
+[[nodiscard]] static std::optional<bool>
+any_comparison_equal_right_numeric(const std::any& left_w, const std::any& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
 
-	if (const auto r = any_comparison_equal<left_t, bool>(left, right);
+	if (const auto r = any_comparison_equal<left_t, bool>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal<left_t, int64_t>(left, right);
+	if (const auto r = any_comparison_equal<left_t, int64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal<left_t, uint64_t>(left, right);
+	if (const auto r = any_comparison_equal<left_t, uint64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal<left_t, double>(left, right);
+	if (const auto r = any_comparison_equal<left_t, double>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
@@ -106,30 +107,30 @@ template <typename left_t>
 }
 
 std::optional<bool>
-any_comparison_equal(const std::any& left, const std::any& right)
+any_comparison_equal(const std::any& left_w, const std::any& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
 
-	if (const auto r = any_comparison_equal_right_numeric<bool>(left, right);
+	if (const auto r = any_comparison_equal_right_numeric<bool>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal_right_numeric<int64_t>(left, right);
+	if (const auto r = any_comparison_equal_right_numeric<int64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
 	if (const auto r =
-			any_comparison_equal_right_numeric<uint64_t>(left, right);
+			any_comparison_equal_right_numeric<uint64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal_right_numeric<double>(left, right);
+	if (const auto r = any_comparison_equal_right_numeric<double>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
 
 	if (const auto r =
-			any_comparison_equal<std::string, std::string>(left, right);
+			any_comparison_equal<std::string, std::string>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}

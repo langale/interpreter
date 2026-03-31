@@ -34,6 +34,10 @@
 #include <optional>
 #include <any>
 
+#if defined ALE_LOGGING_MESSAGES
+#include <ale/ast/utils/node_type_to_string.hpp>
+#endif
+
 #include <intlib/logger/macros.hpp>
 #include <intlib/comparison/comparison.hpp>
 
@@ -41,24 +45,26 @@ namespace intlib {
 namespace detail {
 
 std::optional<bool> any_comparison(
-	const ale::ast::node_type_e t, const std::any& a, const std::any& b
+	const ale::ast::node_type_e t,
+	const std::any& left_w,
+	const std::any& right_w
 )
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
 
 	switch (t) {
 	case ale::ast::node_type_e::Comparison_Equal:
-		return any_comparison_equal(a, b);
+		return any_comparison_equal(left_w, right_w);
 	case ale::ast::node_type_e::Comparison_Not_Equal:
-		return any_comparison_not_equal(a, b);
+		return any_comparison_not_equal(left_w, right_w);
 	case ale::ast::node_type_e::Comparison_Less_Than:
-		return any_comparison_less_than(a, b);
+		return any_comparison_less_than(left_w, right_w);
 	case ale::ast::node_type_e::Comparison_Less_Equal:
-		return any_comparison_less_than_equal_to(a, b);
+		return any_comparison_less_than_equal_to(left_w, right_w);
 	case ale::ast::node_type_e::Comparison_Greater_Than:
-		return any_comparison_greater_than(a, b);
+		return any_comparison_greater_than(left_w, right_w);
 	case ale::ast::node_type_e::Comparison_Greater_Equal:
-		return any_comparison_greater_than_equal_to(a, b);
+		return any_comparison_greater_than_equal_to(left_w, right_w);
 	default:
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Wrong node type '{}' for comparison.", t

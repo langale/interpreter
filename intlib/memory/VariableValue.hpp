@@ -42,7 +42,7 @@ namespace memory {
 /// Data associated to each variable name.
 struct VariableValue {
 	/// The actual value that the variable holds.
-	std::any value;
+	std::any value_w;
 	/// The type of this variable.
 	const std::string type;
 	/// Whether or not the variable is declared with 'const'.
@@ -50,7 +50,7 @@ struct VariableValue {
 };
 
 static constinit VariableValue empty_variable{
-	.value = {}, .type = "void", .is_constant = true
+	.value_w = {}, .type = "void", .is_constant = true
 };
 
 } // namespace memory

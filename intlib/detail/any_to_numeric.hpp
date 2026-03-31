@@ -44,60 +44,60 @@ namespace detail {
 
 template <numeric_c to_type_t>
 [[nodiscard]] std::optional<to_type_t>
-any_to_numeric(const std::any& a) noexcept
+any_to_numeric(const std::any& value_w) noexcept
 {
-	const std::string name = get_type_name(a);
+	const std::string name = get_type_name(value_w);
 
 	if (is_builtin_type<bool>(name)) {
-		return static_cast<to_type_t>(std::any_cast<bool>(a));
+		return static_cast<to_type_t>(std::any_cast<bool>(value_w));
 	}
 
 	if (is_builtin_type<char>(name)) {
-		return static_cast<to_type_t>(std::any_cast<char>(a));
+		return static_cast<to_type_t>(std::any_cast<char>(value_w));
 	}
 	if (is_builtin_type<unsigned char>(name)) {
-		return static_cast<to_type_t>(std::any_cast<unsigned char>(a));
+		return static_cast<to_type_t>(std::any_cast<unsigned char>(value_w));
 	}
 	if (is_builtin_type<signed char>(name)) {
-		return static_cast<to_type_t>(std::any_cast<signed char>(a));
+		return static_cast<to_type_t>(std::any_cast<signed char>(value_w));
 	}
 
 	if (is_builtin_type<uint8_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<uint8_t>(a));
+		return static_cast<to_type_t>(std::any_cast<uint8_t>(value_w));
 	}
 	if (is_builtin_type<int8_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<int8_t>(a));
+		return static_cast<to_type_t>(std::any_cast<int8_t>(value_w));
 	}
 
 	if (is_builtin_type<uint16_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<uint16_t>(a));
+		return static_cast<to_type_t>(std::any_cast<uint16_t>(value_w));
 	}
 	if (is_builtin_type<int16_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<int16_t>(a));
+		return static_cast<to_type_t>(std::any_cast<int16_t>(value_w));
 	}
 
 	if (is_builtin_type<uint32_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<uint32_t>(a));
+		return static_cast<to_type_t>(std::any_cast<uint32_t>(value_w));
 	}
 	if (is_builtin_type<int32_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<int32_t>(a));
+		return static_cast<to_type_t>(std::any_cast<int32_t>(value_w));
 	}
 
 	if (is_builtin_type<uint64_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<uint64_t>(a));
+		return static_cast<to_type_t>(std::any_cast<uint64_t>(value_w));
 	}
 	if (is_builtin_type<int64_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<int64_t>(a));
+		return static_cast<to_type_t>(std::any_cast<int64_t>(value_w));
 	}
 
 	if (is_builtin_type<std::float16_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<std::float16_t>(a));
+		return static_cast<to_type_t>(std::any_cast<std::float16_t>(value_w));
 	}
 	if (is_builtin_type<std::float32_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<std::float32_t>(a));
+		return static_cast<to_type_t>(std::any_cast<std::float32_t>(value_w));
 	}
 	if (is_builtin_type<std::float64_t>(name)) {
-		return static_cast<to_type_t>(std::any_cast<std::float64_t>(a));
+		return static_cast<to_type_t>(std::any_cast<std::float64_t>(value_w));
 	}
 
 	return {};

@@ -101,8 +101,8 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
 	for (const auto& c : v.get_children()) {
-		const std::optional<std::any> res = interpret_node(ctx, c);
-		if (not res.has_value()) {
+		const std::optional<std::any> res_int_w = interpret_node(ctx, c);
+		if (not res_int_w.has_value()) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Failed evaluation of child {} of subscripted variable {}.",
@@ -112,9 +112,9 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 			return {};
 		}
 
-		const std::any& r = *res;
-		const bool is_uint64 = detail::is_type<uint64_t>(r);
-		const bool is_int64 = detail::is_type<int64_t>(r);
+		const std::any& res_w = *res_int_w;
+		const bool is_uint64 = detail::is_type<uint64_t>(res_w);
+		const bool is_int64 = detail::is_type<int64_t>(res_w);
 		if (not is_uint64 and not is_int64) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
@@ -127,11 +127,11 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 		}
 
 		if (is_uint64) {
-			const uint64_t j = std::any_cast<uint64_t>(r);
+			const uint64_t j = std::any_cast<uint64_t>(res_w);
 			indices[i++] = detail::to_int64(j);
 		}
 		else {
-			const int64_t j = std::any_cast<int64_t>(r);
+			const int64_t j = std::any_cast<int64_t>(res_w);
 			indices[i++] = j;
 		}
 	}
@@ -181,7 +181,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 
 	memory::VariableValue& res = ctx.memory.get_variable(full_variable_name);
 
-	if (not res.value.has_value()) {
+	if (not res.value_w.has_value()) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Variable '{}' has no value.",
@@ -195,7 +195,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		};
 	}
 
-	return make_good_evaluation_result(std::move(res.value));
+	return make_good_evaluation_result(res.value_w);
 }
 
 } // namespace ast

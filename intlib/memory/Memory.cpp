@@ -49,37 +49,37 @@ void Memory::initialize() noexcept
 }
 
 void Memory::declare_variable(
-	std::string&& name, std::any&& value, std::string&& type
+	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
 
 	if (not is_current_scope_global()) {
 		m_function_scopes.top().declare_variable(
-			std::move(name), std::move(value), std::move(type)
+			std::move(name), std::move(value_w), std::move(type)
 		);
 	}
 	else {
 		m_global_scope.declare_variable(
-			std::move(name), std::move(value), std::move(type)
+			std::move(name), std::move(value_w), std::move(type)
 		);
 	}
 }
 
 void Memory::declare_constant_variable(
-	std::string&& name, std::any&& value, std::string&& type
+	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
 
 	if (not is_current_scope_global()) {
 		m_function_scopes.top().declare_constant_variable(
-			std::move(name), std::move(value), std::move(type)
+			std::move(name), std::move(value_w), std::move(type)
 		);
 	}
 	else {
 		m_global_scope.declare_constant_variable(
-			std::move(name), std::move(value), std::move(type)
+			std::move(name), std::move(value_w), std::move(type)
 		);
 	}
 }

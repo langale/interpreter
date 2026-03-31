@@ -149,7 +149,7 @@ namespace ast {
 		any_view{value_conv}
 	);
 
-	var_in_memory.value = std::move(value_conv);
+	var_in_memory.value_w = std::move(value_conv);
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println, "Successfully assigned variable '{}'.", var_name

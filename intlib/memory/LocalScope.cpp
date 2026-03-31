@@ -46,7 +46,7 @@ namespace memory {
 void LocalScope::initialize() { }
 
 void LocalScope::declare_variable(
-	std::string&& name, std::any&& value, std::string&& type
+	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
@@ -60,7 +60,7 @@ void LocalScope::declare_variable(
 	m_variables.emplace(
 		std::pair<std::string, VariableValue>{
 			std::move(name),
-			{.value = std::move(value),
+			{.value_w = std::move(value_w),
 			 .type = std::move(type),
 			 .is_constant = false}
 		}
@@ -68,7 +68,7 @@ void LocalScope::declare_variable(
 }
 
 void LocalScope::declare_constant_variable(
-	std::string&& name, std::any&& value, std::string&& type
+	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
@@ -82,7 +82,7 @@ void LocalScope::declare_constant_variable(
 	m_variables.emplace(
 		std::pair<std::string, VariableValue>{
 			std::move(name),
-			{.value = std::move(value),
+			{.value_w = std::move(value_w),
 			 .type = std::move(type),
 			 .is_constant = true}
 		}

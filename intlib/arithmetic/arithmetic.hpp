@@ -41,24 +41,24 @@ namespace intlib {
 namespace arithmetic {
 
 [[nodiscard]] std::any
-arithmetic_addition(const std::any& a, const std::any& b);
+arithmetic_addition(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::any
-arithmetic_division(const std::any& a, const std::any& b);
+arithmetic_division(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::any
-arithmetic_exponentiation(const std::any& a, const std::any& b);
+arithmetic_exponentiation(const std::any& left_w, const std::any& right_w);
 
-[[nodiscard]] std::any arithmetic_modulus(const std::any& a, const std::any& b);
-
-[[nodiscard]] std::any
-arithmetic_multiplication(const std::any& a, const std::any& b);
+[[nodiscard]] std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::any
-arithmetic_subtraction(const std::any& a, const std::any& b);
+arithmetic_multiplication(const std::any& left_w, const std::any& right_w);
+
+[[nodiscard]] std::any
+arithmetic_subtraction(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::any any_arithmetic(
-	const ale::ast::node_type_e t, const std::any& a, const std::any& b
+	const ale::ast::node_type_e t, const std::any& left_w, const std::any& right_w
 );
 
 } // namespace arithmetic

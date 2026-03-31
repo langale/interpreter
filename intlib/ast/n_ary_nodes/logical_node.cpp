@@ -99,43 +99,43 @@ EvaluationResult evaluate_logical_node(
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	EvaluationResult res_w = interpret_node(ctx, c);
-	if (not res_w) {
+	EvaluationResult res_int_w = interpret_node(ctx, c);
+	if (not res_int_w) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
-			std::move(res_w.error()),
+			std::move(res_int_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::any r = std::move(*res_w);
+	const std::any res_w = std::move(*res_int_w);
 	INTERPRETER_PRINT_LOC2(
-		ale::logger::println, "Evaluation of node '{}'", any_view{r}
+		ale::logger::println, "Evaluation of node '{}'", any_view{res_w}
 	);
 
-	if (detail::is_type<void>(r)) {
+	if (detail::is_type<void>(res_w)) {
 		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Evaluation of node failed."
 		);
 		return append_error(
-			std::move(res_w.error()),
+			std::move(res_int_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			"Evaluation of node did not produce any value."
 		);
 	}
 
-	std::optional r_conv_w = detail::any_to_bool(r);
+	const std::optional r_conv_w = detail::any_to_bool(res_w);
 	if (not r_conv_w) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Evaluation of node '{}' could not be converted to a Boolean value "
 			"'{}'.",
-			any_view{r},
+			any_view{res_w},
 			any_view{r_conv_w}
 		);
 		return append_error(
-			std::move(res_w.error()),
+			std::move(res_int_w.error()),
 			evaluation_error_e::Conversion_To_Bool_Failed,
 			"Evaluation of node could not be converted to a Boolean value."
 		);

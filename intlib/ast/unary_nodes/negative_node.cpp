@@ -49,35 +49,35 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 
 	const auto& child = v.get_child();
 
-	EvaluationResult res_w = interpret_node(ctx, child);
-	if (not res_w.has_value()) {
+	EvaluationResult res_int_w = interpret_node(ctx, child);
+	if (not res_int_w.has_value()) {
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
 		return append_error(
-			std::move(res_w.error()),
+			std::move(res_int_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::any& res = *res_w;
-	if (detail::is_type<uint64_t>(res)) {
-		const uint64_t ri = std::any_cast<uint64_t>(res);
+	const std::any& res_w = *res_int_w;
+	if (detail::is_type<uint64_t>(res_w)) {
+		const uint64_t ri = std::any_cast<uint64_t>(res_w);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is uint64_t: {}.", ri
 		);
 		return make_good_evaluation_result(-detail::to_int64(ri));
 	}
 
-	if (detail::is_type<int64_t>(res)) {
-		const int64_t ri = std::any_cast<int64_t>(res);
+	if (detail::is_type<int64_t>(res_w)) {
+		const int64_t ri = std::any_cast<int64_t>(res_w);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is int64_t: {}.", ri
 		);
 		return make_good_evaluation_result(detail::adapt_type(-ri));
 	}
 
-	if (detail::is_type<double>(res)) {
-		const double ri = std::any_cast<double>(res);
+	if (detail::is_type<double>(res_w)) {
+		const double ri = std::any_cast<double>(res_w);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is double: {}.", ri
 		);
@@ -87,12 +87,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
-		detail::get_type_name(*res_w)
+		detail::get_type_name(*res_int_w)
 	);
 	return make_bad_evaluation_result(
 		std::vector{evaluation_error_e::Unhandled_Variable_Type},
 		std::vector{
-			std::format("Unhandled type '{}'", detail::get_type_name(*res_w))
+			std::format("Unhandled type '{}'", detail::get_type_name(*res_int_w))
 		}
 	);
 }

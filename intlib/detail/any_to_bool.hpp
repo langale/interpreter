@@ -39,7 +39,7 @@
 namespace intlib {
 namespace detail {
 
-[[nodiscard]] std::optional<bool> any_to_bool(const std::any& a) noexcept;
+[[nodiscard]] std::optional<bool> any_to_bool(const std::any& value_w) noexcept;
 
 } // namespace detail
 } // namespace intlib

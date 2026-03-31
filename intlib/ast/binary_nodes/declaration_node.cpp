@@ -64,7 +64,7 @@ namespace ast {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	const auto& value_node = decl.get_right_child();
-	std::any value;
+	std::any value_w;
 	if (decl.get_node_type() != ale::ast::node_type_e::Declaration_Declare) {
 		EvaluationResult res_w = interpret_node(ctx, value_node);
 		if (not res_w.has_value()) {
@@ -76,16 +76,16 @@ namespace ast {
 				std::vector<std::string>{"Evaluation of node failed."}
 			);
 		}
-		value = std::move(*res_w);
+		value_w = std::move(*res_w);
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
-			detail::get_type_name(value),
-			any_view{value}
+			detail::get_type_name(value_w),
+			any_view{value_w}
 		);
 	}
-	return make_good_evaluation_result(std::move(value));
+	return make_good_evaluation_result(std::move(value_w));
 }
 
 [[nodiscard]] static EvaluationResult declare_single_variable(
@@ -126,23 +126,23 @@ namespace ast {
 		return make_good_evaluation_result();
 	}
 
-	std::any value_conv = detail::any_convert_to_type(value, var_type);
+	std::any value_conv_w = detail::any_convert_to_type(value, var_type);
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"Value after conversion to '{}' is: '{}'.",
 		var_type,
-		any_view{value_conv}
+		any_view{value_conv_w}
 	);
 
 	if (t == ale::ast::node_type_e::Declaration_Const) {
 		ctx.memory.declare_constant_variable(
-			std::move(var_name), std::move(value_conv), std::move(var_type)
+			std::move(var_name), std::move(value_conv_w), std::move(var_type)
 		);
 	}
 	else {
 		ctx.memory.declare_variable(
-			std::move(var_name), std::move(value_conv), std::move(var_type)
+			std::move(var_name), std::move(value_conv_w), std::move(var_type)
 		);
 	}
 
@@ -379,13 +379,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Variable.");
 		const auto& variable_node = decl.get_left_child();
 
-		EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
-		if (not value_w) {
-			return std::move(value_w.error());
+		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
+		if (not res_w) {
+			return std::move(res_w.error());
 		}
-		std::any value = std::move(*value_w);
-
-		return declare_variable(ctx, decl, variable_node, value);
+		const std::any value_w = std::move(*res_w);
+		return declare_variable(ctx, decl, variable_node, value_w);
 	}
 
 	if (left_child->get_node_type() ==
@@ -403,13 +402,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		ale::ast::node_type_e::Subscripted_Variable) {
 
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Subscripted variable.");
-		EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
-		if (not value_w) {
-			return std::move(value_w.error());
+		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
+		if (not res_w) {
+			return std::move(res_w.error());
 		}
-		std::any value = std::move(*value_w);
-
-		return declare_subscripted_variable(ctx, decl, left_child, value);
+		const std::any value_w = std::move(*res_w);
+		return declare_subscripted_variable(ctx, decl, left_child, value_w);
 	}
 
 	return make_good_evaluation_result();

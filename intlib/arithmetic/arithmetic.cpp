@@ -33,6 +33,10 @@
 
 #include <any>
 
+#if defined ALE_LOGGING_MESSAGES
+#include <ale/ast/utils/node_type_to_string.hpp>
+#endif
+
 #include <intlib/logger/macros.hpp>
 #include <intlib/arithmetic/arithmetic.hpp>
 
@@ -40,25 +44,31 @@ namespace intlib {
 namespace arithmetic {
 
 std::any any_arithmetic(
-	const ale::ast::node_type_e t, const std::any& a, const std::any& b
+	const ale::ast::node_type_e t,
+	const std::any& left_w,
+	const std::any& right_w
 )
 {
 	INTERPRETER_ENTER_ARITHMETIC_FUNCTION(ale::logger::println);
 
 	switch (t) {
 	case ale::ast::node_type_e::Arithmetic_Addition:
-		return arithmetic_addition(a, b);
+		return arithmetic_addition(left_w, right_w);
 	case ale::ast::node_type_e::Arithmetic_Division:
-		return arithmetic_division(a, b);
+		return arithmetic_division(left_w, right_w);
 	case ale::ast::node_type_e::Arithmetic_Exponentiation:
-		return arithmetic_exponentiation(a, b);
+		return arithmetic_exponentiation(left_w, right_w);
 	case ale::ast::node_type_e::Arithmetic_Modulus:
-		return arithmetic_modulus(a, b);
+		return arithmetic_modulus(left_w, right_w);
 	case ale::ast::node_type_e::Arithmetic_Multiplication:
-		return arithmetic_multiplication(a, b);
+		return arithmetic_multiplication(left_w, right_w);
 	case ale::ast::node_type_e::Arithmetic_Subtraction:
-		return arithmetic_subtraction(a, b);
-	default: return {};
+		return arithmetic_subtraction(left_w, right_w);
+	default:
+		INTERPRETER_PRINT_LOC2(
+			ale::logger::println, "Wrong node type '{}' for arithmetic.", t
+		);
+		return {};
 	}
 }
 

@@ -68,7 +68,7 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 
 	memory::VariableValue& res = ctx.memory.get_variable(name);
 
-	if (not res.value.has_value()) {
+	if (not res.value_w.has_value()) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Variable '{}' has no value.", name
 		);
@@ -78,7 +78,7 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 		};
 	}
 
-	return make_good_evaluation_result(std::move(res.value));
+	return make_good_evaluation_result(res.value_w);
 }
 
 } // namespace ast

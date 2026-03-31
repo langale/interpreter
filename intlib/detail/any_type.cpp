@@ -46,9 +46,9 @@ std::string demangle_name_type(const char *name)
 	return (status == 0) ? res.get() : name;
 }
 
-std::string get_type_name(const std::any& a)
+std::string get_type_name(const std::any& value_w)
 {
-	return demangle_name_type(a.type().name());
+	return demangle_name_type(value_w.type().name());
 }
 
 } // namespace detail

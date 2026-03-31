@@ -40,162 +40,165 @@
 namespace intlib {
 namespace arithmetic {
 
-std::any arithmetic_modulus(const std::any& a, const std::any& b)
+std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 {
 	INTERPRETER_ENTER_ARITHMETIC_FUNCTION(ale::logger::println);
 
-	const std::string type_a = detail::get_type_name(a);
-	const std::string type_b = detail::get_type_name(b);
-	
-	if (detail::is_type<uint64_t>(type_a)) {
-		const auto ai = std::any_cast<uint64_t>(a);
+	const std::string left_type = detail::get_type_name(left_w);
+	const std::string right_type = detail::get_type_name(right_w);
+
+	if (detail::is_type<uint64_t>(left_type)) {
+		const auto left = std::any_cast<uint64_t>(left_w);
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "First component is uint64_t: {}.", ai
+			ale::logger::println, "First component is uint64_t: {}.", left
 		);
 
-		if (detail::is_type<uint64_t>(type_b)) {
-			const auto bi = std::any_cast<uint64_t>(b);
+		if (detail::is_type<uint64_t>(right_type)) {
+			const auto right = std::any_cast<uint64_t>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is uint64_t: {}.", bi
+				ale::logger::println, "Second component is uint64_t: {}.", right
 			);
 
-			return ai % bi;
+			return left % right;
 		}
 
-		if (detail::is_type<int64_t>(type_b)) {
-			const auto bi = std::any_cast<int64_t>(b);
+		if (detail::is_type<int64_t>(right_type)) {
+			const auto right = std::any_cast<int64_t>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is int64_t: {}.", bi
+				ale::logger::println, "Second component is int64_t: {}.", right
 			);
 
-			const auto res = detail::to_int64(ai) % bi;
+			const auto res = detail::to_int64(left) % right;
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<double>(type_b)) {
-			const double bd = std::any_cast<double>(b);
+		if (detail::is_type<double>(right_type)) {
+			const auto right = std::any_cast<double>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is double: {}.", bd
+				ale::logger::println, "Second component is double: {}.", right
 			);
 
-			if (bd < 0) {
-				const auto res = detail::to_int64(ai) % detail::to_int64(bd);
+			if (right < 0) {
+				const auto res =
+					detail::to_int64(left) % detail::to_int64(right);
 				return detail::adapt_type(res);
 			}
 
-			const auto res = ai % detail::to_uint64(bd);
+			const auto res = left % detail::to_uint64(right);
 			return detail::adapt_type(res);
 		}
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
-			"Parameter b's type {} is not handled.",
-			detail::get_type_name(b)
+			"Parameter right type {} is not handled.",
+			detail::get_type_name(right_w)
 		);
 	}
 
-	if (detail::is_type<int64_t>(type_a)) {
-		const auto ai = std::any_cast<int64_t>(a);
+	if (detail::is_type<int64_t>(left_type)) {
+		const auto left = std::any_cast<int64_t>(left_w);
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "First component is int64_t: {}.", ai
+			ale::logger::println, "First component is int64_t: {}.", left
 		);
 
-		if (detail::is_type<uint64_t>(type_b)) {
-			const auto bi = std::any_cast<uint64_t>(b);
+		if (detail::is_type<uint64_t>(right_type)) {
+			const auto right = std::any_cast<uint64_t>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is uint64_t: {}.", bi
+				ale::logger::println, "Second component is uint64_t: {}.", right
 			);
 
-			const auto res = ai % detail::to_int64(bi);
+			const auto res = left % detail::to_int64(right);
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<int64_t>(type_b)) {
-			const auto bi = std::any_cast<int64_t>(b);
+		if (detail::is_type<int64_t>(right_type)) {
+			const auto right = std::any_cast<int64_t>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is int64_t: {}.", bi
+				ale::logger::println, "Second component is int64_t: {}.", right
 			);
 
-			const auto res = ai % bi;
+			const auto res = left % right;
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<double>(type_b)) {
-			const double bd = std::any_cast<double>(b);
+		if (detail::is_type<double>(right_type)) {
+			const auto right = std::any_cast<double>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is double: {}.", bd
+				ale::logger::println, "Second component is double: {}.", right
 			);
 
-			if (bd < 0) {
-				const auto res = ai % detail::to_int64(bd);
+			if (right < 0) {
+				const auto res = left % detail::to_int64(right);
 				return detail::adapt_type(res);
 			}
-			const auto res = detail::to_uint64(ai) % detail::to_uint64(bd);
+			const auto res = detail::to_uint64(left) % detail::to_uint64(right);
 			return detail::adapt_type(res);
 		}
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
-			"Parameter b's type {} is not handled.",
-			detail::get_type_name(b)
+			"Parameter right type {} is not handled.",
+			detail::get_type_name(right_w)
 		);
 	}
 
-	if (detail::is_type<double>(type_a)) {
-		const auto ai = std::any_cast<double>(a);
+	if (detail::is_type<double>(left_type)) {
+		const auto left = std::any_cast<double>(left_w);
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "First component is double: {}.", ai
+			ale::logger::println, "First component is double: {}.", left
 		);
 
-		if (detail::is_type<uint64_t>(type_b)) {
-			const auto bi = std::any_cast<uint64_t>(b);
+		if (detail::is_type<uint64_t>(right_type)) {
+			const auto right = std::any_cast<uint64_t>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is uint64_t: {}.", bi
+				ale::logger::println, "Second component is uint64_t: {}.", right
 			);
 
-			if (ai < 0) {
-				const auto res = detail::to_int64(ai) % detail::to_int64(bi);
+			if (left < 0) {
+				const auto res =
+					detail::to_int64(left) % detail::to_int64(right);
 				return detail::adapt_type(res);
 			}
-			const auto res = detail::to_uint64(ai) % bi;
+			const auto res = detail::to_uint64(left) % right;
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<int64_t>(type_b)) {
-			const auto bi = std::any_cast<int64_t>(b);
+		if (detail::is_type<int64_t>(right_type)) {
+			const auto right = std::any_cast<int64_t>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is int64_t: {}.", bi
+				ale::logger::println, "Second component is int64_t: {}.", right
 			);
 
-			const auto res = detail::to_int64(ai) % bi;
+			const auto res = detail::to_int64(left) % right;
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_type<double>(type_b)) {
-			const double bd = std::any_cast<double>(b);
+		if (detail::is_type<double>(right_type)) {
+			const auto right = std::any_cast<double>(right_w);
 			INTERPRETER_PRINT_LOC2(
-				ale::logger::println, "Second component is double: {}.", bd
+				ale::logger::println, "Second component is double: {}.", right
 			);
 
-			if (bd < 0 or ai < 0) {
-				const auto res = detail::to_int64(ai) % detail::to_int64(bd);
+			if (right < 0 or left < 0) {
+				const auto res =
+					detail::to_int64(left) % detail::to_int64(right);
 				return detail::adapt_type(res);
 			}
-			const auto res = detail::to_uint64(ai) % detail::to_uint64(bd);
+			const auto res = detail::to_uint64(left) % detail::to_uint64(right);
 			return detail::adapt_type(res);
 		}
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
-			"Parameter b's type {} is not handled.",
-			detail::get_type_name(b)
+			"Parameter right type {} is not handled.",
+			detail::get_type_name(right_w)
 		);
 	}
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
-		"Parameter a's type {} is not handled.",
-		detail::get_type_name(a)
+		"Parameter left type {} is not handled.",
+		detail::get_type_name(left_w)
 	);
 
 	return {};

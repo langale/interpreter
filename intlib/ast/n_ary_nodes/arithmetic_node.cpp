@@ -96,7 +96,7 @@ EvaluationResult evaluate(
 		return std::move(res_w.error());
 	}
 
-	std::any expr_res = *res_w;
+	std::any expr_res_w = *res_w;
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
@@ -106,9 +106,9 @@ EvaluationResult evaluate(
 			return std::move(res_w.error());
 		}
 
-		expr_res = arithmetic::any_arithmetic(t, expr_res, *rv);
+		expr_res_w = arithmetic::any_arithmetic(t, expr_res_w, *rv);
 
-		if (not expr_res.has_value()) {
+		if (not expr_res_w.has_value()) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Arithmetic operation '{}' did not return a value.",
@@ -124,7 +124,7 @@ EvaluationResult evaluate(
 		}
 	}
 
-	return expr_res;
+	return expr_res_w;
 }
 
 } // namespace ast

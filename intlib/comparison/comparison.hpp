@@ -62,7 +62,7 @@ any_comparison_greater_than(const std::any& a, const std::any& b);
 );
 
 [[nodiscard]] std::optional<bool> any_comparison(
-	const ale::ast::node_type_e t, const std::any& a, const std::any& b
+	const ale::ast::node_type_e t, const std::any& left_w, const std::any& right_w
 );
 
 } // namespace detail

@@ -76,24 +76,24 @@ namespace ast {
 			ale::logger::println, "Made index for child {}.", i
 		);
 
-		auto val_w = interpret_node(ctx, child);
-		if (not val_w.has_value()) {
-			return std::move(val_w.error());
+		auto val_int_w = interpret_node(ctx, child);
+		if (not val_int_w.has_value()) {
+			return std::move(val_int_w.error());
 		}
 
 		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Successfully evaluated child."
 		);
 
-		const std::any& val = *val_w;
-		const std::optional idx_w = detail::any_to_numeric<int64_t>(val);
+		const std::any& val_w = *val_int_w;
+		const std::optional idx_w = detail::any_to_numeric<int64_t>(val_w);
 
 		if (not idx_w) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Could not convert node evaluation '{}' into a numeric "
 				"int64_t.",
-				any_view{val}
+				any_view{val_w}
 			);
 
 			return make_bad_evaluation_result(

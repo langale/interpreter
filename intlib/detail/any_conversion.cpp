@@ -71,59 +71,59 @@ bool is_type_numeric(const std::string& type) noexcept
 	}                                                                          \
 	return {};
 
-std::any any_convert_to_type(const std::any& value, const std::string& type)
+std::any any_convert_to_type(const std::any& value_w, const std::string& type)
 {
 	if (type == "bool") {
-		OPTIONAL_TO_ANY(any_to_bool, value);
+		OPTIONAL_TO_ANY(any_to_bool, value_w);
 	}
 
 	if (is_type_numeric(type)) {
 		if (type == "char") {
-			OPTIONAL_TO_ANY(any_to_numeric<char>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<char>, value_w);
 		}
 		if (type == "unsigned char") {
-			OPTIONAL_TO_ANY(any_to_numeric<unsigned char>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<unsigned char>, value_w);
 		}
 		if (type == "signed char") {
-			OPTIONAL_TO_ANY(any_to_numeric<signed char>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<signed char>, value_w);
 		}
 
 		if (type == "u8") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint8_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint8_t>, value_w);
 		}
 		if (type == "i8") {
-			OPTIONAL_TO_ANY(any_to_numeric<int8_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<int8_t>, value_w);
 		}
 
 		if (type == "u16") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint16_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint16_t>, value_w);
 		}
 		if (type == "i16") {
-			OPTIONAL_TO_ANY(any_to_numeric<int16_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<int16_t>, value_w);
 		}
 
 		if (type == "u32") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint32_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint32_t>, value_w);
 		}
 		if (type == "i32") {
-			OPTIONAL_TO_ANY(any_to_numeric<int32_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<int32_t>, value_w);
 		}
 
 		if (type == "u64") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint64_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<uint64_t>, value_w);
 		}
 		if (type == "i64") {
-			OPTIONAL_TO_ANY(any_to_numeric<int64_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<int64_t>, value_w);
 		}
 
 		if (type == "f16") {
-			OPTIONAL_TO_ANY(any_to_numeric<std::float16_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<std::float16_t>, value_w);
 		}
 		if (type == "f32") {
-			OPTIONAL_TO_ANY(any_to_numeric<std::float32_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<std::float32_t>, value_w);
 		}
 		if (type == "f64") {
-			OPTIONAL_TO_ANY(any_to_numeric<std::float64_t>, value);
+			OPTIONAL_TO_ANY(any_to_numeric<std::float64_t>, value_w);
 		}
 	}
 	return {};

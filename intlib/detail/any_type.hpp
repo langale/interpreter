@@ -49,7 +49,7 @@ namespace detail {
 [[nodiscard]] std::string demangle_name_type(const char *name);
 
 /// Returns a 'standardized' name for 'a'.
-[[nodiscard]] std::string get_type_name(const std::any& a);
+[[nodiscard]] std::string get_type_name(const std::any& value_w);
 
 template <typename type_t>
 [[nodiscard]] constexpr bool check_is_builtint_type() noexcept
@@ -185,14 +185,14 @@ template <typename type_t>
 /**
  * @brief Checks whether the input std::any holds a specific given type.
  * @tparam type_t Given type.
- * @param a Input std::any.
+ * @param value_w Input std::any.
  * @returns True or false depending on whether the input std::any holds the a value
  * of the given type @e T.
  */
 template <typename type_t>
-[[nodiscard]] bool is_type(const std::any& a)
+[[nodiscard]] bool is_type(const std::any& value_w)
 {
-	const std::string name = get_type_name(a);
+	const std::string name = get_type_name(value_w);
 	return is_type<type_t>(name);
 }
 

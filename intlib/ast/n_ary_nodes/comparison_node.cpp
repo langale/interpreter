@@ -39,7 +39,6 @@
 #include <any>
 
 #include <ale/ast/utils/node_type_enum.hpp>
-#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 #include <ale/ast/n_ary_nodes/ComparisonNode.hpp>
 
 #include <intlib/logger/macros.hpp>
@@ -68,54 +67,54 @@ EvaluationResult evaluate(
 	assert(children.size() > 0);
 #endif
 
-	std::any previous;
+	std::any previous_w;
 	{
-		EvaluationResult value_w = interpret_node(ctx, children.at(0));
-		if (not value_w.has_value()) {
+		EvaluationResult res_w = interpret_node(ctx, children.at(0));
+		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
 			);
 			return append_error(
-				std::move(value_w.error()),
+				std::move(res_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				"Evaluation of node did not produce any value."
 			);
 		}
-		previous = std::move(*value_w);
+		previous_w = std::move(*res_w);
 	}
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		EvaluationResult current_w = interpret_node(ctx, c);
-		if (not current_w.has_value()) {
+		EvaluationResult res_w = interpret_node(ctx, c);
+		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Evaluation of node failed."
 			);
 			return append_error(
-				std::move(current_w.error()),
+				std::move(res_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				"Evaluation of node did not produce any value."
 			);
 		}
-		std::any current = std::move(*current_w);
+		std::any current_w = std::move(*res_w);
 
 		const std::optional<bool> comparison_result_w =
-			detail::any_comparison(t, previous, current);
+			detail::any_comparison(t, previous_w, current_w);
 
 		if (not comparison_result_w.has_value()) {
 			INTERPRETER_PRINT_LOC2(
 				ale::logger::println,
 				"Could not compare two std::any values: '{}' and '{}'.",
-				any_view{previous},
-				any_view{current}
+				any_view{previous_w},
+				any_view{current_w}
 			);
 			return make_bad_evaluation_result(
 				std::vector{evaluation_error_e::Comparison_Operation_Failed},
 				std::vector{std::format(
 					"Could not compare two std::any values: '{}' and '{}'.",
-					any_view{previous},
-					any_view{current}
+					any_view{previous_w},
+					any_view{current_w}
 				)}
 			);
 		}
@@ -123,7 +122,7 @@ EvaluationResult evaluate(
 		if (not *comparison_result_w) {
 			return false;
 		}
-		previous = std::move(current);
+		previous_w = std::move(current_w);
 	}
 
 	return true;

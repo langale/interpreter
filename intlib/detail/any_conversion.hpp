@@ -42,7 +42,7 @@ namespace detail {
 [[nodiscard]] bool is_type_numeric(const std::string& type) noexcept;
 
 [[nodiscard]] std::any
-any_convert_to_type(const std::any& value, const std::string& type);
+any_convert_to_type(const std::any& value_w, const std::string& type);
 
 } // namespace detail
 } // namespace intlib

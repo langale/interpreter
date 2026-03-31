@@ -94,7 +94,7 @@ get_variable_value(EvaluationContext& ctx, const std::string& var)
 
 	memory::VariableValue& variable = ctx.memory.get_variable(var);
 
-	if (not variable.value.has_value()) {
+	if (not variable.value_w.has_value()) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Variable {} exists but it does not have a value.",
@@ -103,7 +103,7 @@ get_variable_value(EvaluationContext& ctx, const std::string& var)
 		return std::optional<std::any>{};
 	}
 
-	return std::optional{std::move(variable.value)};
+	return std::optional{variable.value_w};
 }
 
 EvaluationResult
