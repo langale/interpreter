@@ -33,7 +33,11 @@
 #include <print>
 
 #include <ale/lexer/lexer.hpp>
+#include <ale/lexer/utils/token_type_to_string.hpp>
+#include <ale/lexer/utils/tokenize_error_to_string.hpp>
 #include <ale/parser/utils/ParseResult.hpp>
+#include <ale/parser/utils/error_to_string.hpp>
+#include <ale/parser/utils/rule_to_string.hpp>
 #include <ale/parser/program.hpp>
 #include <ale/logger/Logger.hpp>
 
