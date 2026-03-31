@@ -177,7 +177,7 @@ EvaluationResult evaluate(
 			return rc.error();
 		}
 
-		bool rv_value = std::any_cast<bool>(*rv);
+		const bool rv_value = std::any_cast<bool>(*rv);
 		rc_value = compute_logical_expression(t, rc_value, rv_value);
 	}
 

@@ -58,7 +58,7 @@ void Program::print_tree(ale::logger::Stream& os) const
 {
 	os.out() << "= [fixedsize=false shape=none]\n";
 	os.out() << "'PROGRAM'\n";
-	m_program_node->print_tree(os.out(), " ");
+	m_program_node->print_tree_xml(os.out(), " ");
 }
 
 } // namespace intlib
