@@ -164,7 +164,7 @@ EvaluationResult make_subscripted_variable_name(
 
 	auto res_w = get_indices(ctx, subscripted_variable);
 	if (not res_w.has_value()) {
-		return std::move(res_w.error());
+		return make_bad_evaluation_result(std::move(res_w.error()));
 	}
 
 	INTERPRETER_PRINT_LOC(ale::logger::println, "Successfully made indices.");

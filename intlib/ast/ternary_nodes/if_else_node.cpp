@@ -57,10 +57,10 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Condition of if statement is null."
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::If_Statement_Condition_Empty},
-			.message = {"Condition of if statement is null."}
-		};
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::If_Statement_Condition_Empty},
+			std::vector<std::string>{"Condition of if statement is null."}
+		);
 	}
 
 	EvaluationResult cond_w = interpret_node(ctx, first_child);
@@ -80,12 +80,12 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 			"Unhandled variable type '{}'.",
 			detail::get_type_name(*cond_bool_w)
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Unhandled_Variable_Type},
-			.message = {std::format(
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Unhandled_Variable_Type},
+			std::vector{std::format(
 				"Unhandled type '{}'", detail::get_type_name(*cond_bool_w)
 			)}
-		};
+		);
 	}
 
 	if (*cond_bool_w) {
@@ -95,11 +95,13 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 				"Condition is true but the first branch of if statement is "
 				"empty."
 			);
-			return EvaluationError{
-				.error = {evaluation_error_e::If_Statement_First_Branch_Empty},
-				.message = {"Condition is true but the first branch of if "
-							"statement is empty."}
-			};
+			return make_bad_evaluation_result(
+				std::vector{
+					evaluation_error_e::If_Statement_First_Branch_Empty
+				},
+				std::vector<std::string>{"Condition is true but the first "
+										 "branch of if statement is empty."}
+			);
 		}
 
 		return interpret_node(ctx, second_child);
@@ -110,11 +112,11 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 			ale::logger::println,
 			"Condition is true but the second branch of if statement is empty."
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::If_Statement_Second_Branch_Empty},
-			.message = {"Condition is true but the second branch of if "
-						"statement is empty."}
-		};
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::If_Statement_Second_Branch_Empty},
+			std::vector<std::string>{"Condition is true but the second branch "
+									 "of if statement is empty."}
+		);
 	}
 
 	return interpret_node(ctx, third_child);

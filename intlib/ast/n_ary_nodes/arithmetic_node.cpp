@@ -73,27 +73,31 @@ EvaluationResult evaluate(
 				ale::logger::println,
 				"Evaluation of node within arithmetic node failed."
 			);
-			return EvaluationError{
-				.error = {evaluation_error_e::Evaluation_Of_Node_Failed},
-				.message = {"Evaluation of node within arithmetic node failed."}
-			};
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
+				std::vector<std::string>{
+					"Evaluation of node within arithmetic node failed."
+				}
+			);
 		}
 		if (detail::is_type<void>(*res_w)) {
 			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Evaluation of node returned a void value."
 			);
-			return EvaluationError{
-				.error = {evaluation_error_e::Evaluation_Of_Node_Is_Void},
-				.message = {"Evaluation of node returned a void value."}
-			};
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::Evaluation_Of_Node_Is_Void},
+				std::vector<std::string>{
+					"Evaluation of node returned a void value."
+				}
+			);
 		}
-		return std::move(*res_w);
+		return make_good_evaluation_result(std::move(*res_w));
 	};
 
 	EvaluationResult res_w = node_eval(children[0]);
 	if (not res_w) {
-		return std::move(res_w.error());
+		return make_bad_evaluation_result(std::move(res_w.error()));
 	}
 
 	std::any expr_res_w = *res_w;
@@ -103,7 +107,7 @@ EvaluationResult evaluate(
 
 		EvaluationResult rv = node_eval(c);
 		if (not rv) {
-			return std::move(res_w.error());
+			return make_bad_evaluation_result(std::move(res_w.error()));
 		}
 
 		expr_res_w = arithmetic::any_arithmetic(t, expr_res_w, *rv);
@@ -114,17 +118,17 @@ EvaluationResult evaluate(
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()
 			);
-			return EvaluationError{
-				.error = {evaluation_error_e::Arithmetic_Operation_Failed},
-				.message = {std::format(
+			return make_bad_evaluation_result(
+				std::vector{evaluation_error_e::Arithmetic_Operation_Failed},
+				std::vector{std::format(
 					"Arithmetic operation '{}' did not return a value.",
 					v.get_operation_string()
 				)}
-			};
+			);
 		}
 	}
 
-	return expr_res_w;
+	return make_good_evaluation_result(std::move(expr_res_w));
 }
 
 } // namespace ast

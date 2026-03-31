@@ -381,7 +381,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 
 		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
 		if (not res_w) {
-			return std::move(res_w.error());
+			return make_bad_evaluation_result(std::move(res_w.error()));
 		}
 		const std::any value_w = std::move(*res_w);
 		return declare_variable(ctx, decl, variable_node, value_w);
@@ -404,7 +404,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Subscripted variable.");
 		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
 		if (not res_w) {
-			return std::move(res_w.error());
+			return make_bad_evaluation_result(std::move(res_w.error()));
 		}
 		const std::any value_w = std::move(*res_w);
 		return declare_subscripted_variable(ctx, decl, left_child, value_w);

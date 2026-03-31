@@ -72,10 +72,10 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Variable '{}' has no value.", name
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Valueless_Variable},
-			.message = {std::format("Variable '{}' has no value.", name)}
-		};
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Valueless_Variable},
+			std::vector{std::format("Variable '{}' has no value.", name)}
+		);
 	}
 
 	return make_good_evaluation_result(res.value_w);

@@ -37,6 +37,7 @@
 
 #include <ale/logger/Logger.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
+#include <ale/detail/make_optional.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
@@ -89,7 +90,10 @@ std::optional<std::string> make_full_variable_name(
 			full_variable_name += "_" + std::to_string(j);
 		}
 	}
-	return full_variable_name;
+
+	return ale::detail::make_optional<std::string>(
+		std::move(full_variable_name)
+	);
 }
 
 std::optional<std::vector<int64_t>> get_index_sequence(
@@ -135,7 +139,10 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 			indices[i++] = j;
 		}
 	}
-	return indices;
+
+	return ale::detail::make_optional<std::vector<int64_t>>(
+		std::move(indices)
+	);
 }
 
 EvaluationResult
@@ -153,14 +160,14 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 			"retrieved.",
 			v.get_variable_name()
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Valueless_Variable},
-			.message = {std::format(
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Valueless_Variable},
+			std::vector{std::format(
 				"Full variable name of subscripted variable {} could not be "
 				"retrieved.",
 				v.get_variable_name()
 			)}
-		};
+		);
 	}
 
 	const std::string& full_variable_name = *full_variable_name_w;
@@ -170,13 +177,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 			"Variable '{}' is not defined in this scope.",
 			full_variable_name
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Valueless_Variable},
-			.message = {std::format(
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Valueless_Variable},
+			std::vector{std::format(
 				"Variable '{}' is not defined in this scope.",
 				full_variable_name
 			)}
-		};
+		);
 	}
 
 	memory::VariableValue& res = ctx.memory.get_variable(full_variable_name);
@@ -187,12 +194,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 			"Variable '{}' has no value.",
 			full_variable_name
 		);
-		return EvaluationError{
-			.error = {evaluation_error_e::Valueless_Variable},
-			.message = {
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Valueless_Variable},
+			std::vector{
 				std::format("Variable '{}' has no value.", full_variable_name)
 			}
-		};
+		);
 	}
 
 	return make_good_evaluation_result(res.value_w);

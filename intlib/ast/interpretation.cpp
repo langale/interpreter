@@ -153,10 +153,10 @@ interpret_node(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v)
 		break;
 	}
 
-	return EvaluationError{
-		.error = {evaluation_error_e::Unhandled_Node_Type},
-		.message = {std::format("Unhandled node type {}.", v->get_node_type())}
-	};
+	return make_bad_evaluation_result(
+		std::vector{evaluation_error_e::Unhandled_Node_Type},
+		std::vector{std::format("Unhandled node type {}.", v->get_node_type())}
+	);
 }
 
 } // namespace ast
