@@ -105,12 +105,12 @@ EvaluationResult evaluate(
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		EvaluationResult rv = node_eval(c);
-		if (not rv) {
+		res_w = node_eval(c);
+		if (not res_w) {
 			return make_bad_evaluation_result(std::move(res_w.error()));
 		}
 
-		expr_res_w = arithmetic::any_arithmetic(t, expr_res_w, *rv);
+		expr_res_w = arithmetic::any_arithmetic(t, expr_res_w, *res_w);
 
 		if (not expr_res_w.has_value()) {
 			INTERPRETER_PRINT_LOC2(

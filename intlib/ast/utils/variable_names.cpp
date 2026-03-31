@@ -214,9 +214,9 @@ EvaluationResult make_sequence_variable_names(
 		static_cast<const ale::ast::SubscriptedVariableNode *>(
 			left_child.get()
 		);
-	auto left_idxs_w = get_indices(ctx, left_subscripted_variable);
-	if (not left_idxs_w.has_value()) {
-		return std::move(left_idxs_w.error());
+	auto res_left_idxs_w = get_indices(ctx, left_subscripted_variable);
+	if (not res_left_idxs_w.has_value()) {
+		return std::move(res_left_idxs_w.error());
 	}
 
 	// right indices
@@ -224,13 +224,13 @@ EvaluationResult make_sequence_variable_names(
 		static_cast<const ale::ast::SubscriptedVariableNode *>(
 			right_child.get()
 		);
-	auto right_idxs_w = get_indices(ctx, right_subscripted_variable);
-	if (not right_idxs_w.has_value()) {
-		return std::move(right_idxs_w.error());
+	auto res_right_idxs_w = get_indices(ctx, right_subscripted_variable);
+	if (not res_right_idxs_w.has_value()) {
+		return std::move(res_right_idxs_w.error());
 	}
 
-	const std::any& left_idxs = *left_idxs_w;
-	const std::any& right_idxs = *right_idxs_w;
+	const std::any& left_idxs_w = *res_left_idxs_w;
+	const std::any& right_idxs_w = *res_right_idxs_w;
 
 	std::vector<std::string> names;
 
@@ -240,22 +240,22 @@ EvaluationResult make_sequence_variable_names(
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"    Type inside left indices: {}.",
-		detail::get_type_name(left_idxs)
+		detail::get_type_name(left_idxs_w)
 	);
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
 		"    Type inside right indices: {}.",
-		detail::get_type_name(right_idxs)
+		detail::get_type_name(right_idxs_w)
 	);
 
 #if defined DEBUG
-	assert(detail::is_type<std::vector<int64_t>>(left_idxs));
-	assert(detail::is_type<std::vector<int64_t>>(right_idxs));
+	assert(detail::is_type<std::vector<int64_t>>(left_idxs_w));
+	assert(detail::is_type<std::vector<int64_t>>(right_idxs_w));
 #endif
 
 	ale::utils::SequenceNodeIterator iter(
-		std::any_cast<std::vector<int64_t>>(left_idxs),
-		std::any_cast<std::vector<int64_t>>(right_idxs)
+		std::any_cast<std::vector<int64_t>>(left_idxs_w),
+		std::any_cast<std::vector<int64_t>>(right_idxs_w)
 	);
 
 	INTERPRETER_PRINT_LOC(
