@@ -156,12 +156,6 @@ EvaluationResult make_subscripted_variable_name(
 			subscripted_variable_w.get()
 		);
 
-	std::string name = subscripted_variable->get_variable_name();
-
-	INTERPRETER_PRINT_LOC2(
-		ale::logger::println, "Make indices for variable {}.", name
-	);
-
 	auto res_w = get_indices(ctx, subscripted_variable);
 	if (not res_w.has_value()) {
 		return make_bad_evaluation_result(std::move(res_w.error()));
@@ -170,6 +164,12 @@ EvaluationResult make_subscripted_variable_name(
 	INTERPRETER_PRINT_LOC(ale::logger::println, "Successfully made indices.");
 
 	std::any idxs_w = std::move(*res_w);
+
+	std::string name = subscripted_variable->get_variable_name();
+
+	INTERPRETER_PRINT_LOC2(
+		ale::logger::println, "Make indices for variable {}.", name
+	);
 
 	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
 	append_variable_name(name, idxs);

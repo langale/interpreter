@@ -93,7 +93,7 @@ namespace ast {
 	const ale::ast::node_type_e t,
 	std::string&& var_name,
 	std::string&& var_type,
-	const std::any& value
+	const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -126,7 +126,7 @@ namespace ast {
 		return make_good_evaluation_result();
 	}
 
-	std::any value_conv_w = detail::any_convert_to_type(value, var_type);
+	std::any value_conv_w = detail::any_convert_to_type(value_w, var_type);
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println,
@@ -159,7 +159,7 @@ namespace ast {
 	EvaluationContext& ctx,
 	const ale::ast::DeclarationNode& decl,
 	const std::unique_ptr<ale::ast::Node>& variable_node,
-	const std::any& value
+	const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -179,7 +179,7 @@ namespace ast {
 		decl.get_node_type(),
 		std::move(var_name),
 		std::move(var_type),
-		value
+		value_w
 	);
 }
 
@@ -187,7 +187,7 @@ namespace ast {
 	EvaluationContext& ctx,
 	const ale::ast::DeclarationNode& decl,
 	const std::unique_ptr<ale::ast::Node>& variable,
-	const std::any& value
+	const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -220,7 +220,7 @@ namespace ast {
 		decl.get_node_type(),
 		std::any_cast<std::string>(name_w),
 		std::move(var_type),
-		value
+		value_w
 	);
 }
 
@@ -228,7 +228,7 @@ namespace ast {
 	EvaluationContext& ctx,
 	const ale::ast::DeclarationNode& decl,
 	const std::unique_ptr<ale::ast::Node>& sequence,
-	const std::any& value
+	const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -269,7 +269,7 @@ namespace ast {
 			decl.get_node_type(),
 			std::move(var_name),
 			std::move(var_type),
-			value
+			value_w
 		);
 
 		INTERPRETER_PRINT_LOC2(
@@ -302,12 +302,12 @@ namespace ast {
 	);
 #endif
 
-	EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
-	if (not value_w) {
-		return std::move(value_w.error());
+	EvaluationResult res_compute_w = compute_value_from_declaration(ctx, decl);
+	if (not res_compute_w) {
+		return std::move(res_compute_w.error());
 	}
-	const std::any value = std::move(*value_w);
-	return declare_variable_sequence(ctx, decl, sequence, value);
+	const std::any value_w = std::move(*res_compute_w);
+	return declare_variable_sequence(ctx, decl, sequence, value_w);
 }
 
 [[nodiscard]] static EvaluationResult declare_comma_separated_variables(
@@ -325,11 +325,11 @@ namespace ast {
 	);
 #endif
 
-	EvaluationResult value_w = compute_value_from_declaration(ctx, decl);
-	if (not value_w) {
-		return std::move(value_w.error());
+	EvaluationResult res_compute_w = compute_value_from_declaration(ctx, decl);
+	if (not res_compute_w) {
+		return std::move(res_compute_w.error());
 	}
-	const std::any value = std::move(*value_w);
+	const std::any value_w = std::move(*res_compute_w);
 
 	const auto variable_list_node =
 		static_cast<const ale::ast::CommaSeparatedGroupNode *>(
@@ -340,13 +340,13 @@ namespace ast {
 
 	for (const auto& child : children) {
 		if (child->get_node_type() == ale::ast::node_type_e::Variable) {
-			auto res_w = declare_variable(ctx, decl, child, value);
+			auto res_w = declare_variable(ctx, decl, child, value_w);
 			if (not res_w) {
 				return make_bad_evaluation_result(std::move(res_w.error()));
 			}
 		}
 		else if (child->get_node_type() == ale::ast::node_type_e::Sequence) {
-			auto res_w = declare_variable_sequence(ctx, decl, child, value);
+			auto res_w = declare_variable_sequence(ctx, decl, child, value_w);
 			if (not res_w) {
 				return make_bad_evaluation_result(std::move(res_w.error()));
 			}
@@ -354,7 +354,7 @@ namespace ast {
 		else if (child->get_node_type() ==
 				 ale::ast::node_type_e::Subscripted_Variable) {
 
-			auto res_w = declare_subscripted_variable(ctx, decl, child, value);
+			auto res_w = declare_subscripted_variable(ctx, decl, child, value_w);
 			if (not res_w) {
 				return make_bad_evaluation_result(std::move(res_w.error()));
 			}

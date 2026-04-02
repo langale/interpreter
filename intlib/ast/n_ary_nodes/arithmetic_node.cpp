@@ -100,7 +100,7 @@ EvaluationResult evaluate(
 		return make_bad_evaluation_result(std::move(res_w.error()));
 	}
 
-	std::any expr_res_w = *res_w;
+	std::any expr_res_w = std::move(*res_w);
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {

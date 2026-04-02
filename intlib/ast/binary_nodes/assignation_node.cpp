@@ -56,14 +56,16 @@ namespace intlib {
 namespace ast {
 
 [[nodiscard]] static EvaluationResult compute_value_from_assignation(
-	EvaluationContext& ctx, const ale::ast::AssignationNode& assig
+	EvaluationContext& ctx, const ale::ast::AssignationNode& assignation
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	const auto& value_node = assig.get_right_child();
-	std::any value;
-	if (assig.get_node_type() != ale::ast::node_type_e::Declaration_Declare) {
+	const auto& value_node = assignation.get_right_child();
+	std::any value_w;
+	if (assignation.get_node_type() !=
+		ale::ast::node_type_e::Declaration_Declare) {
+
 		EvaluationResult res_w = interpret_node(ctx, value_node);
 		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
@@ -74,20 +76,20 @@ namespace ast {
 				std::vector<std::string>{"Evaluation of node failed."}
 			);
 		}
-		value = std::move(*res_w);
+		value_w = std::move(*res_w);
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
-			detail::get_type_name(value),
-			any_view{value}
+			detail::get_type_name(value_w),
+			any_view{value_w}
 		);
 	}
-	return make_good_evaluation_result(std::move(value));
+	return make_good_evaluation_result(std::move(value_w));
 }
 
 [[nodiscard]] static EvaluationResult assign_single_variable(
-	EvaluationContext& ctx, const std::string& var_name, const std::any& value
+	EvaluationContext& ctx, const std::string& var_name, const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -130,14 +132,14 @@ namespace ast {
 		);
 	}
 
-	std::any value_conv =
-		detail::any_convert_to_type(value, var_in_memory.type);
+	std::any value_conv_w =
+		detail::any_convert_to_type(value_w, var_in_memory.type);
 
-	if (detail::is_type<void>(value_conv)) {
+	if (detail::is_type<void>(value_conv_w)) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
 			"Could not convert value '{}' to a value of type '{}'.",
-			any_view{value},
+			any_view{value_w},
 			var_in_memory.type
 		);
 	}
@@ -146,10 +148,10 @@ namespace ast {
 		ale::logger::println,
 		"Value after conversion to '{}' is: '{}'.",
 		var_in_memory.type,
-		any_view{value_conv}
+		any_view{value_conv_w}
 	);
 
-	var_in_memory.value_w = std::move(value_conv);
+	var_in_memory.value_w = std::move(value_conv_w);
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println, "Successfully assigned variable '{}'.", var_name
@@ -161,7 +163,7 @@ namespace ast {
 [[nodiscard]] static EvaluationResult assign_variable(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& variable_node,
-	const std::any& value
+	const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -174,13 +176,13 @@ namespace ast {
 		static_cast<const ale::ast::VariableNode *>(variable_node.get())
 			->get_variable_name();
 
-	return assign_single_variable(ctx, var_name, value);
+	return assign_single_variable(ctx, var_name, value_w);
 }
 
 [[nodiscard]] static EvaluationResult assign_subscripted_variable(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& variable,
-	const std::any& value
+	const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -207,7 +209,7 @@ namespace ast {
 #endif
 
 	return assign_single_variable(
-		ctx, std::any_cast<std::string>(name_w), value
+		ctx, std::any_cast<std::string>(name_w), value_w
 	);
 }
 
@@ -358,14 +360,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assignation)
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Variable.");
 		const auto& variable_node = assignation.get_left_child();
 
-		EvaluationResult value_w =
+		EvaluationResult res_compute_w =
 			compute_value_from_assignation(ctx, assignation);
-		if (not value_w) {
-			return std::move(value_w.error());
+		if (not res_compute_w) {
+			return std::move(res_compute_w.error());
 		}
-		std::any value = std::move(*value_w);
-
-		return assign_variable(ctx, variable_node, std::move(value));
+		const std::any value_w = std::move(*res_compute_w);
+		return assign_variable(ctx, variable_node, value_w);
 	}
 
 	if (left_child->get_node_type() ==
@@ -383,13 +384,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assignation)
 		ale::ast::node_type_e::Subscripted_Variable) {
 
 		INTERPRETER_PRINT_LOC(ale::logger::println, "Subscripted variable.");
-		EvaluationResult value_w =
+		EvaluationResult res_compute_w =
 			compute_value_from_assignation(ctx, assignation);
-		if (not value_w) {
-			return std::move(value_w.error());
-		}
-		std::any value = std::move(*value_w);
 
+		if (not res_compute_w) {
+			return std::move(res_compute_w.error());
+		}
+		const std::any value = std::move(*res_compute_w);
 		return assign_subscripted_variable(ctx, left_child, value);
 	}
 
