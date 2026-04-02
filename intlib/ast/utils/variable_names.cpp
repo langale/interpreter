@@ -229,10 +229,8 @@ EvaluationResult make_sequence_variable_names(
 		return std::move(res_right_idxs_w.error());
 	}
 
-	const std::any& left_idxs_w = *res_left_idxs_w;
-	const std::any& right_idxs_w = *res_right_idxs_w;
-
-	std::vector<std::string> names;
+	std::any left_idxs_w{std::move(*res_left_idxs_w)};
+	std::any right_idxs_w{std::move(*res_right_idxs_w)};
 
 	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Going to construct SequenceNodeIterator."
@@ -248,19 +246,24 @@ EvaluationResult make_sequence_variable_names(
 		detail::get_type_name(right_idxs_w)
 	);
 
+	using Veci64 = std::vector<int64_t>;
+
 #if defined DEBUG
-	assert(detail::is_type<std::vector<int64_t>>(left_idxs_w));
-	assert(detail::is_type<std::vector<int64_t>>(right_idxs_w));
+	assert(detail::is_type<Veci64>(left_idxs_w));
+	assert(detail::is_type<Veci64>(right_idxs_w));
 #endif
 
 	ale::utils::SequenceNodeIterator iter(
-		std::any_cast<std::vector<int64_t>>(left_idxs_w),
-		std::any_cast<std::vector<int64_t>>(right_idxs_w)
+		std::any_cast<Veci64&&>(std::move(left_idxs_w)),
+		std::any_cast<Veci64&&>(std::move(right_idxs_w))
 	);
 
 	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "    Constructed SequenceNodeIterator."
 	);
+
+	std::vector<std::string> names;
+	names.reserve(iter.size());
 
 	while (not iter.end()) {
 		const auto& idxs = iter.get_current_indices();

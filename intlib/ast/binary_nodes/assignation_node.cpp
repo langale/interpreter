@@ -208,15 +208,14 @@ namespace ast {
 	assert(detail::is_type<std::string>(name_w));
 #endif
 
-	return assign_single_variable(
-		ctx, std::any_cast<std::string>(name_w), value_w
-	);
+	const auto& s = std::any_cast<const std::string&>(name_w);
+	return assign_single_variable(ctx, s, value_w);
 }
 
 [[nodiscard]] static EvaluationResult assign_variable_sequence(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& sequence,
-	const std::any& value
+	const std::any& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
@@ -238,24 +237,26 @@ namespace ast {
 		ale::logger::println, "Successfully made list of names."
 	);
 
-	const std::any& list_w = *res_w;
+	std::any list_w = std::move(*res_w);
+
+	using VecString = std::vector<std::string>;
 
 #if defined DEBUG
-	assert(detail::is_type<std::vector<std::string>>(list_w));
+	assert(detail::is_type<VecString>(list_w));
 #endif
 
-	auto list = std::any_cast<std::vector<std::string>>(list_w);
+	auto list = std::any_cast<VecString&&>(std::move(list_w));
 
 	for (std::string& var_name : list) {
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Declare variable with name '{}'.", var_name
 		);
 
-		auto assign_res_w = assign_single_variable(ctx, var_name, value);
+		auto assign_res_w = assign_single_variable(ctx, var_name, value_w);
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
-			"    Successfully assignd variable with name '{}'.",
+			"    Successfully assigned variable with name '{}'.",
 			var_name
 		);
 
@@ -287,8 +288,7 @@ namespace ast {
 	if (not value_w) {
 		return std::move(value_w.error());
 	}
-	const std::any value = std::move(*value_w);
-	return assign_variable_sequence(ctx, sequence, value);
+	return assign_variable_sequence(ctx, sequence, *value_w);
 }
 
 [[nodiscard]] static EvaluationResult assign_comma_separated_variables(
@@ -365,8 +365,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assignation)
 		if (not res_compute_w) {
 			return std::move(res_compute_w.error());
 		}
-		const std::any value_w = std::move(*res_compute_w);
-		return assign_variable(ctx, variable_node, value_w);
+		return assign_variable(ctx, variable_node, *res_compute_w);
 	}
 
 	if (left_child->get_node_type() ==
@@ -390,8 +389,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assignation)
 		if (not res_compute_w) {
 			return std::move(res_compute_w.error());
 		}
-		const std::any value = std::move(*res_compute_w);
-		return assign_subscripted_variable(ctx, left_child, value);
+		return assign_subscripted_variable(ctx, left_child, *res_compute_w);
 	}
 
 	return make_good_evaluation_result();
