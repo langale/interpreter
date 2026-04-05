@@ -111,7 +111,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return make_good_evaluation_result();
+	return make_good_evaluation_result<std::any>();
 }
 
 } // namespace ast

@@ -44,7 +44,7 @@ EvaluationResult evaluate(const EvaluationContext&, const ale::ast::FalseNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return make_good_evaluation_result(false);
+	return make_good_evaluation_result<bool>(false);
 }
 
 } // namespace ast

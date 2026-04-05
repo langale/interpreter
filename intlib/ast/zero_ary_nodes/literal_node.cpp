@@ -49,7 +49,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return make_good_evaluation_result(v.get_value());
+	return make_good_evaluation_result<std::string>(v.get_value());
 }
 
 EvaluationResult
@@ -57,7 +57,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return make_good_evaluation_result(v.get_value());
+	return make_good_evaluation_result<double>(v.get_value());
 }
 
 EvaluationResult evaluate(
@@ -66,7 +66,7 @@ EvaluationResult evaluate(
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return make_good_evaluation_result(v.get_value());
+	return make_good_evaluation_result<uint64_t>(v.get_value());
 }
 
 EvaluationResult
@@ -74,7 +74,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralSignedIntegerNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return make_good_evaluation_result(v.get_value());
+	return make_good_evaluation_result<int64_t>(v.get_value());
 }
 
 } // namespace ast

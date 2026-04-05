@@ -71,7 +71,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 		}
 	}
 	ctx.memory.get_current_scope().pop_local_scope();
-	return make_good_evaluation_result();
+	return make_good_evaluation_result<std::any>();
 }
 
 } // namespace ast

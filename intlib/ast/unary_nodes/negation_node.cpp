@@ -64,7 +64,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node: {}.", *res_bool_w
 		);
-		return make_good_evaluation_result(not *res_bool_w);
+		return make_good_evaluation_result<bool>(not *res_bool_w);
 	}
 
 	INTERPRETER_PRINT_LOC2(

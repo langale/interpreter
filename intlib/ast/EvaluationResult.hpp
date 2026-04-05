@@ -55,12 +55,21 @@ struct EvaluationError {
 
 using EvaluationResult = std::expected<std::any, EvaluationError>;
 
-template <typename... params_t>
+template <typename content_t, typename... params_t>
 EvaluationResult make_good_evaluation_result(params_t&&...params)
 {
-	return ale::detail::make_expected<
-		ale::detail::expected_type_e::Good,
-		EvaluationResult>(std::forward<params_t>(params)...);
+	if constexpr (std::is_same_v<content_t, std::any>) {
+		return ale::detail::make_expected<
+			ale::detail::expected_type_e::Good,
+			EvaluationResult>(std::forward<params_t>(params)...);
+	}
+	else {
+		return ale::detail::
+			make_expected<ale::detail::expected_type_e::Good, EvaluationResult>(
+				std::in_place_type_t<content_t>{},
+				std::forward<params_t>(params)...
+			);
+	}
 }
 
 template <typename... params_t>

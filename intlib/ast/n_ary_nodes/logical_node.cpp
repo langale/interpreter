@@ -141,7 +141,7 @@ EvaluationResult evaluate_logical_node(
 		);
 	}
 
-	return make_good_evaluation_result(*r_conv_w);
+	return make_good_evaluation_result<bool>(*r_conv_w);
 }
 
 EvaluationResult evaluate(
@@ -182,7 +182,7 @@ EvaluationResult evaluate(
 		rc_value = compute_logical_expression(t, rc_value, rv_value);
 	}
 
-	return make_good_evaluation_result(std::any{rc_value});
+	return make_good_evaluation_result<std::any>(rc_value);
 }
 
 } // namespace ast

@@ -92,7 +92,7 @@ EvaluationResult evaluate(
 				}
 			);
 		}
-		return make_good_evaluation_result(std::move(*res_w));
+		return make_good_evaluation_result<std::any>(std::move(*res_w));
 	};
 
 	EvaluationResult res_w = node_eval(children[0]);
@@ -128,7 +128,7 @@ EvaluationResult evaluate(
 		}
 	}
 
-	return make_good_evaluation_result(std::move(expr_res_w));
+	return make_good_evaluation_result<std::any>(std::move(expr_res_w));
 }
 
 } // namespace ast

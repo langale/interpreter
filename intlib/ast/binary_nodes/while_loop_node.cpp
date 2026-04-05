@@ -57,7 +57,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Condition in while loop is missing."
 		);
-		return make_good_evaluation_result();
+		return make_good_evaluation_result<std::any>();
 	}
 
 	bool stop = false;
@@ -112,7 +112,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		}
 	}
 
-	return make_good_evaluation_result();
+	return make_good_evaluation_result<std::any>();
 }
 
 } // namespace ast

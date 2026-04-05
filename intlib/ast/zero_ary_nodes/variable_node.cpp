@@ -31,10 +31,6 @@
  *
  ********************************************************************/
 
-#if defined DEBUG
-#include <cassert>
-#endif
-
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
 
 #include <intlib/logger/macros.hpp>
@@ -78,7 +74,12 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 		);
 	}
 
-	return make_good_evaluation_result(res.value_w);
+	if (res.is_constant) {
+		return make_good_evaluation_result<const memory::VariableValue&>(
+			res.value_w
+		);
+	}
+	return make_good_evaluation_result<memory::VariableValue&>(res.value_w);
 }
 
 } // namespace ast

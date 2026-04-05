@@ -48,7 +48,7 @@ EvaluationResult evaluate(EvaluationContext&, const ale::ast::ProgramNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	return {};
+	return make_good_evaluation_result<std::any>();
 }
 
 } // namespace ast

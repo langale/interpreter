@@ -61,27 +61,27 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 
 	const std::any& res_w = *res_int_w;
 	if (detail::is_type<uint64_t>(res_w)) {
-		const uint64_t ri = std::any_cast<uint64_t>(res_w);
+		const auto ri = std::any_cast<uint64_t>(res_w);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is uint64_t: {}.", ri
 		);
-		return make_good_evaluation_result(detail::to_uint64(ri));
+		return make_good_evaluation_result<uint64_t>(detail::to_uint64(ri));
 	}
 
 	if (detail::is_type<int64_t>(res_w)) {
-		const int64_t ri = std::any_cast<int64_t>(res_w);
+		const auto ri = std::any_cast<int64_t>(res_w);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is int64_t: {}.", ri
 		);
-		return make_good_evaluation_result(ri);
+		return make_good_evaluation_result<int64_t>(ri);
 	}
 
 	if (detail::is_type<double>(res_w)) {
-		const double ri = std::any_cast<double>(res_w);
+		const auto ri = std::any_cast<double>(res_w);
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println, "Evaluation of node is double: {}.", ri
 		);
-		return make_good_evaluation_result(ri);
+		return make_good_evaluation_result<double>(ri);
 	}
 
 	INTERPRETER_PRINT_LOC2(

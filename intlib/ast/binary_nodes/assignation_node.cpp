@@ -85,7 +85,7 @@ namespace ast {
 			any_view{value_w}
 		);
 	}
-	return make_good_evaluation_result(std::move(value_w));
+	return make_good_evaluation_result<std::any>(std::move(value_w));
 }
 
 [[nodiscard]] static EvaluationResult assign_single_variable(
@@ -157,7 +157,7 @@ namespace ast {
 		ale::logger::println, "Successfully assigned variable '{}'.", var_name
 	);
 
-	return make_good_evaluation_result();
+	return make_good_evaluation_result<std::any>();
 }
 
 [[nodiscard]] static EvaluationResult assign_variable(
@@ -265,7 +265,7 @@ namespace ast {
 		}
 	}
 
-	return make_good_evaluation_result();
+	return make_good_evaluation_result<std::any>();
 }
 
 [[nodiscard]] static EvaluationResult assign_variable_sequence(
@@ -342,7 +342,7 @@ namespace ast {
 		}
 	}
 
-	return make_good_evaluation_result();
+	return make_good_evaluation_result<std::any>();
 }
 
 EvaluationResult
@@ -392,7 +392,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assignation)
 		return assign_subscripted_variable(ctx, left_child, *res_compute_w);
 	}
 
-	return make_good_evaluation_result();
+	return make_good_evaluation_result<std::any>();
 }
 
 } // namespace ast

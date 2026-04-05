@@ -110,7 +110,9 @@ namespace ast {
 		indices.push_back(idx);
 	}
 
-	return make_good_evaluation_result(std::move(indices));
+	return make_good_evaluation_result<std::vector<int64_t>>(
+		std::move(indices)
+	);
 }
 
 void append_variable_name(std::string& name, const std::vector<int64_t>& idxs)
@@ -178,7 +180,7 @@ EvaluationResult make_subscripted_variable_name(
 		ale::logger::println, "Name constructed '{}'.", name
 	);
 
-	return make_good_evaluation_result(std::move(name));
+	return make_good_evaluation_result<std::string>(std::move(name));
 }
 
 EvaluationResult make_sequence_variable_names(
@@ -279,7 +281,9 @@ EvaluationResult make_sequence_variable_names(
 		iter.next_indices();
 	}
 
-	return make_good_evaluation_result(std::move(names));
+	return make_good_evaluation_result<std::vector<std::string>>(
+		std::move(names)
+	);
 }
 
 } // namespace ast

@@ -202,7 +202,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		);
 	}
 
-	return make_good_evaluation_result(res.value_w);
+	return make_good_evaluation_result<memory::VariableValue&>(res.value_w);
 }
 
 } // namespace ast
