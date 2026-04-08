@@ -47,7 +47,7 @@ namespace ast {
 void append_variable_name(
 	std::string& name, const std::vector<int64_t>& indices
 );
-[[nodiscard]] std::string make_variable_name(
+[[nodiscard]] std::string make_indexed_variable_name(
 	const std::string& name, const std::vector<int64_t>& indices
 );
 
@@ -59,7 +59,13 @@ get_variable_name(const ale::ast::SequenceNode& sequence);
 	const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
 );
 
-[[nodiscard]] EvaluationResult make_sequence_variable_names(
+struct ShallowSequenceIndices {
+	std::vector<int64_t> left;
+	std::vector<int64_t> right;
+	std::string base_name;
+};
+
+[[nodiscard]] EvaluationResult make_shallow_sequence_indices(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& sequence_w
 );
 

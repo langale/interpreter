@@ -222,7 +222,7 @@ namespace ast {
 
 	INTERPRETER_PRINT_LOC(ale::logger::println, "Going to make list of names.");
 
-	auto res_w = make_sequence_variable_names(ctx, sequence);
+	auto res_w = make_shallow_sequence_indices(ctx, sequence);
 	if (not res_w) {
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
@@ -237,19 +237,30 @@ namespace ast {
 		ale::logger::println, "Successfully made list of names."
 	);
 
-	std::any list_w = std::move(*res_w);
-
-	using VecString = std::vector<std::string>;
+	std::any idxs_w = std::move(*res_w);
 
 #if defined DEBUG
-	assert(detail::is_type<VecString>(list_w));
+	assert(detail::is_type<ShallowSequenceIndices>(idxs_w));
 #endif
 
-	auto list = std::any_cast<VecString&&>(std::move(list_w));
+	auto idxs = std::any_cast<ShallowSequenceIndices&&>(std::move(idxs_w));
+	const std::string& base_name = idxs.base_name;
 
-	for (std::string& var_name : list) {
+	INTERPRETER_PRINT_LOC(
+		ale::logger::println, "    Constructed SequenceNodeIterator."
+	);
+
+	ale::utils::SequenceNodeIterator iter(
+		std::move(idxs.left), std::move(idxs.right)
+	);
+	while (not iter.end()) {
+		const auto& indices = iter.get_current_indices();
+
+		std::string var_name = base_name;
+		append_variable_name(var_name, indices);
+
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "Declare variable with name '{}'.", var_name
+			ale::logger::println, "Variable name: {}.", var_name
 		);
 
 		auto assign_res_w = assign_single_variable(ctx, var_name, value_w);
@@ -263,6 +274,8 @@ namespace ast {
 		if (not assign_res_w) {
 			return make_bad_evaluation_result(std::move(assign_res_w.error()));
 		}
+
+		iter.next_indices();
 	}
 
 	return make_good_evaluation_result<std::any>();

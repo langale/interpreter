@@ -233,7 +233,7 @@ namespace ast {
 
 	INTERPRETER_PRINT_LOC(ale::logger::println, "Going to make list of names.");
 
-	auto res_w = make_sequence_variable_names(ctx, sequence);
+	auto res_w = make_shallow_sequence_indices(ctx, sequence);
 	if (not res_w) {
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
@@ -248,17 +248,30 @@ namespace ast {
 		ale::logger::println, "Successfully made list of names."
 	);
 
-	const std::any& list_w = *res_w;
+	std::any idxs_w = std::move(*res_w);
 
 #if defined DEBUG
-	assert(detail::is_type<std::vector<std::string>>(list_w));
+	assert(detail::is_type<ShallowSequenceIndices>(idxs_w));
 #endif
 
-	auto list = std::any_cast<std::vector<std::string>>(list_w);
+	auto idxs = std::any_cast<ShallowSequenceIndices&&>(std::move(idxs_w));
+	const std::string& base_name = idxs.base_name;
 
-	for (std::string& var_name : list) {
+	INTERPRETER_PRINT_LOC(
+		ale::logger::println, "    Constructed SequenceNodeIterator."
+	);
+
+	ale::utils::SequenceNodeIterator iter(
+		std::move(idxs.left), std::move(idxs.right)
+	);
+	while (not iter.end()) {
+		const auto& indices = iter.get_current_indices();
+
+		std::string var_name = base_name;
+		append_variable_name(var_name, indices);
+
 		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "Declare variable with name '{}'.", var_name
+			ale::logger::println, "Variable name: {}.", var_name
 		);
 
 		std::string var_type = decl.get_variable_type();
@@ -272,13 +285,15 @@ namespace ast {
 
 		INTERPRETER_PRINT_LOC2(
 			ale::logger::println,
-			"Successfully declared variable with name '{}'.",
+			"    Successfully assigned variable with name '{}'.",
 			var_name
 		);
 
 		if (not declare_res_w) {
 			return make_bad_evaluation_result(std::move(declare_res_w.error()));
 		}
+
+		iter.next_indices();
 	}
 
 	return make_good_evaluation_result<std::any>();
@@ -329,12 +344,12 @@ namespace ast {
 	}
 	const std::any value_w = std::move(*res_compute_w);
 
-	const auto variable_list_node =
-		static_cast<const ale::ast::CommaSeparatedGroupNode *>(
+	const auto& variable_list_node =
+		*static_cast<const ale::ast::CommaSeparatedGroupNode *>(
 			variable_list_node_w.get()
 		);
 
-	const auto& children = variable_list_node->get_children();
+	const auto& children = variable_list_node.get_children();
 
 	for (const auto& child : children) {
 		if (child->get_node_type() == ale::ast::node_type_e::Variable) {
@@ -352,7 +367,8 @@ namespace ast {
 		else if (child->get_node_type() ==
 				 ale::ast::node_type_e::Subscripted_Variable) {
 
-			auto res_w = declare_subscripted_variable(ctx, decl, child, value_w);
+			auto res_w =
+				declare_subscripted_variable(ctx, decl, child, value_w);
 			if (not res_w) {
 				return make_bad_evaluation_result(std::move(res_w.error()));
 			}

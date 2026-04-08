@@ -44,6 +44,7 @@
 #include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/detail/any_type.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/detail/any_output.hpp>
@@ -54,17 +55,15 @@
 namespace intlib {
 namespace ast {
 
-/// TODO: try using C++23 std::generator
-
 [[nodiscard]] EvaluationResult get_indices(
 	EvaluationContext& ctx,
-	const ale::ast::SubscriptedVariableNode * const subscripted_variable
+	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
 	std::vector<int64_t> indices;
-	const auto& children = subscripted_variable->get_children();
+	const auto& children = subscripted_variable.get_children();
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println, "Variable has {} subindices.", children.size()
@@ -122,16 +121,16 @@ void append_variable_name(std::string& name, const std::vector<int64_t>& idxs)
 	}
 }
 
-std::string
-make_variable_name(const std::string& name, const std::vector<int64_t>& indices)
+std::string make_indexed_variable_name(
+	const std::string& name, const std::vector<int64_t>& indices
+)
 {
 	std::string n = name;
 	append_variable_name(n, indices);
 	return n;
 }
 
-[[nodiscard]] std::string
-get_variable_name(const ale::ast::SequenceNode& sequence)
+std::string get_variable_name(const ale::ast::SequenceNode& sequence)
 {
 	return dynamic_cast<ale::ast::SubscriptedVariableNode *>(
 			   sequence.get_left_child().get()
@@ -154,7 +153,7 @@ EvaluationResult make_subscripted_variable_name(
 #endif
 
 	const auto& subscripted_variable =
-		static_cast<const ale::ast::SubscriptedVariableNode *>(
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(
 			subscripted_variable_w.get()
 		);
 
@@ -167,7 +166,7 @@ EvaluationResult make_subscripted_variable_name(
 
 	std::any idxs_w = std::move(*res_w);
 
-	std::string name = subscripted_variable->get_variable_name();
+	std::string name = subscripted_variable.get_variable_name();
 
 	INTERPRETER_PRINT_LOC2(
 		ale::logger::println, "Make indices for variable {}.", name
@@ -183,7 +182,7 @@ EvaluationResult make_subscripted_variable_name(
 	return make_good_evaluation_result<std::string>(std::move(name));
 }
 
-EvaluationResult make_sequence_variable_names(
+EvaluationResult make_shallow_sequence_indices(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& sequence_w
 )
 {
@@ -212,8 +211,8 @@ EvaluationResult make_sequence_variable_names(
 #endif
 
 	// left indices
-	auto left_subscripted_variable =
-		static_cast<const ale::ast::SubscriptedVariableNode *>(
+	const auto& left_subscripted_variable =
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(
 			left_child.get()
 		);
 	auto res_left_idxs_w = get_indices(ctx, left_subscripted_variable);
@@ -222,8 +221,8 @@ EvaluationResult make_sequence_variable_names(
 	}
 
 	// right indices
-	auto right_subscripted_variable =
-		static_cast<const ale::ast::SubscriptedVariableNode *>(
+	const auto& right_subscripted_variable =
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(
 			right_child.get()
 		);
 	auto res_right_idxs_w = get_indices(ctx, right_subscripted_variable);
@@ -231,8 +230,8 @@ EvaluationResult make_sequence_variable_names(
 		return std::move(res_right_idxs_w.error());
 	}
 
-	std::any left_idxs_w{std::move(*res_left_idxs_w)};
-	std::any right_idxs_w{std::move(*res_right_idxs_w)};
+	std::any left_idxs_w = std::move(*res_left_idxs_w);
+	std::any right_idxs_w = std::move(*res_right_idxs_w);
 
 	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Going to construct SequenceNodeIterator."
@@ -255,34 +254,13 @@ EvaluationResult make_sequence_variable_names(
 	assert(detail::is_type<Veci64>(right_idxs_w));
 #endif
 
-	ale::utils::SequenceNodeIterator iter(
-		std::any_cast<Veci64&&>(std::move(left_idxs_w)),
-		std::any_cast<Veci64&&>(std::move(right_idxs_w))
-	);
-
-	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "    Constructed SequenceNodeIterator."
-	);
-
-	std::vector<std::string> names;
-	names.reserve(iter.size());
-
-	while (not iter.end()) {
-		const auto& idxs = iter.get_current_indices();
-
-		std::string name = left_subscripted_variable->get_variable_name();
-		append_variable_name(name, idxs);
-
-		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "Variable name: {}.", name
-		);
-
-		names.push_back(std::move(name));
-		iter.next_indices();
-	}
-
-	return make_good_evaluation_result<std::vector<std::string>>(
-		std::move(names)
+	ShallowSequenceIndices idxs_limits{
+		.left = std::any_cast<Veci64&&>(std::move(left_idxs_w)),
+		.right = std::any_cast<Veci64&&>(std::move(right_idxs_w)),
+		.base_name = left_subscripted_variable.get_variable_name()
+	};
+	return make_good_evaluation_result<ShallowSequenceIndices>(
+		std::move(idxs_limits)
 	);
 }
 
