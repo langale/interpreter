@@ -31,12 +31,7 @@
  *
  ********************************************************************/
 
-#include <optional>
-#include <ranges>
-#include <any>
-
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
-#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
@@ -45,69 +40,7 @@
 namespace intlib {
 namespace ast {
 
-ale::utils::SequenceNodeIterator
-make_iterator(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
-
-	/*
-	const auto& left_child = seq.get_left_child();
-	const auto& right_child = seq.get_right_child();
-#if defined DEBUG
-	assert(left_child != nullptr);
-	assert(right_child != nullptr);
-
-	assert(
-		left_child->get_node_type() ==
-		ale::ast::node_type_e::Subscripted_Variable
-	);
-	assert(
-		right_child->get_node_type() ==
-		ale::ast::node_type_e::Subscripted_Variable
-	);
-#endif
-
-	std::vector<int64_t> first_indices = get_index_sequence(
-		static_cast<const ale::ast::SubscriptedVariableNode&>(*left_child.get())
-	);
-	std::vector<int64_t> last_indices = get_index_sequence(
-		static_cast<const ale::ast::SubscriptedVariableNode&>(
-			*right_child.get()
-		)
-	);
-	*/
-
-	return ale::utils::SequenceNodeIterator({}, {});
-}
-
-std::optional<std::any>
-get_variable_value(EvaluationContext& ctx, const std::string& var)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
-
-	if (not ctx.memory.variable_exists(var)) {
-		INTERPRETER_PRINT_LOC2(
-			ale::logger::println, "Trying to use undeclared variable {}.", var
-		);
-		return std::optional<std::any>{};
-	}
-
-	memory::VariableValue& variable = ctx.memory.get_variable(var);
-
-	if (not variable.value_w.has_value()) {
-		INTERPRETER_PRINT_LOC2(
-			ale::logger::println,
-			"Variable {} exists but it does not have a value.",
-			var
-		);
-		return std::optional<std::any>{};
-	}
-
-	return std::optional{variable.value_w};
-}
-
-EvaluationResult
-evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& v)
+EvaluationResult evaluate(EvaluationContext&, const ale::ast::SequenceNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
