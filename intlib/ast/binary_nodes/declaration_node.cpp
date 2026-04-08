@@ -172,8 +172,7 @@ namespace ast {
 		static_cast<const ale::ast::VariableNode *>(variable_node.get())
 			->get_variable_name();
 
-	std::string var_type = decl.get_type();
-
+	std::string var_type = decl.get_variable_type();
 	return declare_single_variable(
 		ctx,
 		decl.get_node_type(),
@@ -213,8 +212,7 @@ namespace ast {
 	assert(detail::is_type<std::string>(name_w));
 #endif
 
-	std::string var_type = decl.get_type();
-
+	std::string var_type = decl.get_variable_type();
 	return declare_single_variable(
 		ctx,
 		decl.get_node_type(),
@@ -263,7 +261,7 @@ namespace ast {
 			ale::logger::println, "Declare variable with name '{}'.", var_name
 		);
 
-		std::string var_type = decl.get_type();
+		std::string var_type = decl.get_variable_type();
 		auto declare_res_w = declare_single_variable(
 			ctx,
 			decl.get_node_type(),
