@@ -4,11 +4,6 @@ message(STATUS "===============================")
 message(STATUS "Configuring interpreter library")
 message(STATUS "===============================")
 
-# needed includes to make CMake work
-include(CheckCXXCompilerFlag)
-# installation directories (platform dependent)
-include(GNUInstallDirs)
-
 # project declaration
 project(INTERPRETER_LIB VERSION "${ALE_INTERPRETER_VERSION}")
 project(INTERPRETER_LIB DESCRIPTION "Interpreter for the ALE language")

@@ -8,11 +8,6 @@ message(STATUS "===========================")
 project(ALE_INTERPRETER_CLI VERSION "${ALE_INTERPRETER_VERSION}")
 project(ALE_INTERPRETER_CLI DESCRIPTION "A CLI for ALE's interpreter")
 
-# needed includes to make CMake work
-include(CheckCXXCompilerFlag)
-# installation directories (platform dependent)
-include(GNUInstallDirs)
-
 # **********************************************************************
 # Custom functions
 

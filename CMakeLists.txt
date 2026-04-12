@@ -1,16 +1,20 @@
 cmake_minimum_required(VERSION 3.16)
-project(ALE_INTERPRETER LANGUAGES CXX)
+project(INTERPRETER LANGUAGES CXX)
 
 # Turn on export of compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # project's version
-set(ALE_INTERPRETER_MAJOR 99.99)
-set(ALE_INTERPRETER_PATCH 99)
-set(ALE_INTERPRETER_VERSION "${ALE_INTERPRETER_MAJOR}.${ALE_INTERPRETER_PATCH}")
+set(INTERPRETER_MAJOR 99)
+set(INTERPRETER_MINOR 99)
+set(INTERPRETER_PATCH 99)
+set(INTERPRETER_VERSION "${INTERPRETER_MAJOR}.${INTERPRETER_MINOR}.${INTERPRETER_PATCH}")
 
 # ******************************************************************************
 # Custom functions
+
+include(CheckCXXCompilerFlag)
+include(GNUInstallDirs)
 
 function(add_compile_flag executable flag)
 	check_cxx_compiler_flag(${flag} CXX_HAS_FLAG_${flag})
@@ -228,4 +232,3 @@ message(STATUS "    Enable ASAN (-DENABLE_ASAN=ON/OFF)? ${ENABLE_ASAN}")
 
 add_subdirectory(intlib)
 add_subdirectory(interpreter)
-add_subdirectory(tests)
