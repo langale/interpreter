@@ -41,7 +41,7 @@
 #include <ale/ast/Node.hpp>
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
-#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
+#include <ale/utils/IndexIterator.hpp>
 
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>

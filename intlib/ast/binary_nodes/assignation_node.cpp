@@ -38,8 +38,8 @@
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 #include <ale/ast/binary_nodes/AssignationNode.hpp>
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
-#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
+#include <ale/utils/IndexIterator.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
@@ -250,9 +250,7 @@ namespace ast {
 		ale::logger::println, "    Constructed SequenceNodeIterator."
 	);
 
-	ale::utils::SequenceNodeIterator iter(
-		std::move(idxs.left), std::move(idxs.right)
-	);
+	ale::utils::IndexIterator iter(std::move(idxs.left), std::move(idxs.right));
 	while (not iter.end()) {
 		const auto& indices = iter.get_current_indices();
 

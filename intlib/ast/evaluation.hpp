@@ -59,7 +59,7 @@
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralUnsignedIntegerNode.hpp>
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralSignedIntegerNode.hpp>
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
-#include <ale/utils/binary_nodes/sequence_node/SequenceNodeIterator.hpp>
+#include <ale/utils/IndexIterator.hpp>
 
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
@@ -154,7 +154,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& v);
 [[nodiscard]] EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl);
 
-[[nodiscard]] ale::utils::SequenceNodeIterator
+[[nodiscard]] ale::utils::IndexIterator
 make_iterator(EvaluationContext& ctx, const ale::ast::SequenceNode& v);
 
 [[nodiscard]] EvaluationResult
