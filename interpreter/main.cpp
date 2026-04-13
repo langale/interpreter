@@ -38,7 +38,7 @@
 #include <ale/parser/utils/ParseResult.hpp>
 #include <ale/parser/utils/error_to_string.hpp>
 #include <ale/parser/utils/rule_to_string.hpp>
-#include <ale/parser/program.hpp>
+#include <ale/parser/Parser.hpp>
 #include <ale/logger/Logger.hpp>
 
 #include <intlib/Program.hpp>
@@ -83,7 +83,8 @@ int main(int argc, char *argv[])
 
 	ale::lexer::TokenVector& tokvec = *tokenize_res;
 
-	ale::parser::ParseResult parse_res = ale::parser::parse_program(tokvec);
+	ale::parser::Parser parser(tokvec);
+	ale::parser::ParseResult parse_res = parser.parse_program({.i = 0});
 
 	if (ale::parser::result_is_match_error(parse_res)) {
 		l.force_flush();
