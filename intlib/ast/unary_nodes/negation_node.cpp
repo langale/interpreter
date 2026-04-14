@@ -61,13 +61,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 
 	const std::optional res_bool_w = detail::any_to_bool(*res_w);
 	if (res_bool_w) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Evaluation of node: {}.", *res_bool_w
 		);
 		return make_good_evaluation_result<bool>(not *res_bool_w);
 	}
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
 		detail::get_type_name(*res_w)

@@ -49,7 +49,7 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 	const std::string& name = v.get_variable_name();
 
 	if (not ctx.memory.variable_exists(name)) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Variable '{}' is not defined in this scope.",
 			name
@@ -65,7 +65,7 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 	memory::VariableValue& res = ctx.memory.get_variable(name);
 
 	if (not res.value_w.has_value()) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Variable '{}' has no value.", name
 		);
 		return make_bad_evaluation_result(

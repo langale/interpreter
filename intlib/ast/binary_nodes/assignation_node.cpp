@@ -78,7 +78,7 @@ namespace ast {
 		}
 		value_w = std::move(*res_w);
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
 			detail::get_type_name(value_w),
@@ -94,12 +94,12 @@ namespace ast {
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Going to assign variable '{}'.", var_name
 	);
 
 	if (not ctx.memory.variable_exists(var_name)) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Attempted to assign a value to non-existent variable {}.",
 			var_name
@@ -116,7 +116,7 @@ namespace ast {
 	auto& var_in_memory = ctx.memory.get_variable(var_name);
 
 	if (var_in_memory.is_constant) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Attempted to assign a value to constant variable {}.",
 			var_name
@@ -136,7 +136,7 @@ namespace ast {
 		detail::any_convert_to_type(value_w, var_in_memory.type);
 
 	if (detail::is_type<void>(value_conv_w)) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Could not convert value '{}' to a value of type '{}'.",
 			any_view{value_w},
@@ -144,7 +144,7 @@ namespace ast {
 		);
 	}
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"Value after conversion to '{}' is: '{}'.",
 		var_in_memory.type,
@@ -153,7 +153,7 @@ namespace ast {
 
 	var_in_memory.value_w = std::move(value_conv_w);
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Successfully assigned variable '{}'.", var_name
 	);
 
@@ -257,13 +257,13 @@ namespace ast {
 		std::string var_name = base_name;
 		append_variable_name(var_name, indices);
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Variable name: {}.", var_name
 		);
 
 		auto assign_res_w = assign_single_variable(ctx, var_name, value_w);
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"    Successfully assigned variable with name '{}'.",
 			var_name

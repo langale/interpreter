@@ -65,7 +65,7 @@ std::any any_arithmetic(
 	case ale::ast::node_type_e::Arithmetic_Subtraction:
 		return arithmetic_subtraction(left_w, right_w);
 	default:
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Wrong node type '{}' for arithmetic.", t
 		);
 		return {};

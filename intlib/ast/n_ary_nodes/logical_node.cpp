@@ -66,7 +66,7 @@ namespace ast {
 		return l or r;
 	}
 
-	INTERPRETER_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
+	INTERPRETER_PRINT_LOC(ale::logger::println, "Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -85,7 +85,7 @@ namespace ast {
 		return true;
 	}
 
-	INTERPRETER_PRINT_LOC2(ale::logger::println, "Wrong node type {}.", t);
+	INTERPRETER_PRINT_LOC(ale::logger::println, "Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -110,7 +110,7 @@ EvaluationResult evaluate_logical_node(
 	}
 
 	const std::any res_w = std::move(*res_int_w);
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Evaluation of node '{}'", any_view{res_w}
 	);
 
@@ -127,7 +127,7 @@ EvaluationResult evaluate_logical_node(
 
 	const std::optional r_conv_w = detail::any_to_bool(res_w);
 	if (not r_conv_w) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Evaluation of node '{}' could not be converted to a Boolean value "
 			"'{}'.",

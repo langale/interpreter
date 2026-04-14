@@ -103,7 +103,7 @@ EvaluationResult evaluate(
 			detail::any_comparison(t, previous_w, current_w);
 
 		if (not comparison_result_w.has_value()) {
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Could not compare two std::any values: '{}' and '{}'.",
 				any_view{previous_w},

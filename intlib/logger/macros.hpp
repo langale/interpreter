@@ -35,19 +35,12 @@
 
 #if defined ALE_LOGGING_MESSAGES
 
-#include <filesystem>
-
 #include <ale/logger/Logger.hpp>
 #include <ale/logger/AutomaticTab.hpp>
 
-#define INTERPRETER_FILENAME                                                   \
-	std::filesystem::relative(__FILE__, INTERPRETER_PROJECT_DIRECTORY).string()
-
 #define INTERPRETER_ENTER_AST_FUNCTION(func)                                   \
 	ale::logger::GreenTab ale_tabulator_variable_do_not_use(                   \
-		INTERPRETER_FILENAME,                                                  \
-		__FUNCTION__,                                                          \
-		__LINE__,                                                              \
+		std::source_location::current(),                                       \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -59,9 +52,7 @@
 
 #define INTERPRETER_ENTER_ARITHMETIC_FUNCTION(func)                            \
 	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
-		INTERPRETER_FILENAME,                                                  \
-		__FUNCTION__,                                                          \
-		__LINE__,                                                              \
+		std::source_location::current(),                                       \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -73,9 +64,7 @@
 
 #define INTERPRETER_ENTER_COMPARISON_FUNCTION(func)                            \
 	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
-		INTERPRETER_FILENAME,                                                  \
-		__FUNCTION__,                                                          \
-		__LINE__,                                                              \
+		std::source_location::current(),                                       \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -87,9 +76,7 @@
 
 #define INTERPRETER_ENTER_MEMORY_FUNCTION(func)                                \
 	ale::logger::PurpleTab ale_tabulator_variable_do_not_use(                  \
-		INTERPRETER_FILENAME,                                                  \
-		__FUNCTION__,                                                          \
-		__LINE__,                                                              \
+		std::source_location::current(),                                       \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -101,9 +88,7 @@
 
 #define INTERPRETER_ENTER_FUNCTION(func)                                       \
 	ale::logger::YellowTab ale_tabulator_variable_do_not_use(                  \
-		INTERPRETER_FILENAME,                                                  \
-		__FUNCTION__,                                                          \
-		__LINE__,                                                              \
+		std::source_location::current(),                                       \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -115,17 +100,12 @@
 
 #define INTERPRETER_FUNC_LOCATION_NAME(func) func##loc
 
-#define INTERPRETER_PRINT_LOC(func, fmt)                                       \
-	INTERPRETER_FUNC_LOCATION_NAME(func)(INTERPRETER_FILENAME, __LINE__, fmt)
-
-#define INTERPRETER_PRINT_LOC2(func, fmt, ...)                                 \
+#define INTERPRETER_PRINT_LOC(func, fmt, ...)                                  \
 	INTERPRETER_FUNC_LOCATION_NAME(func)(                                      \
-		INTERPRETER_FILENAME, __LINE__, fmt, __VA_ARGS__                       \
+		std::source_location::current(), fmt __VA_OPT__(, ) __VA_ARGS__        \
 	)
 
 #else
-
-#define INTERPRETER_FILENAME
 
 #define INTERPRETER_ENTER_AST_FUNCTION(func)
 
@@ -137,8 +117,6 @@
 
 #define INTERPRETER_ENTER_FUNCTION(func)
 
-#define INTERPRETER_PRINT_LOC(func, fmt)
-
-#define INTERPRETER_PRINT_LOC2(func, fmt, ...)
+#define INTERPRETER_PRINT_LOC(func, fmt, ...)
 
 #endif

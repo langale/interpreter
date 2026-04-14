@@ -49,13 +49,13 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 	if (detail::is_type<uint64_t>(left_type)) {
 		const auto left = std::any_cast<uint64_t>(left_w);
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "First component is uint64_t: {}.", left
 		);
 
 		if (detail::is_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is uint64_t: {}.", right
 			);
 
@@ -64,7 +64,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is int64_t: {}.", right
 			);
 
@@ -74,7 +74,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is double: {}.", right
 			);
 
@@ -88,7 +88,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 			return detail::adapt_type(res);
 		}
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Parameter right type {} is not handled.",
 			detail::get_type_name(right_w)
@@ -97,13 +97,13 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 	if (detail::is_type<int64_t>(left_type)) {
 		const auto left = std::any_cast<int64_t>(left_w);
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "First component is int64_t: {}.", left
 		);
 
 		if (detail::is_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is uint64_t: {}.", right
 			);
 
@@ -113,7 +113,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is int64_t: {}.", right
 			);
 
@@ -123,7 +123,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is double: {}.", right
 			);
 
@@ -135,7 +135,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 			return detail::adapt_type(res);
 		}
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Parameter right type {} is not handled.",
 			detail::get_type_name(right_w)
@@ -144,13 +144,13 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 	if (detail::is_type<double>(left_type)) {
 		const auto left = std::any_cast<double>(left_w);
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "First component is double: {}.", left
 		);
 
 		if (detail::is_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is uint64_t: {}.", right
 			);
 
@@ -165,7 +165,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is int64_t: {}.", right
 			);
 
@@ -175,7 +175,7 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println, "Second component is double: {}.", right
 			);
 
@@ -188,14 +188,14 @@ std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w)
 			return detail::adapt_type(res);
 		}
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Parameter right type {} is not handled.",
 			detail::get_type_name(right_w)
 		);
 	}
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"Parameter left type {} is not handled.",
 		detail::get_type_name(left_w)

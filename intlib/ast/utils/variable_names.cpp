@@ -65,13 +65,13 @@ namespace ast {
 	std::vector<int64_t> indices;
 	const auto& children = subscripted_variable.get_children();
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Variable has {} subindices.", children.size()
 	);
 
 	for (const auto& [i, child] : children | std::views::enumerate) {
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Made index for child {}.", i
 		);
 
@@ -88,7 +88,7 @@ namespace ast {
 		const std::optional idx_w = detail::any_to_numeric<int64_t>(val_w);
 
 		if (not idx_w) {
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Could not convert node evaluation '{}' into a numeric "
 				"int64_t.",
@@ -105,7 +105,7 @@ namespace ast {
 		}
 
 		const auto idx = *idx_w;
-		INTERPRETER_PRINT_LOC2(ale::logger::println, "Made index {}.", idx);
+		INTERPRETER_PRINT_LOC(ale::logger::println, "Made index {}.", idx);
 		indices.push_back(idx);
 	}
 
@@ -168,14 +168,14 @@ EvaluationResult make_subscripted_variable_name(
 
 	std::string name = subscripted_variable.get_variable_name();
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Make indices for variable {}.", name
 	);
 
 	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
 	append_variable_name(name, idxs);
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Name constructed '{}'.", name
 	);
 
@@ -236,12 +236,12 @@ EvaluationResult make_shallow_sequence_indices(
 	INTERPRETER_PRINT_LOC(
 		ale::logger::println, "Going to construct SequenceNodeIterator."
 	);
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"    Type inside left indices: {}.",
 		detail::get_type_name(left_idxs_w)
 	);
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"    Type inside right indices: {}.",
 		detail::get_type_name(right_idxs_w)

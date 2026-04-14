@@ -58,7 +58,7 @@ std::optional<std::string> make_full_variable_name(
 	for (const auto& [i, c] : v.get_children() | std::views::enumerate) {
 		const EvaluationResult res = interpret_node(ctx, c);
 		if (not res) {
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Failed evaluation of child {} of subscripted variable {}.",
 				i,
@@ -71,7 +71,7 @@ std::optional<std::string> make_full_variable_name(
 		const bool is_uint64 = detail::is_type<uint64_t>(r);
 		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Evaluation of child {} of subscripted variable {} is not an "
 				"integral number.",
@@ -107,7 +107,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 	for (const auto& c : v.get_children()) {
 		const std::optional<std::any> res_int_w = interpret_node(ctx, c);
 		if (not res_int_w.has_value()) {
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Failed evaluation of child {} of subscripted variable {}.",
 				i,
@@ -120,7 +120,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 		const bool is_uint64 = detail::is_type<uint64_t>(res_w);
 		const bool is_int64 = detail::is_type<int64_t>(res_w);
 		if (not is_uint64 and not is_int64) {
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Evaluation of child {} of subscripted variable {} is not an "
 				"integral number.",
@@ -154,7 +154,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		make_full_variable_name(ctx, v);
 
 	if (not full_variable_name_w) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Full variable name of subscripted variable {} could not be "
 			"retrieved.",
@@ -172,7 +172,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 
 	const std::string& full_variable_name = *full_variable_name_w;
 	if (not ctx.memory.variable_exists(full_variable_name)) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Variable '{}' is not defined in this scope.",
 			full_variable_name
@@ -189,7 +189,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	memory::VariableValue& res = ctx.memory.get_variable(full_variable_name);
 
 	if (not res.value_w.has_value()) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Variable '{}' has no value.",
 			full_variable_name

@@ -62,7 +62,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	const std::any& res_w = *res_int_w;
 	if (detail::is_type<uint64_t>(res_w)) {
 		const auto ri = std::any_cast<uint64_t>(res_w);
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Evaluation of node is uint64_t: {}.", ri
 		);
 		return make_good_evaluation_result<int64_t>(-detail::to_int64(ri));
@@ -70,7 +70,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 
 	if (detail::is_type<int64_t>(res_w)) {
 		const auto ri = std::any_cast<int64_t>(res_w);
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Evaluation of node is int64_t: {}.", ri
 		);
 		return make_good_evaluation_result<std::any>(detail::adapt_type(-ri));
@@ -78,13 +78,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 
 	if (detail::is_type<double>(res_w)) {
 		const auto ri = std::any_cast<double>(res_w);
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Evaluation of node is double: {}.", ri
 		);
 		return make_good_evaluation_result<double>(-ri);
 	}
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"Unhandled variable type '{}'.",
 		detail::get_type_name(*res_int_w)

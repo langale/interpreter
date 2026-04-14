@@ -113,7 +113,7 @@ EvaluationResult evaluate(
 		expr_res_w = arithmetic::any_arithmetic(t, expr_res_w, *res_w);
 
 		if (not expr_res_w.has_value()) {
-			INTERPRETER_PRINT_LOC2(
+			INTERPRETER_PRINT_LOC(
 				ale::logger::println,
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()

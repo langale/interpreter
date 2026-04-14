@@ -78,7 +78,7 @@ namespace ast {
 		}
 		value_w = std::move(*res_w);
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
 			detail::get_type_name(value_w),
@@ -102,14 +102,14 @@ namespace ast {
 	const std::string variable_name_copy = var_name;
 #endif
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"Going to declare variable '{}'.",
 		variable_name_copy
 	);
 
 	if (ctx.memory.variable_exists_shallow(var_name)) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Attempt to redeclare variable {}.", var_name
 		);
 		return make_bad_evaluation_result(
@@ -128,7 +128,7 @@ namespace ast {
 
 	std::any value_conv_w = detail::any_convert_to_type(value_w, var_type);
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"Value after conversion to '{}' is: '{}'.",
 		var_type,
@@ -146,7 +146,7 @@ namespace ast {
 		);
 	}
 
-	INTERPRETER_PRINT_LOC2(
+	INTERPRETER_PRINT_LOC(
 		ale::logger::println,
 		"Successfully declared variable '{}'.",
 		variable_name_copy
@@ -268,7 +268,7 @@ namespace ast {
 		std::string var_name = base_name;
 		append_variable_name(var_name, indices);
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println, "Variable name: {}.", var_name
 		);
 
@@ -281,7 +281,7 @@ namespace ast {
 			value_w
 		);
 
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"    Successfully assigned variable with name '{}'.",
 			var_name

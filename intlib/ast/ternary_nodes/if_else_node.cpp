@@ -75,7 +75,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	const std::optional cond_bool_w = detail::any_to_bool(*cond_w);
 	if (not cond_bool_w) {
-		INTERPRETER_PRINT_LOC2(
+		INTERPRETER_PRINT_LOC(
 			ale::logger::println,
 			"Unhandled variable type '{}'.",
 			detail::get_type_name(*cond_bool_w)
