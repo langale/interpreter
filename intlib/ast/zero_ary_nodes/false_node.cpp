@@ -31,7 +31,7 @@
  *
  ********************************************************************/
 
-#include <ale/ast/zero_ary_nodes/FalseNode.hpp>
+#include <ale/ast/zero_ary_nodes/LiteralFalseNode.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
@@ -40,7 +40,8 @@
 namespace intlib {
 namespace ast {
 
-EvaluationResult evaluate(const EvaluationContext&, const ale::ast::FalseNode&)
+EvaluationResult
+evaluate(const EvaluationContext&, const ale::ast::LiteralFalseNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
 

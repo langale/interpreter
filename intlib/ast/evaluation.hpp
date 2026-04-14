@@ -52,8 +52,8 @@
 #include <ale/ast/unary_nodes/NegationNode.hpp>
 #include <ale/ast/unary_nodes/NegativeNode.hpp>
 #include <ale/ast/unary_nodes/PositiveNode.hpp>
-#include <ale/ast/zero_ary_nodes/TrueNode.hpp>
-#include <ale/ast/zero_ary_nodes/FalseNode.hpp>
+#include <ale/ast/zero_ary_nodes/LiteralTrueNode.hpp>
+#include <ale/ast/zero_ary_nodes/LiteralFalseNode.hpp>
 #include <ale/ast/zero_ary_nodes/literal_nodes/LiteralStringNode.hpp>
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralDecimalNode.hpp>
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralUnsignedIntegerNode.hpp>
@@ -177,10 +177,10 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v);
 /* zero-ary nodes */
 
 [[nodiscard]] EvaluationResult
-evaluate(const EvaluationContext& ctx, const ale::ast::TrueNode& v);
+evaluate(const EvaluationContext& ctx, const ale::ast::LiteralTrueNode& v);
 
 [[nodiscard]] EvaluationResult
-evaluate(const EvaluationContext& ctx, const ale::ast::FalseNode& v);
+evaluate(const EvaluationContext& ctx, const ale::ast::LiteralFalseNode& v);
 
 [[nodiscard]] EvaluationResult
 evaluate(const EvaluationContext& ctx, const ale::ast::LiteralStringNode& v);

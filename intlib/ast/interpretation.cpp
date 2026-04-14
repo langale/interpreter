@@ -132,9 +132,9 @@ interpret_node(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v)
 		/* zero-ary nodes */
 
 	case ale::ast::node_type_e::Literal_True:
-		return call_evaluate<ale::ast::TrueNode>(ctx, v);
+		return call_evaluate<ale::ast::LiteralTrueNode>(ctx, v);
 	case ale::ast::node_type_e::Literal_False:
-		return call_evaluate<ale::ast::FalseNode>(ctx, v);
+		return call_evaluate<ale::ast::LiteralFalseNode>(ctx, v);
 	case ale::ast::node_type_e::Variable:
 		return call_evaluate<ale::ast::VariableNode>(ctx, v);
 	case ale::ast::node_type_e::Literal_String:
