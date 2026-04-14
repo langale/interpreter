@@ -32,6 +32,7 @@
  ********************************************************************/
 
 #include <ale/logger/Stream.hpp>
+#include <ale/ast/utils/xml_tree.hpp>
 
 #include <intlib/Program.hpp>
 #include <intlib/ast/interpretation.hpp>
@@ -58,7 +59,14 @@ void Program::print_tree(ale::logger::Stream& os) const
 {
 	os.out() << "= [fixedsize=false shape=none]\n";
 	os.out() << "'PROGRAM'\n";
-	m_program_node->print_tree_xml(os.out(), " ");
+	ale::ast::print_xml_tree(
+		m_program_node,
+		{.os = os.out(),
+		 .start = " ",
+		 .sep = " ",
+		 .use_tab = true,
+		 .include_attributes = true}
+	);
 }
 
 } // namespace intlib
