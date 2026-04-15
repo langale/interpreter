@@ -40,7 +40,9 @@
 
 #define INTERPRETER_ENTER_AST_FUNCTION(func)                                   \
 	ale::logger::GreenTab ale_tabulator_variable_do_not_use(                   \
-		std::source_location::current(),                                       \
+		ale::logger::SourceLocation(                                           \
+			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
+		),                                                                     \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -52,7 +54,9 @@
 
 #define INTERPRETER_ENTER_ARITHMETIC_FUNCTION(func)                            \
 	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
-		std::source_location::current(),                                       \
+		ale::logger::SourceLocation(                                           \
+			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
+		),                                                                     \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -64,7 +68,9 @@
 
 #define INTERPRETER_ENTER_COMPARISON_FUNCTION(func)                            \
 	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
-		std::source_location::current(),                                       \
+		ale::logger::SourceLocation(                                           \
+			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
+		),                                                                     \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -76,7 +82,9 @@
 
 #define INTERPRETER_ENTER_MEMORY_FUNCTION(func)                                \
 	ale::logger::PurpleTab ale_tabulator_variable_do_not_use(                  \
-		std::source_location::current(),                                       \
+		ale::logger::SourceLocation(                                           \
+			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
+		),                                                                     \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -88,7 +96,9 @@
 
 #define INTERPRETER_ENTER_FUNCTION(func)                                       \
 	ale::logger::YellowTab ale_tabulator_variable_do_not_use(                  \
-		std::source_location::current(),                                       \
+		ale::logger::SourceLocation(                                           \
+			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
+		),                                                                     \
 		{},                                                                    \
 		[]<typename... types_t>(                                               \
 			std::format_string<types_t...> fmt, types_t&&...args               \
@@ -98,11 +108,14 @@
 		}                                                                      \
 	)
 
-#define INTERPRETER_FUNC_LOCATION_NAME(func) func##loc
+#define ALE_FUNC_LOCATION_NAME(func) func##loc
 
 #define INTERPRETER_PRINT_LOC(func, fmt, ...)                                  \
-	INTERPRETER_FUNC_LOCATION_NAME(func)(                                      \
-		std::source_location::current(), fmt __VA_OPT__(, ) __VA_ARGS__        \
+	ALE_FUNC_LOCATION_NAME(func)(                                              \
+		ale::logger::SourceLocation(                                           \
+			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
+		),                                                                     \
+		fmt __VA_OPT__(, ) __VA_ARGS__                                         \
 	)
 
 #else
