@@ -57,20 +57,20 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 [[nodiscard]] static EvaluationResult compute_value_from_declaration(
 	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& value_node = decl.get_right_child();
 	std::any value_w;
 	if (decl.get_node_type() != ale::ast::node_type_e::Declaration_Declare) {
 		EvaluationResult res_w = interpret_node(ctx, value_node);
 		if (not res_w.has_value()) {
-			INTERPRETER_PRINT_LOC(
-				ale::logger::println, "Evaluation of node failed."
-			);
+			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
 			return make_bad_evaluation_result(
 				std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
 				std::vector<std::string>{"Evaluation of node failed."}
@@ -79,7 +79,7 @@ namespace ast {
 		value_w = std::move(*res_w);
 
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println,
+			aleprln,
 			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
 			detail::get_type_name(value_w),
 			any_view{value_w}
@@ -96,21 +96,19 @@ namespace ast {
 	const std::any& value_w
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 #if defined ALE_LOGGING_MESSAGES
 	const std::string variable_name_copy = var_name;
 #endif
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println,
-		"Going to declare variable '{}'.",
-		variable_name_copy
+		aleprln, "Going to declare variable '{}'.", variable_name_copy
 	);
 
 	if (ctx.memory.variable_exists_shallow(var_name)) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Attempt to redeclare variable {}.", var_name
+			aleprln, "Attempt to redeclare variable {}.", var_name
 		);
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::Memory_Variable_Already_Exists},
@@ -129,7 +127,7 @@ namespace ast {
 	std::any value_conv_w = detail::any_convert_to_type(value_w, var_type);
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println,
+		aleprln,
 		"Value after conversion to '{}' is: '{}'.",
 		var_type,
 		any_view{value_conv_w}
@@ -147,9 +145,7 @@ namespace ast {
 	}
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println,
-		"Successfully declared variable '{}'.",
-		variable_name_copy
+		aleprln, "Successfully declared variable '{}'.", variable_name_copy
 	);
 
 	return make_good_evaluation_result<std::any>();
@@ -162,7 +158,7 @@ namespace ast {
 	const std::any& value_w
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 #if defined DEBUG
 	assert(variable_node->get_node_type() == ale::ast::node_type_e::Variable);
@@ -189,16 +185,14 @@ namespace ast {
 	const std::any& value_w
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "Making the name of the variable."
-	);
+	INTERPRETER_PRINT_LOC(aleprln, "Making the name of the variable.");
 
 	EvaluationResult res_w = make_subscripted_variable_name(ctx, variable);
 	if (not res_w.has_value()) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Could not make the name of the variable."
+			aleprln, "Could not make the name of the variable."
 		);
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
@@ -229,9 +223,9 @@ namespace ast {
 	const std::any& value_w
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	INTERPRETER_PRINT_LOC(ale::logger::println, "Going to make list of names.");
+	INTERPRETER_PRINT_LOC(aleprln, "Going to make list of names.");
 
 	auto res_w = make_shallow_sequence_indices(ctx, sequence);
 	if (not res_w) {
@@ -244,9 +238,7 @@ namespace ast {
 		);
 	}
 
-	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "Successfully made list of names."
-	);
+	INTERPRETER_PRINT_LOC(aleprln, "Successfully made list of names.");
 
 	std::any idxs_w = std::move(*res_w);
 
@@ -257,20 +249,20 @@ namespace ast {
 	auto idxs = std::any_cast<ShallowSequenceIndices&&>(std::move(idxs_w));
 	const std::string& base_name = idxs.base_name;
 
-	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "    Constructed SequenceNodeIterator."
-	);
+	INTERPRETER_PRINT_LOC(aleprln, "# left  indices: {}.", idxs.left.size());
+	INTERPRETER_PRINT_LOC(aleprln, "# right indices: {}.", idxs.right.size());
 
 	ale::utils::IndexIterator iter(std::move(idxs.left), std::move(idxs.right));
+
+	INTERPRETER_PRINT_LOC(aleprln, "Constructed SequenceNodeIterator.");
+
 	while (not iter.end()) {
 		const auto& indices = iter.get_current_indices();
 
 		std::string var_name = base_name;
 		append_variable_name(var_name, indices);
 
-		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Variable name: {}.", var_name
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Variable name: {}.", var_name);
 
 		std::string var_type = decl.get_variable_type();
 		auto declare_res_w = declare_single_variable(
@@ -282,7 +274,7 @@ namespace ast {
 		);
 
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println,
+			aleprln,
 			"    Successfully assigned variable with name '{}'.",
 			var_name
 		);
@@ -303,7 +295,7 @@ namespace ast {
 	const std::unique_ptr<ale::ast::Node>& sequence
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& variable_list_node_w = decl.get_left_child();
 
@@ -325,7 +317,7 @@ namespace ast {
 	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& variable_list_node_w = decl.get_left_child();
 
@@ -379,7 +371,7 @@ namespace ast {
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& left_child = decl.get_left_child();
 
@@ -388,7 +380,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 #endif
 
 	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
-		INTERPRETER_PRINT_LOC(ale::logger::println, "Variable.");
+		INTERPRETER_PRINT_LOC(aleprln, "Variable.");
 		const auto& variable_node = decl.get_left_child();
 
 		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
@@ -401,19 +393,19 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 
 	if (left_child->get_node_type() ==
 		ale::ast::node_type_e::Comma_Separated_Group) {
-		INTERPRETER_PRINT_LOC(ale::logger::println, "Comma-separated group.");
+		INTERPRETER_PRINT_LOC(aleprln, "Comma-separated group.");
 		return declare_comma_separated_variables(ctx, decl);
 	}
 
 	if (left_child->get_node_type() == ale::ast::node_type_e::Sequence) {
-		INTERPRETER_PRINT_LOC(ale::logger::println, "Variable sequence.");
+		INTERPRETER_PRINT_LOC(aleprln, "Variable sequence.");
 		return declare_variable_sequence(ctx, decl, left_child);
 	}
 
 	if (left_child->get_node_type() ==
 		ale::ast::node_type_e::Subscripted_Variable) {
 
-		INTERPRETER_PRINT_LOC(ale::logger::println, "Subscripted variable.");
+		INTERPRETER_PRINT_LOC(aleprln, "Subscripted variable.");
 		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
 		if (not res_w) {
 			return make_bad_evaluation_result(std::move(res_w.error()));
