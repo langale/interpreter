@@ -46,7 +46,7 @@ function(configure_object thing)
 
 	# Definitions
 
-	define_symbol(${thing} -DPROJECT_DIRECTORY="${INTERPRETER_DIR}")
+	define_symbol(${thing} -DINTERPRETER_PROJECT_DIRECTORY="${INTERPRETER_DIR}")
 
 	# Warning flags
 
