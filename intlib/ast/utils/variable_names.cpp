@@ -85,16 +85,36 @@ namespace ast {
 		);
 
 		const std::any& val_w = *val_int_w;
-		const std::optional idx_w = detail::any_to_numeric<int64_t>(val_w);
+		std::optional<int64_t> idx_w;
+
+		if (detail::is_type<memory::VariableValue>(val_w)) {
+			const auto& memory_variable =
+				std::any_cast<const memory::VariableValue&>(val_w);
+			idx_w = detail::any_to_numeric<int64_t>(memory_variable.value_w);
+
+			if (not idx_w) {
+				INTERPRETER_PRINT_LOC(
+					ale::logger::println,
+					"Could not convert node evaluation '{}' into a numeric "
+					"int64_t.",
+					any_view{memory_variable.value_w}
+				);
+			}
+		}
+		else {
+			idx_w = detail::any_to_numeric<int64_t>(val_w);
+
+			if (not idx_w) {
+				INTERPRETER_PRINT_LOC(
+					ale::logger::println,
+					"Could not convert node evaluation '{}' into a numeric "
+					"int64_t.",
+					any_view{val_w}
+				);
+			}
+		}
 
 		if (not idx_w) {
-			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
-				"Could not convert node evaluation '{}' into a numeric "
-				"int64_t.",
-				any_view{val_w}
-			);
-
 			return make_bad_evaluation_result(
 				std::vector{evaluation_error_e::
 								Evaluation_Of_Node_Is_Not_A_Numeric_Value},
@@ -175,9 +195,7 @@ EvaluationResult make_subscripted_variable_name(
 	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
 	append_variable_name(name, idxs);
 
-	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "Name constructed '{}'.", name
-	);
+	INTERPRETER_PRINT_LOC(ale::logger::println, "Name constructed '{}'.", name);
 
 	return make_good_evaluation_result<std::string>(std::move(name));
 }
