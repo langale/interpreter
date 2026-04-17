@@ -37,6 +37,7 @@
 #include <string>
 
 #include <ale/ast/Node.hpp>
+#include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 
 #include <intlib/ast/EvaluationResult.hpp>
@@ -57,7 +58,7 @@ get_variable_name(const ale::ast::SequenceNode& sequence) noexcept;
 
 [[nodiscard]] EvaluationResult make_subscripted_variable_name(
 	EvaluationContext& ctx,
-	const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
+	const ale::ast::SubscriptedVariableNode& subscripted_variable
 );
 
 struct ShallowSequenceIndices {
@@ -67,7 +68,7 @@ struct ShallowSequenceIndices {
 };
 
 [[nodiscard]] EvaluationResult make_shallow_sequence_indices(
-	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& sequence_w
+	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence_comma
 );
 
 } // namespace ast

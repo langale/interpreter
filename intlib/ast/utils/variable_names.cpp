@@ -37,6 +37,7 @@
 #include <memory>
 #include <string>
 #include <ranges>
+using namespace std::string_literals;
 
 #include <ale/ast/Node.hpp>
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
@@ -116,9 +117,7 @@ namespace ast {
 			return make_bad_evaluation_result(
 				std::vector{evaluation_error_e::
 								Evaluation_Of_Node_Is_Not_A_Numeric_Value},
-				std::vector<std::string>{
-					"Evaluation of node is not a numeric value."
-				}
+				std::vector{"Evaluation of node is not a numeric value."s}
 			);
 		}
 
@@ -159,22 +158,10 @@ get_variable_name(const ale::ast::SequenceNode& sequence) noexcept
 
 EvaluationResult make_subscripted_variable_name(
 	EvaluationContext& ctx,
-	const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
+	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-#if defined DEBUG
-	assert(
-		subscripted_variable_w->get_node_type() ==
-		ale::ast::node_type_e::Subscripted_Variable
-	);
-#endif
-
-	const auto& subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(
-			subscripted_variable_w.get()
-		);
 
 	auto res_w = get_indices(ctx, subscripted_variable);
 	if (not res_w.has_value()) {
@@ -198,20 +185,21 @@ EvaluationResult make_subscripted_variable_name(
 }
 
 EvaluationResult make_shallow_sequence_indices(
-	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& sequence_w
+	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence_comma
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 #if defined DEBUG
-	assert(sequence_w->get_node_type() == ale::ast::node_type_e::Sequence);
+	assert(sequence_comma.get_operator_type().has_value());
+	assert(
+		sequence_comma.get_operator_type() ==
+		ale::ast::node_type_e::Comma_Separated_Group
+	);
 #endif
 
-	auto sequence =
-		static_cast<const ale::ast::SequenceNode *>(sequence_w.get());
-
-	const auto& left_child = sequence->get_left_child();
-	const auto& right_child = sequence->get_right_child();
+	const auto& left_child = sequence_comma.get_left_child();
+	const auto& right_child = sequence_comma.get_right_child();
 
 #if defined DEBUG
 	assert(
@@ -248,15 +236,14 @@ EvaluationResult make_shallow_sequence_indices(
 	std::any left_idxs_w = std::move(*res_left_idxs_w);
 	std::any right_idxs_w = std::move(*res_right_idxs_w);
 
-	INTERPRETER_PRINT_LOC(aleprln, "Going to construct SequenceNodeIterator.");
 	INTERPRETER_PRINT_LOC(
 		aleprln,
-		"    Type inside left indices: {}.",
+		"Type inside left indices: {}.",
 		detail::get_type_name(left_idxs_w)
 	);
 	INTERPRETER_PRINT_LOC(
 		aleprln,
-		"    Type inside right indices: {}.",
+		"Type inside right indices: {}.",
 		detail::get_type_name(right_idxs_w)
 	);
 
