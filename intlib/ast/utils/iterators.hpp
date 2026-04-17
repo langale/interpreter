@@ -35,7 +35,10 @@
 
 #include <generator>
 
+#include <ale/ast/zero_ary_nodes/VariableNode.hpp>
+#include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
+#include <ale/ast/binary_nodes/SequenceNode.hpp>
 
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
@@ -46,14 +49,52 @@ namespace ast {
 using Generator = std::generator<EvaluationResult>;
 using SharedGenerator = std::shared_ptr<std::generator<EvaluationResult>>;
 
-[[nodiscard]] static Generator
-generate_empty(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode&)
+[[nodiscard]] inline Generator
+empty_iterator(const EvaluationContext&, const ale::ast::Node&)
 {
 	co_return;
 }
 
-[[nodiscard]] std::generator<EvaluationResult> make_iterator(
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] std::generator<EvaluationResult>
+make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var);
+
+[[nodiscard]] std::generator<EvaluationResult> make_value_iterator(
+	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& var
+);
+
+[[nodiscard]] std::generator<EvaluationResult> make_value_iterator(
+	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence
+);
+
+[[nodiscard]] std::generator<EvaluationResult> make_value_iterator(
 	EvaluationContext& ctx, const ale::ast::CommaSeparatedGroupNode& comma
+);
+
+[[nodiscard]] std::generator<EvaluationResult> make_value_iterator(
+	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& node
+);
+
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] std::generator<EvaluationResult>
+make_name_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var);
+
+[[nodiscard]] std::generator<EvaluationResult> make_name_iterator(
+	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& var
+);
+
+[[nodiscard]] std::generator<EvaluationResult> make_name_iterator(
+	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence
+);
+
+[[nodiscard]] std::generator<EvaluationResult> make_name_iterator(
+	EvaluationContext& ctx, const ale::ast::CommaSeparatedGroupNode& comma
+);
+
+[[nodiscard]] std::generator<EvaluationResult> make_name_iterator(
+	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& node
 );
 
 } // namespace ast
