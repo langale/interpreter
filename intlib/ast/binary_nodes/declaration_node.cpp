@@ -41,11 +41,8 @@
 #include <any>
 using namespace std::string_literals;
 
-#include <ale/ast/binary_nodes/SequenceNode.hpp>
 #include <ale/ast/binary_nodes/DeclarationNode.hpp>
-#include <ale/ast/zero_ary_nodes/VariableNode.hpp>
 #include <ale/utils/IndexIterator.hpp>
-#include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
@@ -54,56 +51,43 @@ using namespace std::string_literals;
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
-#include <intlib/ast/utils/variable_names.hpp>
-#include <intlib/ast/utils/iterators/comma_separated_group.hpp>
+#include <intlib/ast/utils/iterators.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-[[nodiscard]] static EvaluationResult compute_value_from_declaration(
-	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
+[[nodiscard]] static EvaluationResult declare_variable(
+	EvaluationContext& ctx, std::string&& var_name, std::string&& var_type
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	std::any value_w;
-	if (decl.get_node_type() != ale::ast::node_type_e::Declaration_Declare) {
+#if defined ALE_LOGGING_MESSAGES
+	const std::string variable_name_copy = var_name;
+#endif
 
-		const auto& value_node = decl.get_right_child();
+	INTERPRETER_PRINT_LOC(
+		aleprln, "Going to declare variable '{}'.", variable_name_copy
+	);
 
-		if (value_node->get_node_type() ==
-			ale::ast::node_type_e::Comma_Separated_Group) {
-
-			const ale::ast::CommaSeparatedGroupNode& comma =
-				*static_cast<ale::ast::CommaSeparatedGroupNode *>(
-					value_node.get()
-				);
-
-			return make_good_evaluation_result<SharedGenerator>(
-				std::make_shared<Generator>(make_iterator(ctx, comma))
-			);
-		}
-
-		EvaluationResult res = interpret_node(ctx, value_node);
-		if (not res.has_value()) {
-			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
-			return make_bad_evaluation_result(std::move(res.error()));
-		}
-		value_w = std::move(*res);
-
+	if (ctx.memory.variable_exists_shallow(var_name)) {
 		INTERPRETER_PRINT_LOC(
-			aleprln,
-			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
-			detail::get_type_name(value_w),
-			any_view{value_w}
+			aleprln, "Attempt to redeclare variable {}.", var_name
+		);
+		return make_bad_evaluation_result(
+			std::vector{evaluation_error_e::Memory_Variable_Already_Exists},
+			std::vector{std::format("Redeclaration of variable {}.", var_name)}
 		);
 	}
-	return make_good_evaluation_result<std::any>(std::move(value_w));
+
+	// This is a 'declare' node.
+	ctx.memory.declare_variable(std::move(var_name), {}, std::move(var_type));
+	return make_good_evaluation_result<std::any>();
 }
 
-[[nodiscard]] static EvaluationResult declare_single_variable(
+[[nodiscard]] static EvaluationResult declare_variable(
 	EvaluationContext& ctx,
 	const ale::ast::node_type_e t,
 	std::string&& var_name,
@@ -131,15 +115,16 @@ namespace ast {
 		);
 	}
 
-	// This is a 'declare' node.
-	if (t == ale::ast::node_type_e::Declaration_Declare) {
-		ctx.memory.declare_variable(
-			std::move(var_name), {}, std::move(var_type)
-		);
-		return make_good_evaluation_result<std::any>();
-	}
-
 	std::any value_conv_w = detail::any_convert_to_type(value_w, var_type);
+
+	if (detail::is_type<void>(value_conv_w)) {
+		INTERPRETER_PRINT_LOC(
+			aleprln,
+			"Could not convert value '{}' to a value of type '{}'.",
+			any_view{value_w},
+			var_type
+		);
+	}
 
 	INTERPRETER_PRINT_LOC(
 		aleprln,
@@ -166,376 +151,159 @@ namespace ast {
 	return make_good_evaluation_result<std::any>();
 }
 
-[[nodiscard]] static EvaluationResult declare_variable(
-	EvaluationContext& ctx,
-	const ale::ast::DeclarationNode& decl,
-	const std::unique_ptr<ale::ast::Node>& variable_node,
-	const std::any& value_w
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-#if defined DEBUG
-	assert(variable_node->get_node_type() == ale::ast::node_type_e::Variable);
-#endif
-
-	std::string var_name =
-		static_cast<const ale::ast::VariableNode *>(variable_node.get())
-			->get_variable_name();
-
-	std::string var_type = decl.get_variable_type();
-	return declare_single_variable(
-		ctx,
-		decl.get_node_type(),
-		std::move(var_name),
-		std::move(var_type),
-		value_w
-	);
-}
-
-[[nodiscard]] static EvaluationResult declare_subscripted_variable(
-	EvaluationContext& ctx,
-	const ale::ast::DeclarationNode& decl,
-	const std::unique_ptr<ale::ast::Node>& variable,
-	const std::any& value_w
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-	INTERPRETER_PRINT_LOC(aleprln, "Making the name of the variable.");
-
-	EvaluationResult res = make_subscripted_variable_name(ctx, variable);
-	if (not res.has_value()) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Could not make the name of the variable."
-		);
-		return make_bad_evaluation_result(std::move(res.error()));
-	}
-
-	const std::any& name_w = *res;
-#if defined DEBUG
-	assert(detail::is_type<std::string>(name_w));
-#endif
-
-	std::string var_type = decl.get_variable_type();
-	return declare_single_variable(
-		ctx,
-		decl.get_node_type(),
-		std::any_cast<std::string>(name_w),
-		std::move(var_type),
-		value_w
-	);
-}
-
-template <bool value_is_group, typename generator_iterator_t>
-[[nodiscard]] static EvaluationResult declare_variable_sequence(
-	EvaluationContext& ctx,
-	const ale::ast::DeclarationNode& decl,
-	const std::unique_ptr<ale::ast::Node>& sequence,
-	const std::any& value_w,
-	generator_iterator_t& comma_iterator
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-	INTERPRETER_PRINT_LOC(aleprln, "Going to make list of names.");
-
-	auto res = make_shallow_sequence_indices(ctx, sequence);
-	if (not res) {
-		return make_bad_evaluation_result(std::move(res.error()));
-	}
-
-	INTERPRETER_PRINT_LOC(aleprln, "Successfully made list of names.");
-
-	std::any idxs_w = std::move(*res);
-
-#if defined DEBUG
-	assert(detail::is_type<ShallowSequenceIndices>(idxs_w));
-#endif
-
-	auto idxs = std::any_cast<ShallowSequenceIndices&&>(std::move(idxs_w));
-	const std::string& base_name = idxs.base_name;
-
-	INTERPRETER_PRINT_LOC(aleprln, "# left  indices: {}.", idxs.left.size());
-	INTERPRETER_PRINT_LOC(aleprln, "# right indices: {}.", idxs.right.size());
-
-	ale::utils::IndexIterator iter(std::move(idxs.left), std::move(idxs.right));
-
-	INTERPRETER_PRINT_LOC(aleprln, "Constructed SequenceNodeIterator.");
-
-	while (not iter.end()) {
-		const auto& indices = iter.get_current_indices();
-
-		std::string var_name = base_name;
-		append_variable_name(var_name, indices);
-#if defined ALE_LOGGING_MESSAGES
-		const std::string var_name_copy = var_name;
-#endif
-
-		INTERPRETER_PRINT_LOC(aleprln, "Variable name: {}.", var_name);
-
-		std::string var_type = decl.get_variable_type();
-		EvaluationResult declare_res;
-
-		if constexpr (value_is_group) {
-			/// TODO: figure out why removing "const &" is a compilation error
-			const EvaluationResult& group_value_res_w = *comma_iterator;
-			if (not group_value_res_w) {
-				return make_bad_evaluation_result(group_value_res_w.error());
-			}
-
-			const std::any& group_value_w = *group_value_res_w;
-
-			declare_res = declare_single_variable(
-				ctx,
-				decl.get_node_type(),
-				std::move(var_name),
-				std::move(var_type),
-				group_value_w
-			);
-			++comma_iterator;
-		}
-		else {
-			declare_res = declare_single_variable(
-				ctx,
-				decl.get_node_type(),
-				std::move(var_name),
-				std::move(var_type),
-				value_w
-			);
-		}
-
-		INTERPRETER_PRINT_LOC(
-			aleprln,
-			"    Successfully assigned variable with name '{}'.",
-			var_name_copy
-		);
-
-		if (not declare_res) {
-			return make_bad_evaluation_result(std::move(declare_res.error()));
-		}
-
-		iter.next_indices();
-	}
-
-	return make_good_evaluation_result<std::any>();
-}
-
-[[nodiscard]] static EvaluationResult declare_variable_sequence(
-	EvaluationContext& ctx,
-	const ale::ast::DeclarationNode& decl,
-	const std::unique_ptr<ale::ast::Node>& sequence
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-	const bool is_declare =
-		decl.get_node_type() == ale::ast::node_type_e::Declaration_Declare;
-	const auto& variable_list_node_w = decl.get_left_child();
-
-#if defined DEBUG
-	assert(
-		variable_list_node_w->get_node_type() == ale::ast::node_type_e::Sequence
-	);
-#endif
-
-	auto compute_res = compute_value_from_declaration(ctx, decl);
-	if (not compute_res) {
-		return std::move(compute_res.error());
-	}
-	const std::any value_w = std::move(*compute_res);
-
-	const bool value_is_group =
-		not is_declare and decl.get_right_child()->get_node_type() ==
-							   ale::ast::node_type_e::Comma_Separated_Group;
-
-	[[maybe_unused]] SharedGenerator comma_values;
-	ale::ast::CommaSeparatedGroupNode placeholder_node;
-	if (value_is_group) {
-		comma_values = std::any_cast<SharedGenerator>(value_w);
-	}
-	else {
-		comma_values =
-			std::make_shared<Generator>(generate_empty(ctx, placeholder_node));
-	}
-	[[maybe_unused]] auto pos = comma_values->begin();
-	[[maybe_unused]] auto end = comma_values->end();
-
-	if (not is_declare and decl.get_right_child()->get_node_type() ==
-							   ale::ast::node_type_e::Comma_Separated_Group) {
-
-		return declare_variable_sequence<true>(
-			ctx, decl, sequence, value_w, pos
-		);
-	}
-	return declare_variable_sequence<false>(ctx, decl, sequence, value_w, pos);
-}
-
-[[nodiscard]] static EvaluationResult declare_comma_separated_variables(
-	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-	const bool is_declare =
-		decl.get_node_type() == ale::ast::node_type_e::Declaration_Declare;
-	const auto& variable_list_node_w = decl.get_left_child();
-
-#if defined DEBUG
-	assert(
-		variable_list_node_w->get_node_type() ==
-		ale::ast::node_type_e::Comma_Separated_Group
-	);
-#endif
-
-	auto compute_res = compute_value_from_declaration(ctx, decl);
-	if (not compute_res) {
-		return std::move(compute_res.error());
-	}
-	const std::any value_w = std::move(*compute_res);
-
-	const bool value_is_group =
-		not is_declare and decl.get_right_child()->get_node_type() ==
-							   ale::ast::node_type_e::Comma_Separated_Group;
-
-	[[maybe_unused]] SharedGenerator comma_values_w;
-	ale::ast::CommaSeparatedGroupNode placeholder_node;
-	if (value_is_group) {
-		comma_values_w = std::any_cast<SharedGenerator>(value_w);
-	}
-	else {
-		comma_values_w =
-			std::make_shared<Generator>(generate_empty(ctx, placeholder_node));
-	}
-	[[maybe_unused]] auto pos = comma_values_w->begin();
-	[[maybe_unused]] auto end = comma_values_w->end();
-
-	const auto& variable_list_node =
-		*static_cast<const ale::ast::CommaSeparatedGroupNode *>(
-			variable_list_node_w.get()
-		);
-
-	[[maybe_unused]] std::any group_value_w;
-	const auto& children = variable_list_node.get_children();
-	for (const auto& child : children) {
-
-		if (child->get_node_type() == ale::ast::node_type_e::Variable) {
-
-			EvaluationResult res;
-			if (value_is_group) {
-				/// TODO: figure out why removing "const &" is a compilation error
-				const EvaluationResult& group_value_res_w = *pos;
-				if (not group_value_res_w) {
-					return make_bad_evaluation_result(
-						group_value_res_w.error()
-					);
-				}
-
-				group_value_w = *group_value_res_w;
-				++pos;
-
-				res = declare_variable(ctx, decl, child, group_value_w);
-			}
-			else {
-				res = declare_variable(ctx, decl, child, value_w);
-			}
-			if (not res) {
-				return make_bad_evaluation_result(std::move(res.error()));
-			}
-		}
-		else if (child->get_node_type() == ale::ast::node_type_e::Sequence) {
-
-			EvaluationResult res;
-			if (value_is_group) {
-				res = declare_variable_sequence<true>(
-					ctx, decl, child, value_w, pos
-				);
-			}
-			else {
-				res = declare_variable_sequence<false>(
-					ctx, decl, child, value_w, pos
-				);
-			}
-			if (not res) {
-				return make_bad_evaluation_result(std::move(res.error()));
-			}
-		}
-		else if (child->get_node_type() ==
-				 ale::ast::node_type_e::Subscripted_Variable) {
-
-			EvaluationResult res;
-			if (value_is_group) {
-				/// TODO: figure out why removing "const &" is a compilation error
-				const EvaluationResult& group_value_res_w = *pos;
-				if (not group_value_res_w) {
-					return make_bad_evaluation_result(
-						group_value_res_w.error()
-					);
-				}
-
-				group_value_w = *group_value_res_w;
-				++pos;
-
-				res = declare_subscripted_variable(
-					ctx, decl, child, group_value_w
-				);
-			}
-			else {
-				res = declare_subscripted_variable(ctx, decl, child, value_w);
-			}
-			if (not res) {
-				return make_bad_evaluation_result(std::move(res.error()));
-			}
-		}
-	}
-
-	return make_good_evaluation_result<std::any>();
-}
-
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
+	const auto decl_t = decl.get_node_type();
 	const auto& left_child = decl.get_left_child();
-
 #if defined DEBUG
 	assert(left_child != nullptr);
 #endif
 
-	if (left_child->get_node_type() == ale::ast::node_type_e::Variable) {
-		INTERPRETER_PRINT_LOC(aleprln, "Variable.");
-		const auto& variable_node = decl.get_left_child();
+	auto var_iter = make_name_iterator(ctx, left_child);
+	auto var_iter_pos = var_iter.begin();
+	auto var_iter_end = var_iter.end();
 
-		EvaluationResult res = compute_value_from_declaration(ctx, decl);
-		if (not res) {
-			return make_bad_evaluation_result(std::move(res.error()));
+	if (decl_t == ale::ast::node_type_e::Declaration_Declare) {
+		while (var_iter_pos != var_iter_end) {
+			EvaluationResult res = *var_iter_pos;
+			if (not res) {
+				return res;
+			}
+			std::any name_w = std::move(*res);
+			std::string name = std::any_cast<const std::string&>(name_w);
+			std::string var_type = decl.get_variable_type();
+			auto declaration_result =
+				declare_variable(ctx, std::move(name), std::move(var_type));
+			if (not declaration_result) {
+				return make_bad_evaluation_result(
+					std::move(declaration_result.error())
+				);
+			}
+			++var_iter_pos;
 		}
-		const std::any value_w = std::move(*res);
-		return declare_variable(ctx, decl, variable_node, value_w);
+		return make_good_evaluation_result<std::any>();
 	}
 
-	if (left_child->get_node_type() ==
-		ale::ast::node_type_e::Comma_Separated_Group) {
-		INTERPRETER_PRINT_LOC(aleprln, "Comma-separated group.");
-		return declare_comma_separated_variables(ctx, decl);
-	}
+	const auto& right_child = decl.get_right_child();
+#if defined DEBUG
+	assert(right_child != nullptr);
+#endif
+	const auto right_t = right_child->get_node_type();
 
-	if (left_child->get_node_type() == ale::ast::node_type_e::Sequence) {
-		INTERPRETER_PRINT_LOC(aleprln, "Variable sequence.");
-		return declare_variable_sequence(ctx, decl, left_child);
-	}
+	if (right_t == ale::ast::node_type_e::Sequence or
+		right_t == ale::ast::node_type_e::Comma_Separated_Group) {
 
-	if (left_child->get_node_type() ==
-		ale::ast::node_type_e::Subscripted_Variable) {
+		auto value_iter = make_value_iterator(ctx, right_child);
+		auto value_iter_pos = value_iter.begin();
+		auto value_iter_end = value_iter.end();
 
-		INTERPRETER_PRINT_LOC(aleprln, "Subscripted variable.");
-		EvaluationResult res = compute_value_from_declaration(ctx, decl);
-		if (not res) {
-			return make_bad_evaluation_result(std::move(res.error()));
+		while (var_iter_pos != var_iter_end and
+			   value_iter_pos != value_iter_end) {
+			INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
+
+			EvaluationResult var_res = *var_iter_pos;
+			if (not var_res) {
+				INTERPRETER_PRINT_LOC(
+					aleprln,
+					"Something went wrong when retrieving the next variable."
+				);
+				INTERPRETER_PRINT_LOC(
+					aleprln, "Error: '{}'", var_res.error().error[0]
+				);
+				return var_res;
+			}
+
+			EvaluationResult value_res = *value_iter_pos;
+			if (not value_res) {
+				INTERPRETER_PRINT_LOC(
+					aleprln,
+					"Something went wrong when computing the next value."
+				);
+				return value_res;
+			}
+
+			std::any var_name_w = std::move(*var_res);
+			std::any value_w = std::move(*value_res);
+
+			std::string var_name = std::any_cast<std::string>(var_name_w);
+			std::string var_type = decl.get_variable_type();
+
+			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
+			INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Of value: '{}'.", any_view{value_w}
+			);
+
+			EvaluationResult decl_res = declare_variable(
+				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
+			);
+			if (not decl_res) {
+				return decl_res;
+			}
+
+			++value_iter_pos;
+			++var_iter_pos;
 		}
-		const std::any value_w = std::move(*res);
-		return declare_subscripted_variable(ctx, decl, left_child, value_w);
+
+		if (var_iter_pos != var_iter_end) {
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Too many values in the right hand side"
+			);
+			return make_bad_evaluation_result();
+		}
+
+		if (value_iter_pos != value_iter_end) {
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Too many values in the left hand side"
+			);
+			return make_bad_evaluation_result();
+		}
+	}
+	else {
+
+		EvaluationResult compute_res = interpret_node(ctx, right_child);
+		if (not compute_res) {
+			return compute_res;
+		}
+
+		std::any value_w = std::move(*compute_res);
+
+		while (var_iter_pos != var_iter_end) {
+			INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
+
+			EvaluationResult var_res = *var_iter_pos;
+			if (not var_res) {
+				INTERPRETER_PRINT_LOC(
+					aleprln,
+					"Something went wrong when retrieving the next variable."
+				);
+				INTERPRETER_PRINT_LOC(
+					aleprln, "Error: '{}'", var_res.error().error[0]
+				);
+				return var_res;
+			}
+
+			std::any var_name_w = std::move(*var_res);
+			std::string var_name = std::any_cast<std::string>(var_name_w);
+			std::string var_type = decl.get_variable_type();
+
+			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
+			INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Of value: '{}'.", any_view{value_w}
+			);
+
+			EvaluationResult decl_res = declare_variable(
+				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
+			);
+			if (not decl_res) {
+				return decl_res;
+			};
+			++var_iter_pos;
+		}
 	}
 
 	return make_good_evaluation_result<std::any>();
