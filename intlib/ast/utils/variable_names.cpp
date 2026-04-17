@@ -73,18 +73,14 @@ namespace ast {
 
 	for (const auto& [i, child] : children | std::views::enumerate) {
 
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Made index for child {}.", i
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Made index for child {}.", i);
 
 		auto val_int_w = interpret_node(ctx, child);
 		if (not val_int_w.has_value()) {
 			return std::move(val_int_w.error());
 		}
 
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Successfully evaluated child."
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Successfully evaluated child.");
 
 		const std::any& val_w = *val_int_w;
 		std::optional<int64_t> idx_w;
@@ -152,9 +148,10 @@ std::string make_indexed_variable_name(
 	return n;
 }
 
-std::string get_variable_name(const ale::ast::SequenceNode& sequence)
+const std::string&
+get_variable_name(const ale::ast::SequenceNode& sequence) noexcept
 {
-	return dynamic_cast<ale::ast::SubscriptedVariableNode *>(
+	return static_cast<ale::ast::SubscriptedVariableNode *>(
 			   sequence.get_left_child().get()
 	)
 		->get_variable_name();
@@ -190,9 +187,7 @@ EvaluationResult make_subscripted_variable_name(
 
 	std::string name = subscripted_variable.get_variable_name();
 
-	INTERPRETER_PRINT_LOC(
-		aleprln, "Make indices for variable {}.", name
-	);
+	INTERPRETER_PRINT_LOC(aleprln, "Make indices for variable {}.", name);
 
 	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
 	append_variable_name(name, idxs);
@@ -253,9 +248,7 @@ EvaluationResult make_shallow_sequence_indices(
 	std::any left_idxs_w = std::move(*res_left_idxs_w);
 	std::any right_idxs_w = std::move(*res_right_idxs_w);
 
-	INTERPRETER_PRINT_LOC(
-		aleprln, "Going to construct SequenceNodeIterator."
-	);
+	INTERPRETER_PRINT_LOC(aleprln, "Going to construct SequenceNodeIterator.");
 	INTERPRETER_PRINT_LOC(
 		aleprln,
 		"    Type inside left indices: {}.",
