@@ -154,9 +154,6 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& v);
 [[nodiscard]] EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl);
 
-[[nodiscard]] ale::utils::IndexIterator
-make_iterator(EvaluationContext& ctx, const ale::ast::SequenceNode& v);
-
 [[nodiscard]] EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& v);
 
