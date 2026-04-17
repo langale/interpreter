@@ -35,11 +35,12 @@
 
 #include <expected>
 #include <vector>
+#include <string>
 #include <any>
 
 #include <ale/detail/make_expected.hpp>
 
-#include <intlib/ast/evaluation_error_enum.hpp>
+#include <intlib/ast/utils/evaluation_error_enum.hpp>
 
 namespace intlib {
 namespace ast {

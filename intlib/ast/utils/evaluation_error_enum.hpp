@@ -31,20 +31,42 @@
  *
  ********************************************************************/
 
-#include <intlib/ast/utils/evaluation_error_enum.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#pragma once
+
+#include <cstdint>
 
 namespace intlib {
 namespace ast {
 
-EvaluationError append_error(
-	EvaluationError&& err, const evaluation_error_e t, std::string&& msg
-)
-{
-	err.error.push_back(t);
-	err.message.push_back(std::move(msg));
-	return err;
-}
+enum class evaluation_error_e : uint8_t {
+	Unhandled_Node_Type,
+	Unhandled_Variable_Type,
+
+	Undefined_Variable,
+	Valueless_Variable,
+
+	Evaluation_Of_Node_Failed,
+	Evaluation_Of_Node_Is_Void,
+	Evaluation_Of_Node_While_Loop_Failed,
+	Evaluation_Of_Node_Is_Not_A_Boolean_Value,
+	Evaluation_Of_Node_Is_Not_A_Numeric_Value,
+
+	Arithmetic_Operation_Failed,
+	Comparison_Operation_Failed,
+
+	Forbidden_Evaluation_Of_Node,
+
+	Conversion_To_Bool_Failed,
+
+	If_Statement_Condition_Empty,
+	If_Statement_First_Branch_Empty,
+	If_Statement_Second_Branch_Empty,
+
+	Memory_Variable_Does_Not_Exist,
+	Memory_Variable_Already_Exists,
+	Memory_Type_Mismatch,
+	Memory_Attempt_To_Assign_Value_To_Constant_Variable,
+};
 
 } // namespace ast
 } // namespace intlib
