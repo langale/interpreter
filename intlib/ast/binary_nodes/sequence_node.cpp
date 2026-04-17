@@ -40,9 +40,11 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult evaluate(EvaluationContext&, const ale::ast::SequenceNode&)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation_result<std::any>();
 }

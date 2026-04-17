@@ -41,11 +41,13 @@
 namespace intlib {
 namespace memory {
 
+#define aleprln ale::logger::println
+
 /* MODIFIERS */
 
 void FunctionScope::initialize()
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	m_local_scopes.emplace_back(LocalScope{});
 }
@@ -54,7 +56,7 @@ void FunctionScope::declare_variable(
 	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	m_local_scopes.back().declare_variable(
 		std::move(name), std::move(value_w), std::move(type)
@@ -65,7 +67,7 @@ void FunctionScope::declare_constant_variable(
 	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	m_local_scopes.back().declare_constant_variable(
 		std::move(name), std::move(value_w), std::move(type)
@@ -77,7 +79,7 @@ void FunctionScope::declare_constant_variable(
 const VariableValue&
 FunctionScope::get_variable(const std::string& name) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
@@ -95,7 +97,7 @@ FunctionScope::get_variable(const std::string& name) const noexcept
 
 VariableValue& FunctionScope::get_variable(const std::string& name) noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
@@ -113,7 +115,7 @@ VariableValue& FunctionScope::get_variable(const std::string& name) noexcept
 
 bool FunctionScope::variable_exists(const std::string& name) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
@@ -127,7 +129,7 @@ bool FunctionScope::variable_exists_shallow(
 	const std::string& name
 ) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	return m_local_scopes.back().variable_exists(name);
 }

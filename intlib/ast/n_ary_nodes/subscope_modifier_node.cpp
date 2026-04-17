@@ -43,17 +43,19 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	ctx.memory.get_current_scope().push_local_scope();
 	for (const auto& w : v.get_children()) {
 		EvaluationResult res_w = interpret_node(ctx, w);
 		if (not res_w) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println, "Evaluation of node failed."
+				aleprln, "Evaluation of node failed."
 			);
 			return append_error(
 				std::move(res_w.error()),
@@ -65,7 +67,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 		const std::any& value = *res_w;
 		if (value.has_value()) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Potentially-ignored return value or expression."
 			);
 		}

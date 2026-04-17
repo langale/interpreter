@@ -44,10 +44,12 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult
 evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation_result<std::string>(v.get_value());
 }
@@ -55,7 +57,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 EvaluationResult
 evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation_result<double>(v.get_value());
 }
@@ -64,7 +66,7 @@ EvaluationResult evaluate(
 	const EvaluationContext&, const ale::ast::LiteralUnsignedIntegerNode& v
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation_result<uint64_t>(v.get_value());
 }
@@ -72,7 +74,7 @@ EvaluationResult evaluate(
 EvaluationResult
 evaluate(const EvaluationContext&, const ale::ast::LiteralSignedIntegerNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation_result<int64_t>(v.get_value());
 }

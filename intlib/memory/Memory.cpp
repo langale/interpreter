@@ -41,6 +41,8 @@
 namespace intlib {
 namespace memory {
 
+#define aleprln ale::logger::println
+
 /* MODIFIERS */
 
 void Memory::initialize() noexcept
@@ -52,7 +54,7 @@ void Memory::declare_variable(
 	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		m_function_scopes.top().declare_variable(
@@ -70,7 +72,7 @@ void Memory::declare_constant_variable(
 	std::string&& name, std::any&& value_w, std::string&& type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		m_function_scopes.top().declare_constant_variable(
@@ -89,7 +91,7 @@ void Memory::declare_constant_variable(
 const VariableValue&
 Memory::get_variable(const std::string& name) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		return m_function_scopes.top().get_variable(name);
@@ -99,7 +101,7 @@ Memory::get_variable(const std::string& name) const noexcept
 
 VariableValue& Memory::get_variable(const std::string& name) noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		return m_function_scopes.top().get_variable(name);
@@ -109,7 +111,7 @@ VariableValue& Memory::get_variable(const std::string& name) noexcept
 
 FunctionScope& Memory::get_current_scope() noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 #if defined DEBUG
 	assert(not is_current_scope_global());
@@ -127,7 +129,7 @@ const FunctionScope& Memory::get_current_scope() const noexcept
 
 bool Memory::variable_exists(const std::string& name) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		return m_function_scopes.top().variable_exists(name)
@@ -139,7 +141,7 @@ bool Memory::variable_exists(const std::string& name) const noexcept
 
 bool Memory::variable_exists_shallow(const std::string& name) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		return m_function_scopes.top().variable_exists_shallow(name);

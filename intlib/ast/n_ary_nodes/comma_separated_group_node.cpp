@@ -46,13 +46,15 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult
 evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println,
+		aleprln,
 		"Cannot evaluate nodes of type '{}'.",
 		v.get_node_type()
 	);

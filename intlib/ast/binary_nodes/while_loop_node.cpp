@@ -45,17 +45,19 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
 
 	if (left_child == nullptr) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Condition in while loop is missing."
+			aleprln, "Condition in while loop is missing."
 		);
 		return make_good_evaluation_result<std::any>();
 	}
@@ -65,7 +67,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		EvaluationResult cond_w = interpret_node(ctx, left_child);
 		if (not cond_w) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println, "Node evaluation failed."
+				aleprln, "Node evaluation failed."
 			);
 			return append_error(
 				std::move(cond_w.error()),
@@ -77,7 +79,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		const std::optional cond_res_w = detail::any_to_bool(*cond_w);
 		if (not cond_res_w) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
 			);
@@ -100,7 +102,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 			EvaluationResult res_w = interpret_node(ctx, right_child);
 			if (not res_w) {
 				INTERPRETER_PRINT_LOC(
-					ale::logger::println,
+					aleprln,
 					"Evaluation of while loop body failed."
 				);
 				return append_error(

@@ -53,13 +53,15 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ComparisonNode& v,
 	const ale::ast::node_type_e t
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& children = v.get_children();
 
@@ -72,7 +74,7 @@ EvaluationResult evaluate(
 		EvaluationResult res_w = interpret_node(ctx, children.at(0));
 		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println, "Evaluation of node failed."
+				aleprln, "Evaluation of node failed."
 			);
 			return append_error(
 				std::move(res_w.error()),
@@ -89,7 +91,7 @@ EvaluationResult evaluate(
 		EvaluationResult res_w = interpret_node(ctx, c);
 		if (not res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println, "Evaluation of node failed."
+				aleprln, "Evaluation of node failed."
 			);
 			return append_error(
 				std::move(res_w.error()),
@@ -104,7 +106,7 @@ EvaluationResult evaluate(
 
 		if (not comparison_result_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Could not compare two std::any values: '{}' and '{}'.",
 				any_view{previous_w},
 				any_view{current_w}

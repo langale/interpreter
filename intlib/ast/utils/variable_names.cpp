@@ -55,24 +55,26 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 [[nodiscard]] EvaluationResult get_indices(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	std::vector<int64_t> indices;
 	const auto& children = subscripted_variable.get_children();
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "Variable has {} subindices.", children.size()
+		aleprln, "Variable has {} subindices.", children.size()
 	);
 
 	for (const auto& [i, child] : children | std::views::enumerate) {
 
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Made index for child {}.", i
+			aleprln, "Made index for child {}.", i
 		);
 
 		auto val_int_w = interpret_node(ctx, child);
@@ -81,7 +83,7 @@ namespace ast {
 		}
 
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Successfully evaluated child."
+			aleprln, "Successfully evaluated child."
 		);
 
 		const std::any& val_w = *val_int_w;
@@ -94,7 +96,7 @@ namespace ast {
 
 			if (not idx_w) {
 				INTERPRETER_PRINT_LOC(
-					ale::logger::println,
+					aleprln,
 					"Could not convert node evaluation '{}' into a numeric "
 					"int64_t.",
 					any_view{memory_variable.value_w}
@@ -106,7 +108,7 @@ namespace ast {
 
 			if (not idx_w) {
 				INTERPRETER_PRINT_LOC(
-					ale::logger::println,
+					aleprln,
 					"Could not convert node evaluation '{}' into a numeric "
 					"int64_t.",
 					any_view{val_w}
@@ -125,7 +127,7 @@ namespace ast {
 		}
 
 		const auto idx = *idx_w;
-		INTERPRETER_PRINT_LOC(ale::logger::println, "Made index {}.", idx);
+		INTERPRETER_PRINT_LOC(aleprln, "Made index {}.", idx);
 		indices.push_back(idx);
 	}
 
@@ -163,7 +165,7 @@ EvaluationResult make_subscripted_variable_name(
 	const std::unique_ptr<ale::ast::Node>& subscripted_variable_w
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 #if defined DEBUG
 	assert(
@@ -182,20 +184,20 @@ EvaluationResult make_subscripted_variable_name(
 		return make_bad_evaluation_result(std::move(res_w.error()));
 	}
 
-	INTERPRETER_PRINT_LOC(ale::logger::println, "Successfully made indices.");
+	INTERPRETER_PRINT_LOC(aleprln, "Successfully made indices.");
 
 	std::any idxs_w = std::move(*res_w);
 
 	std::string name = subscripted_variable.get_variable_name();
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "Make indices for variable {}.", name
+		aleprln, "Make indices for variable {}.", name
 	);
 
 	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
 	append_variable_name(name, idxs);
 
-	INTERPRETER_PRINT_LOC(ale::logger::println, "Name constructed '{}'.", name);
+	INTERPRETER_PRINT_LOC(aleprln, "Name constructed '{}'.", name);
 
 	return make_good_evaluation_result<std::string>(std::move(name));
 }
@@ -204,7 +206,7 @@ EvaluationResult make_shallow_sequence_indices(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& sequence_w
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 #if defined DEBUG
 	assert(sequence_w->get_node_type() == ale::ast::node_type_e::Sequence);
@@ -252,15 +254,15 @@ EvaluationResult make_shallow_sequence_indices(
 	std::any right_idxs_w = std::move(*res_right_idxs_w);
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println, "Going to construct SequenceNodeIterator."
+		aleprln, "Going to construct SequenceNodeIterator."
 	);
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println,
+		aleprln,
 		"    Type inside left indices: {}.",
 		detail::get_type_name(left_idxs_w)
 	);
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println,
+		aleprln,
 		"    Type inside right indices: {}.",
 		detail::get_type_name(right_idxs_w)
 	);

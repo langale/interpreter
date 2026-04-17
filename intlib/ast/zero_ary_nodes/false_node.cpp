@@ -40,10 +40,12 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult
 evaluate(const EvaluationContext&, const ale::ast::LiteralFalseNode&)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation_result<bool>(false);
 }

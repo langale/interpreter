@@ -44,13 +44,15 @@
 namespace intlib {
 namespace detail {
 
+#define aleprln ale::logger::println
+
 std::optional<bool> any_comparison(
 	const ale::ast::node_type_e t,
 	const std::any& left_w,
 	const std::any& right_w
 )
 {
-	INTERPRETER_ENTER_COMPARISON_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
 	switch (t) {
 	case ale::ast::node_type_e::Comparison_Equal:
@@ -67,7 +69,7 @@ std::optional<bool> any_comparison(
 		return any_comparison_greater_than_equal_to(left_w, right_w);
 	default:
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Wrong node type '{}' for comparison.", t
+			aleprln, "Wrong node type '{}' for comparison.", t
 		);
 		return {};
 	}

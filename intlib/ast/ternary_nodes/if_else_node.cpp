@@ -45,9 +45,11 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& first_child = v.get_first_child();
 	const auto& second_child = v.get_second_child();
@@ -55,7 +57,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	if (first_child == nullptr) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Condition of if statement is null."
+			aleprln, "Condition of if statement is null."
 		);
 		return make_bad_evaluation_result(
 			std::vector{evaluation_error_e::If_Statement_Condition_Empty},
@@ -65,7 +67,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	EvaluationResult cond_w = interpret_node(ctx, first_child);
 	if (not cond_w.has_value()) {
-		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
 		return append_error(
 			std::move(cond_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -76,7 +78,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	const std::optional cond_bool_w = detail::any_to_bool(*cond_w);
 	if (not cond_bool_w) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println,
+			aleprln,
 			"Unhandled variable type '{}'.",
 			detail::get_type_name(*cond_bool_w)
 		);
@@ -91,7 +93,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	if (*cond_bool_w) {
 		if (second_child == nullptr) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Condition is true but the first branch of if statement is "
 				"empty."
 			);
@@ -109,7 +111,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	if (third_child == nullptr) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println,
+			aleprln,
 			"Condition is true but the second branch of if statement is empty."
 		);
 		return make_bad_evaluation_result(

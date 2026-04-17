@@ -51,13 +51,15 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ArithmeticNode& v,
 	const ale::ast::node_type_e t
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& children = v.get_children();
 #if defined DEBUG
@@ -70,7 +72,7 @@ EvaluationResult evaluate(
 		EvaluationResult res_w = interpret_node(ctx, c);
 		if (not res_w) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Evaluation of node within arithmetic node failed."
 			);
 			return make_bad_evaluation_result(
@@ -82,7 +84,7 @@ EvaluationResult evaluate(
 		}
 		if (detail::is_type<void>(*res_w)) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Evaluation of node returned a void value."
 			);
 			return make_bad_evaluation_result(
@@ -114,7 +116,7 @@ EvaluationResult evaluate(
 
 		if (not expr_res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()
 			);

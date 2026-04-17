@@ -42,16 +42,18 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& child = v.get_child();
 
 	EvaluationResult res_int_w = interpret_node(ctx, child);
 	if (not res_int_w.has_value()) {
-		INTERPRETER_PRINT_LOC(ale::logger::println, "Node evaluation failed.");
+		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
 		return append_error(
 			std::move(res_int_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -63,7 +65,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	if (detail::is_type<uint64_t>(res_w)) {
 		const auto ri = std::any_cast<uint64_t>(res_w);
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Evaluation of node is uint64_t: {}.", ri
+			aleprln, "Evaluation of node is uint64_t: {}.", ri
 		);
 		return make_good_evaluation_result<int64_t>(-detail::to_int64(ri));
 	}
@@ -71,7 +73,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	if (detail::is_type<int64_t>(res_w)) {
 		const auto ri = std::any_cast<int64_t>(res_w);
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Evaluation of node is int64_t: {}.", ri
+			aleprln, "Evaluation of node is int64_t: {}.", ri
 		);
 		return make_good_evaluation_result<std::any>(detail::adapt_type(-ri));
 	}
@@ -79,13 +81,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	if (detail::is_type<double>(res_w)) {
 		const auto ri = std::any_cast<double>(res_w);
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println, "Evaluation of node is double: {}.", ri
+			aleprln, "Evaluation of node is double: {}.", ri
 		);
 		return make_good_evaluation_result<double>(-ri);
 	}
 
 	INTERPRETER_PRINT_LOC(
-		ale::logger::println,
+		aleprln,
 		"Unhandled variable type '{}'.",
 		detail::get_type_name(*res_int_w)
 	);

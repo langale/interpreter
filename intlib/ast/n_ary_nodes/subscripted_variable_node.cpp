@@ -48,18 +48,20 @@
 namespace intlib {
 namespace ast {
 
+#define aleprln ale::logger::println
+
 std::optional<std::string> make_full_variable_name(
 	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	std::string full_variable_name = v.get_variable_name();
 	for (const auto& [i, c] : v.get_children() | std::views::enumerate) {
 		const EvaluationResult res = interpret_node(ctx, c);
 		if (not res) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Failed evaluation of child {} of subscripted variable {}.",
 				i,
 				v.get_variable_name()
@@ -72,7 +74,7 @@ std::optional<std::string> make_full_variable_name(
 		const bool is_int64 = detail::is_type<int64_t>(r);
 		if (not is_uint64 and not is_int64) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Evaluation of child {} of subscripted variable {} is not an "
 				"integral number.",
 				i,
@@ -100,7 +102,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	std::vector<int64_t> indices(v.get_num_children());
 	std::size_t i = 0;
@@ -108,7 +110,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 		const std::optional<std::any> res_int_w = interpret_node(ctx, c);
 		if (not res_int_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Failed evaluation of child {} of subscripted variable {}.",
 				i,
 				v.get_variable_name()
@@ -121,7 +123,7 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 		const bool is_int64 = detail::is_type<int64_t>(res_w);
 		if (not is_uint64 and not is_int64) {
 			INTERPRETER_PRINT_LOC(
-				ale::logger::println,
+				aleprln,
 				"Evaluation of child {} of subscripted variable {} is not an "
 				"integral number.",
 				i,
@@ -148,14 +150,14 @@ std::optional<std::vector<int64_t>> get_index_sequence(
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(ale::logger::println);
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const std::optional<std::string> full_variable_name_w =
 		make_full_variable_name(ctx, v);
 
 	if (not full_variable_name_w) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println,
+			aleprln,
 			"Full variable name of subscripted variable {} could not be "
 			"retrieved.",
 			v.get_variable_name()
@@ -173,7 +175,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	const std::string& full_variable_name = *full_variable_name_w;
 	if (not ctx.memory.variable_exists(full_variable_name)) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println,
+			aleprln,
 			"Variable '{}' is not defined in this scope.",
 			full_variable_name
 		);
@@ -190,7 +192,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 
 	if (not res.value_w.has_value()) {
 		INTERPRETER_PRINT_LOC(
-			ale::logger::println,
+			aleprln,
 			"Variable '{}' has no value.",
 			full_variable_name
 		);
