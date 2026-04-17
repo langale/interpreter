@@ -55,47 +55,12 @@ using namespace std::string_literals;
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
+#include <intlib/ast/utils/iterators/comma_separated_group.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
-
-using GeneratorComma = std::generator<EvaluationResult>;
-using SharedGeneratorComma = std::shared_ptr<GeneratorComma>;
-
-[[nodiscard]] static GeneratorComma
-generate_empty(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode&)
-{
-	co_return;
-}
-
-[[nodiscard]] static GeneratorComma generate_comma_values(
-	EvaluationContext& ctx, const ale::ast::CommaSeparatedGroupNode& comma
-)
-{
-	const auto& children = comma.get_children();
-	for (const auto& child : children) {
-
-		EvaluationResult res_w = interpret_node(ctx, child);
-		if (not res_w.has_value()) {
-			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
-			co_yield make_bad_evaluation_result(std::move(res_w.error()));
-			co_return;
-		}
-
-		std::any value_w = std::move(*res_w);
-
-		INTERPRETER_PRINT_LOC(
-			aleprln,
-			"Type returned from node evaluation is: '{}'. Value is: '{}'.",
-			detail::get_type_name(value_w),
-			any_view{value_w}
-		);
-
-		co_yield make_good_evaluation_result<std::any>(std::move(value_w));
-	}
-}
 
 [[nodiscard]] static EvaluationResult compute_value_from_declaration(
 	EvaluationContext& ctx, const ale::ast::DeclarationNode& decl
@@ -116,19 +81,17 @@ generate_empty(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode&)
 					value_node.get()
 				);
 
-			return make_good_evaluation_result<SharedGeneratorComma>(
-				std::make_shared<GeneratorComma>(
-					generate_comma_values(ctx, comma)
-				)
+			return make_good_evaluation_result<SharedGenerator>(
+				std::make_shared<Generator>(make_iterator(ctx, comma))
 			);
 		}
 
-		EvaluationResult res_w = interpret_node(ctx, value_node);
-		if (not res_w.has_value()) {
+		EvaluationResult res = interpret_node(ctx, value_node);
+		if (not res.has_value()) {
 			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
-			return make_bad_evaluation_result(std::move(res_w.error()));
+			return make_bad_evaluation_result(std::move(res.error()));
 		}
-		value_w = std::move(*res_w);
+		value_w = std::move(*res);
 
 		INTERPRETER_PRINT_LOC(
 			aleprln,
@@ -241,15 +204,15 @@ generate_empty(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode&)
 
 	INTERPRETER_PRINT_LOC(aleprln, "Making the name of the variable.");
 
-	EvaluationResult res_w = make_subscripted_variable_name(ctx, variable);
-	if (not res_w.has_value()) {
+	EvaluationResult res = make_subscripted_variable_name(ctx, variable);
+	if (not res.has_value()) {
 		INTERPRETER_PRINT_LOC(
 			aleprln, "Could not make the name of the variable."
 		);
-		return make_bad_evaluation_result(std::move(res_w.error()));
+		return make_bad_evaluation_result(std::move(res.error()));
 	}
 
-	const std::any& name_w = *res_w;
+	const std::any& name_w = *res;
 #if defined DEBUG
 	assert(detail::is_type<std::string>(name_w));
 #endif
@@ -277,14 +240,14 @@ template <bool value_is_group, typename generator_iterator_t>
 
 	INTERPRETER_PRINT_LOC(aleprln, "Going to make list of names.");
 
-	auto res_w = make_shallow_sequence_indices(ctx, sequence);
-	if (not res_w) {
-		return make_bad_evaluation_result(std::move(res_w.error()));
+	auto res = make_shallow_sequence_indices(ctx, sequence);
+	if (not res) {
+		return make_bad_evaluation_result(std::move(res.error()));
 	}
 
 	INTERPRETER_PRINT_LOC(aleprln, "Successfully made list of names.");
 
-	std::any idxs_w = std::move(*res_w);
+	std::any idxs_w = std::move(*res);
 
 #if defined DEBUG
 	assert(detail::is_type<ShallowSequenceIndices>(idxs_w));
@@ -312,7 +275,7 @@ template <bool value_is_group, typename generator_iterator_t>
 		INTERPRETER_PRINT_LOC(aleprln, "Variable name: {}.", var_name);
 
 		std::string var_type = decl.get_variable_type();
-		EvaluationResult declare_res_w;
+		EvaluationResult declare_res;
 
 		if constexpr (value_is_group) {
 			/// TODO: figure out why removing "const &" is a compilation error
@@ -323,7 +286,7 @@ template <bool value_is_group, typename generator_iterator_t>
 
 			const std::any& group_value_w = *group_value_res_w;
 
-			declare_res_w = declare_single_variable(
+			declare_res = declare_single_variable(
 				ctx,
 				decl.get_node_type(),
 				std::move(var_name),
@@ -333,7 +296,7 @@ template <bool value_is_group, typename generator_iterator_t>
 			++comma_iterator;
 		}
 		else {
-			declare_res_w = declare_single_variable(
+			declare_res = declare_single_variable(
 				ctx,
 				decl.get_node_type(),
 				std::move(var_name),
@@ -348,8 +311,8 @@ template <bool value_is_group, typename generator_iterator_t>
 			var_name_copy
 		);
 
-		if (not declare_res_w) {
-			return make_bad_evaluation_result(std::move(declare_res_w.error()));
+		if (not declare_res) {
+			return make_bad_evaluation_result(std::move(declare_res.error()));
 		}
 
 		iter.next_indices();
@@ -376,28 +339,27 @@ template <bool value_is_group, typename generator_iterator_t>
 	);
 #endif
 
-	auto compute_res_w = compute_value_from_declaration(ctx, decl);
-	if (not compute_res_w) {
-		return std::move(compute_res_w.error());
+	auto compute_res = compute_value_from_declaration(ctx, decl);
+	if (not compute_res) {
+		return std::move(compute_res.error());
 	}
-	const std::any value_w = std::move(*compute_res_w);
+	const std::any value_w = std::move(*compute_res);
 
 	const bool value_is_group =
 		not is_declare and decl.get_right_child()->get_node_type() ==
 							   ale::ast::node_type_e::Comma_Separated_Group;
 
-	[[maybe_unused]] SharedGeneratorComma comma_values_w;
+	[[maybe_unused]] SharedGenerator comma_values;
 	ale::ast::CommaSeparatedGroupNode placeholder_node;
 	if (value_is_group) {
-		comma_values_w = std::any_cast<SharedGeneratorComma>(value_w);
+		comma_values = std::any_cast<SharedGenerator>(value_w);
 	}
 	else {
-		comma_values_w = std::make_shared<GeneratorComma>(
-			generate_empty(ctx, placeholder_node)
-		);
+		comma_values =
+			std::make_shared<Generator>(generate_empty(ctx, placeholder_node));
 	}
-	[[maybe_unused]] auto pos = comma_values_w->begin();
-	[[maybe_unused]] auto end = comma_values_w->end();
+	[[maybe_unused]] auto pos = comma_values->begin();
+	[[maybe_unused]] auto end = comma_values->end();
 
 	if (not is_declare and decl.get_right_child()->get_node_type() ==
 							   ale::ast::node_type_e::Comma_Separated_Group) {
@@ -426,25 +388,24 @@ template <bool value_is_group, typename generator_iterator_t>
 	);
 #endif
 
-	auto compute_res_w = compute_value_from_declaration(ctx, decl);
-	if (not compute_res_w) {
-		return std::move(compute_res_w.error());
+	auto compute_res = compute_value_from_declaration(ctx, decl);
+	if (not compute_res) {
+		return std::move(compute_res.error());
 	}
-	const std::any value_w = std::move(*compute_res_w);
+	const std::any value_w = std::move(*compute_res);
 
 	const bool value_is_group =
 		not is_declare and decl.get_right_child()->get_node_type() ==
 							   ale::ast::node_type_e::Comma_Separated_Group;
 
-	[[maybe_unused]] SharedGeneratorComma comma_values_w;
+	[[maybe_unused]] SharedGenerator comma_values_w;
 	ale::ast::CommaSeparatedGroupNode placeholder_node;
 	if (value_is_group) {
-		comma_values_w = std::any_cast<SharedGeneratorComma>(value_w);
+		comma_values_w = std::any_cast<SharedGenerator>(value_w);
 	}
 	else {
-		comma_values_w = std::make_shared<GeneratorComma>(
-			generate_empty(ctx, placeholder_node)
-		);
+		comma_values_w =
+			std::make_shared<Generator>(generate_empty(ctx, placeholder_node));
 	}
 	[[maybe_unused]] auto pos = comma_values_w->begin();
 	[[maybe_unused]] auto end = comma_values_w->end();
@@ -460,7 +421,7 @@ template <bool value_is_group, typename generator_iterator_t>
 
 		if (child->get_node_type() == ale::ast::node_type_e::Variable) {
 
-			EvaluationResult res_w;
+			EvaluationResult res;
 			if (value_is_group) {
 				/// TODO: figure out why removing "const &" is a compilation error
 				const EvaluationResult& group_value_res_w = *pos;
@@ -473,36 +434,36 @@ template <bool value_is_group, typename generator_iterator_t>
 				group_value_w = *group_value_res_w;
 				++pos;
 
-				res_w = declare_variable(ctx, decl, child, group_value_w);
+				res = declare_variable(ctx, decl, child, group_value_w);
 			}
 			else {
-				res_w = declare_variable(ctx, decl, child, value_w);
+				res = declare_variable(ctx, decl, child, value_w);
 			}
-			if (not res_w) {
-				return make_bad_evaluation_result(std::move(res_w.error()));
+			if (not res) {
+				return make_bad_evaluation_result(std::move(res.error()));
 			}
 		}
 		else if (child->get_node_type() == ale::ast::node_type_e::Sequence) {
 
-			EvaluationResult res_w;
+			EvaluationResult res;
 			if (value_is_group) {
-				res_w = declare_variable_sequence<true>(
+				res = declare_variable_sequence<true>(
 					ctx, decl, child, value_w, pos
 				);
 			}
 			else {
-				res_w = declare_variable_sequence<false>(
+				res = declare_variable_sequence<false>(
 					ctx, decl, child, value_w, pos
 				);
 			}
-			if (not res_w) {
-				return make_bad_evaluation_result(std::move(res_w.error()));
+			if (not res) {
+				return make_bad_evaluation_result(std::move(res.error()));
 			}
 		}
 		else if (child->get_node_type() ==
 				 ale::ast::node_type_e::Subscripted_Variable) {
 
-			EvaluationResult res_w;
+			EvaluationResult res;
 			if (value_is_group) {
 				/// TODO: figure out why removing "const &" is a compilation error
 				const EvaluationResult& group_value_res_w = *pos;
@@ -515,15 +476,15 @@ template <bool value_is_group, typename generator_iterator_t>
 				group_value_w = *group_value_res_w;
 				++pos;
 
-				res_w = declare_subscripted_variable(
+				res = declare_subscripted_variable(
 					ctx, decl, child, group_value_w
 				);
 			}
 			else {
-				res_w = declare_subscripted_variable(ctx, decl, child, value_w);
+				res = declare_subscripted_variable(ctx, decl, child, value_w);
 			}
-			if (not res_w) {
-				return make_bad_evaluation_result(std::move(res_w.error()));
+			if (not res) {
+				return make_bad_evaluation_result(std::move(res.error()));
 			}
 		}
 	}
@@ -546,11 +507,11 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		INTERPRETER_PRINT_LOC(aleprln, "Variable.");
 		const auto& variable_node = decl.get_left_child();
 
-		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
-		if (not res_w) {
-			return make_bad_evaluation_result(std::move(res_w.error()));
+		EvaluationResult res = compute_value_from_declaration(ctx, decl);
+		if (not res) {
+			return make_bad_evaluation_result(std::move(res.error()));
 		}
-		const std::any value_w = std::move(*res_w);
+		const std::any value_w = std::move(*res);
 		return declare_variable(ctx, decl, variable_node, value_w);
 	}
 
@@ -569,11 +530,11 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		ale::ast::node_type_e::Subscripted_Variable) {
 
 		INTERPRETER_PRINT_LOC(aleprln, "Subscripted variable.");
-		EvaluationResult res_w = compute_value_from_declaration(ctx, decl);
-		if (not res_w) {
-			return make_bad_evaluation_result(std::move(res_w.error()));
+		EvaluationResult res = compute_value_from_declaration(ctx, decl);
+		if (not res) {
+			return make_bad_evaluation_result(std::move(res.error()));
 		}
-		const std::any value_w = std::move(*res_w);
+		const std::any value_w = std::move(*res);
 		return declare_subscripted_variable(ctx, decl, left_child, value_w);
 	}
 
