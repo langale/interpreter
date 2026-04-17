@@ -52,13 +52,12 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 
 	if (not ctx.memory.variable_exists(name)) {
 		INTERPRETER_PRINT_LOC(
-			aleprln,
-			"Variable '{}' is not defined in this scope.",
-			name
+			aleprln, "Variable '{}' is not defined in this scope.", name
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Valueless_Variable},
-			std::vector{
+			Vec{evaluation_error_e::Valueless_Variable},
+			Vec{evaluation_function_e::Variable},
+			Vec{
 				std::format("Variable '{}' is not defined in this scope.", name)
 			}
 		);
@@ -67,12 +66,11 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 	memory::VariableValue& res = ctx.memory.get_variable(name);
 
 	if (not res.value_w.has_value()) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Variable '{}' has no value.", name
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Variable '{}' has no value.", name);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Valueless_Variable},
-			std::vector{std::format("Variable '{}' has no value.", name)}
+			Vec{evaluation_error_e::Valueless_Variable},
+			Vec{evaluation_function_e::Variable},
+			Vec{std::format("Variable '{}' has no value.", name)}
 		);
 	}
 

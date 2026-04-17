@@ -44,19 +44,28 @@ enum class evaluation_error_e : uint8_t {
 
 	Undefined_Variable,
 	Valueless_Variable,
+	Assignation_Of_Variable,
+	Declaration_Of_Variable,
 
 	Evaluation_Of_Node_Failed,
 	Evaluation_Of_Node_Is_Void,
 	Evaluation_Of_Node_While_Loop_Failed,
 	Evaluation_Of_Node_Is_Not_A_Boolean_Value,
 	Evaluation_Of_Node_Is_Not_A_Numeric_Value,
+	Evaluation_Of_Indices_Failed,
+	Evaluation_Of_Node_Is_Forbidden,
 
 	Arithmetic_Operation_Failed,
 	Comparison_Operation_Failed,
 
-	Forbidden_Evaluation_Of_Node,
-
 	Conversion_To_Bool_Failed,
+	Conversion_To_Numeric_Failed,
+	Conversion_Generic,
+
+	Overfull_Left_Hand_Side_Values,
+	Overfull_Right_Hand_Side_Values,
+
+	List_Iteration,
 
 	If_Statement_Condition_Empty,
 	If_Statement_First_Branch_Empty,
@@ -66,6 +75,8 @@ enum class evaluation_error_e : uint8_t {
 	Memory_Variable_Already_Exists,
 	Memory_Type_Mismatch,
 	Memory_Attempt_To_Assign_Value_To_Constant_Variable,
+
+	Node_Is_Malformed,
 };
 
 } // namespace ast

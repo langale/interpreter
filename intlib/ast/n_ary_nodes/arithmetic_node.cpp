@@ -36,13 +36,16 @@
 #endif
 #include <optional>
 #include <ranges>
+#include <string>
 #include <any>
+using namespace std::string_literals;
 
 #include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/n_ary_nodes/ArithmeticNode.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
+#include <intlib/detail/any_output.hpp>
 #include <intlib/arithmetic/arithmetic.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/EvaluationResult.hpp>
@@ -69,65 +72,77 @@ EvaluationResult evaluate(
 	const auto node_eval =
 		[&](const std::unique_ptr<ale::ast::Node>& c) -> EvaluationResult
 	{
-		EvaluationResult res_w = interpret_node(ctx, c);
-		if (not res_w) {
+		EvaluationResult res = interpret_node(ctx, c);
+		if (not res) {
 			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Evaluation of node within arithmetic node failed."
+				aleprln, "Evaluation of node within arithmetic node failed."
 			);
 			return make_bad_evaluation_result(
-				std::vector{evaluation_error_e::Evaluation_Of_Node_Failed},
-				std::vector<std::string>{
-					"Evaluation of node within arithmetic node failed."
-				}
+				Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
+				Vec{evaluation_function_e::Arithmetic},
+				Vec{"Evaluation of node within arithmetic node failed"s}
 			);
 		}
-		if (detail::is_type<void>(*res_w)) {
+
+		if (detail::is_type<void>(*res)) {
 			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Evaluation of node returned a void value."
+				aleprln, "Evaluation of node returned a void value."
 			);
 			return make_bad_evaluation_result(
-				std::vector{evaluation_error_e::Evaluation_Of_Node_Is_Void},
-				std::vector<std::string>{
-					"Evaluation of node returned a void value."
-				}
+				Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},
+				Vec{evaluation_function_e::Arithmetic},
+				Vec{"Evaluation of node returned a void value"s}
 			);
 		}
-		return make_good_evaluation_result<std::any>(std::move(*res_w));
+		return make_good_evaluation_result<std::any>(std::move(*res));
 	};
 
-	EvaluationResult res_w = node_eval(children[0]);
-	if (not res_w) {
-		return make_bad_evaluation_result(std::move(res_w.error()));
+	EvaluationResult res = node_eval(children[0]);
+	if (not res) {
+		return append_error(
+			std::move(res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Arithmetic,
+			"Evaluation of node failed"
+		);
 	}
 
-	std::any expr_res_w = std::move(*res_w);
+	std::any expr_res_w = std::move(*res);
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		res_w = node_eval(c);
-		if (not res_w) {
-			return make_bad_evaluation_result(std::move(res_w.error()));
+		res = node_eval(c);
+		if (not res) {
+			return append_error(
+				std::move(res.error()),
+				evaluation_error_e::Evaluation_Of_Node_Failed,
+				evaluation_function_e::Arithmetic,
+				"Evaluation of node failed"
+			);
 		}
 
-		expr_res_w = arithmetic::any_arithmetic(t, expr_res_w, *res_w);
+		std::any operation_res_w =
+			arithmetic::any_arithmetic(t, expr_res_w, *res);
 
-		if (not expr_res_w.has_value()) {
+		if (not operation_res_w.has_value()) {
 			INTERPRETER_PRINT_LOC(
 				aleprln,
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()
 			);
 			return make_bad_evaluation_result(
-				std::vector{evaluation_error_e::Arithmetic_Operation_Failed},
-				std::vector{std::format(
-					"Arithmetic operation '{}' did not return a value.",
-					v.get_operation_string()
+				Vec{evaluation_error_e::Arithmetic_Operation_Failed},
+				Vec{evaluation_function_e::Arithmetic},
+				Vec{std::format(
+					"Could not operate two std::any values: '{}' and '{}'.",
+					any_view{expr_res_w},
+					any_view{res}
 				)}
 			);
 		}
+
+		expr_res_w = std::move(operation_res_w);
 	}
 
 	return make_good_evaluation_result<std::any>(std::move(expr_res_w));

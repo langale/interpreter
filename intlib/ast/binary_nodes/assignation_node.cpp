@@ -52,6 +52,7 @@ using namespace std::string_literals;
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/iterators.hpp>
+#include <intlib/ast/utils/evaluation_error_to_string.hpp>
 
 namespace intlib {
 namespace ast {
@@ -73,9 +74,10 @@ namespace ast {
 			var_name
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Memory_Variable_Does_Not_Exist},
-			std::vector{std::format(
-				"Attempted to assign a value to non-existent variable {}.",
+			Vec{evaluation_error_e::Memory_Variable_Does_Not_Exist},
+			Vec{evaluation_function_e::Assignation},
+			Vec{std::format(
+				"Attempted to assign a value to non-existent variable '{}'",
 				var_name
 			)}
 		);
@@ -90,12 +92,12 @@ namespace ast {
 			var_name
 		);
 		return make_bad_evaluation_result(
-			std::vector{
-				evaluation_error_e::
-					Memory_Attempt_To_Assign_Value_To_Constant_Variable
-			},
-			std::vector{std::format(
-				"Attempted to assign a value to constant variable {}.", var_name
+			Vec{evaluation_error_e::
+					Memory_Attempt_To_Assign_Value_To_Constant_Variable},
+			Vec{evaluation_function_e::Assignation},
+			Vec{std::format(
+				"Attempted to assign a value to constant variable '{}'",
+				var_name
 			)}
 		);
 	}
@@ -109,6 +111,15 @@ namespace ast {
 			"Could not convert value '{}' to a value of type '{}'.",
 			any_view{value_w},
 			var_in_memory.type
+		);
+		return make_bad_evaluation_result(
+			Vec{evaluation_error_e::Conversion_Generic},
+			Vec{evaluation_function_e::Assignation},
+			Vec{std::format(
+				"Could not convert value '{}' to a value of type '{}'",
+				any_view{value_w},
+				var_in_memory.type
+			)}
 		);
 	}
 
@@ -167,9 +178,14 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 					"Something went wrong when retrieving the next variable."
 				);
 				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().error[0]
+					aleprln, "Error: '{}'", var_res.error().error.at(0)
 				);
-				return var_res;
+				return append_error(
+					std::move(var_res.error()),
+					evaluation_error_e::List_Iteration,
+					evaluation_function_e::Assignation,
+					"Something went wrong when retrieving the next variable"
+				);
 			}
 
 			EvaluationResult value_res = *value_iter_pos;
@@ -178,7 +194,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 					aleprln,
 					"Something went wrong when computing the next value."
 				);
-				return value_res;
+				return append_error(
+					std::move(value_res.error()),
+					evaluation_error_e::List_Iteration,
+					evaluation_function_e::Assignation,
+					"Something went wrong when retrieving the next value"
+				);
 			}
 
 			std::any var_name_w = std::move(*var_res);
@@ -195,7 +216,15 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 			EvaluationResult assign_res =
 				assign_variable(ctx, var_name, value_w);
 			if (not assign_res) {
-				return assign_res;
+				return append_error(
+					std::move(var_res.error()),
+					evaluation_error_e::Assignation_Of_Variable,
+					evaluation_function_e::Assignation,
+					std::format(
+						"Something went wrong when assigning  variable '{}'",
+						var_name
+					)
+				);
 			}
 
 			++value_iter_pos;
@@ -206,21 +235,34 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 			INTERPRETER_PRINT_LOC(
 				aleprln, "Too many values in the right hand side"
 			);
-			return make_bad_evaluation_result();
+			return make_bad_evaluation_result(
+				Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
+				Vec{evaluation_function_e::Assignation},
+				Vec{"Too many values in the right hand side"s}
+			);
 		}
 
 		if (value_iter_pos != value_iter_end) {
 			INTERPRETER_PRINT_LOC(
 				aleprln, "Too many values in the left hand side"
 			);
-			return make_bad_evaluation_result();
+			return make_bad_evaluation_result(
+				Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
+				Vec{evaluation_function_e::Assignation},
+				Vec{"Too many values in the left hand side"s}
+			);
 		}
 	}
 	else {
 
 		EvaluationResult compute_res = interpret_node(ctx, right_child);
 		if (not compute_res) {
-			return compute_res;
+			return append_error(
+				std::move(compute_res.error()),
+				evaluation_error_e::Evaluation_Of_Node_Failed,
+				evaluation_function_e::Assignation,
+				"Something went wrong when evaluating a node"
+			);
 		}
 
 		std::any value_w = std::move(*compute_res);
@@ -235,9 +277,14 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 					"Something went wrong when retrieving the next variable."
 				);
 				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().error[0]
+					aleprln, "Error: '{}'", var_res.error().error.at(0)
 				);
-				return var_res;
+				return append_error(
+					std::move(var_res.error()),
+					evaluation_error_e::List_Iteration,
+					evaluation_function_e::Assignation,
+					"Something went wrong when retrieving the next variable"
+				);
 			}
 
 			std::any var_name_w = std::move(*var_res);
@@ -252,7 +299,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 			EvaluationResult assign_res =
 				assign_variable(ctx, var_name, value_w);
 			if (not assign_res) {
-				return assign_res;
+				return append_error(
+					std::move(var_res.error()),
+					evaluation_error_e::Assignation_Of_Variable,
+					evaluation_function_e::Assignation,
+					"Something went wrong when retrieving the next variable"
+				);
 			};
 			++var_iter_pos;
 		}

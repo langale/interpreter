@@ -65,7 +65,7 @@ namespace ast {
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	std::vector<int64_t> indices;
+	Vec<int64_t> indices;
 	const auto& children = subscripted_variable.get_children();
 
 	INTERPRETER_PRINT_LOC(
@@ -115,9 +115,10 @@ namespace ast {
 
 		if (not idx_w) {
 			return make_bad_evaluation_result(
-				std::vector{evaluation_error_e::
-								Evaluation_Of_Node_Is_Not_A_Numeric_Value},
-				std::vector{"Evaluation of node is not a numeric value."s}
+				Vec{evaluation_error_e::
+						Evaluation_Of_Node_Is_Not_A_Numeric_Value},
+				Vec{evaluation_function_e::Variable_Names},
+				Vec{"Evaluation of node is not a numeric value."s}
 			);
 		}
 
@@ -126,21 +127,18 @@ namespace ast {
 		indices.push_back(idx);
 	}
 
-	return make_good_evaluation_result<std::vector<int64_t>>(
-		std::move(indices)
-	);
+	return make_good_evaluation_result<Vec<int64_t>>(std::move(indices));
 }
 
-void append_variable_name(std::string& name, const std::vector<int64_t>& idxs)
+void append_variable_name(std::string& name, const Vec<int64_t>& idxs)
 {
 	for (const int64_t idx : idxs) {
 		name += "_" + std::to_string(idx);
 	}
 }
 
-std::string make_indexed_variable_name(
-	const std::string& name, const std::vector<int64_t>& indices
-)
+std::string
+make_indexed_variable_name(const std::string& name, const Vec<int64_t>& indices)
 {
 	std::string n = name;
 	append_variable_name(n, indices);
@@ -176,7 +174,7 @@ EvaluationResult make_subscripted_variable_name(
 
 	INTERPRETER_PRINT_LOC(aleprln, "Make indices for variable {}.", name);
 
-	auto idxs = std::any_cast<std::vector<int64_t>&&>(std::move(idxs_w));
+	auto idxs = std::any_cast<Vec<int64_t>&&>(std::move(idxs_w));
 	append_variable_name(name, idxs);
 
 	INTERPRETER_PRINT_LOC(aleprln, "Name constructed '{}'.", name);
@@ -247,7 +245,7 @@ EvaluationResult make_shallow_sequence_indices(
 		detail::get_type_name(right_idxs_w)
 	);
 
-	using Veci64 = std::vector<int64_t>;
+	using Veci64 = Vec<int64_t>;
 
 #if defined DEBUG
 	assert(detail::is_type<Veci64>(left_idxs_w));

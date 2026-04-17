@@ -36,7 +36,9 @@
 #endif
 #include <optional>
 #include <ranges>
+#include <string>
 #include <any>
+using namespace std::string_literals;
 
 #include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/n_ary_nodes/ComparisonNode.hpp>
@@ -71,35 +73,33 @@ EvaluationResult evaluate(
 
 	std::any previous_w;
 	{
-		EvaluationResult res_w = interpret_node(ctx, children.at(0));
-		if (not res_w.has_value()) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Evaluation of node failed."
-			);
+		EvaluationResult res = interpret_node(ctx, children.at(0));
+		if (not res.has_value()) {
+			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
 			return append_error(
-				std::move(res_w.error()),
+				std::move(res.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
-				"Evaluation of node did not produce any value."
+				evaluation_function_e::Comparison,
+				"Evaluation of node failed"
 			);
 		}
-		previous_w = std::move(*res_w);
+		previous_w = std::move(*res);
 	}
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		EvaluationResult res_w = interpret_node(ctx, c);
-		if (not res_w.has_value()) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Evaluation of node failed."
-			);
+		EvaluationResult res = interpret_node(ctx, c);
+		if (not res.has_value()) {
+			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
 			return append_error(
-				std::move(res_w.error()),
+				std::move(res.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
-				"Evaluation of node did not produce any value."
+				evaluation_function_e::Comparison,
+				"Evaluation of node failed"
 			);
 		}
-		std::any current_w = std::move(*res_w);
+		std::any current_w = std::move(*res);
 
 		const std::optional<bool> comparison_result_w =
 			detail::any_comparison(t, previous_w, current_w);
@@ -112,8 +112,9 @@ EvaluationResult evaluate(
 				any_view{current_w}
 			);
 			return make_bad_evaluation_result(
-				std::vector{evaluation_error_e::Comparison_Operation_Failed},
-				std::vector{std::format(
+				Vec{evaluation_error_e::Comparison_Operation_Failed},
+				Vec{evaluation_function_e::Comparison},
+				Vec{std::format(
 					"Could not compare two std::any values: '{}' and '{}'.",
 					any_view{previous_w},
 					any_view{current_w}

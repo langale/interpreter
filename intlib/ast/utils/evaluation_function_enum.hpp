@@ -31,24 +31,52 @@
  *
  ********************************************************************/
 
-#include <intlib/ast/utils/evaluation_error_enum.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#pragma once
+
+#include <cstdint>
 
 namespace intlib {
 namespace ast {
 
-EvaluationError append_error(
-	EvaluationError&& err,
-	const evaluation_error_e t,
-	const evaluation_function_e f,
-	std::string&& msg
-)
-{
-	err.error.push_back(t);
-	err.functions.push_back(f);
-	err.message.push_back(std::move(msg));
-	return err;
-}
+enum class evaluation_function_e : uint8_t {
+	Assignation,
+	Declaration,
+	Sequence,
+	While_Loop,
+
+	Arithmetic,
+	Comma_Separated_Group,
+	Comparison,
+	Logical,
+	Program,
+	Subscope_Modifier,
+	Subscripted_Variable,
+
+	If_Else,
+
+	Negation,
+	Negative,
+	Positive,
+
+	False,
+	Literal,
+	True,
+	Variable,
+
+	Variable_Names,
+
+	Iterator_Value_Variable,
+	Iterator_Value_Subscripted_Variable,
+	Iterator_Value_Sequence,
+	Iterator_Value_Comma_Separated_Group,
+
+	Iterator_Name_Variable,
+	Iterator_Name_Subscripted_Variable,
+	Iterator_Name_Sequence,
+	Iterator_Name_Comma_Separated_Group,
+
+	Interpretation_Node
+};
 
 } // namespace ast
 } // namespace intlib

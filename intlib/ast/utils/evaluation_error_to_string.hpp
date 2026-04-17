@@ -74,7 +74,7 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 	case evaluation_error_e::If_Statement_Second_Branch_Empty:
 		return "If_Statement_Second_Branch_Empty";
 
-	case evaluation_error_e::Forbidden_Evaluation_Of_Node:
+	case evaluation_error_e::Evaluation_Of_Node_Is_Forbidden:
 		return "Forbidden_Evaluation_Of_Node";
 
 	case evaluation_error_e::Conversion_To_Bool_Failed:

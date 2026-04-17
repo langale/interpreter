@@ -52,6 +52,7 @@ using namespace std::string_literals;
 #include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/iterators.hpp>
+#include <intlib/ast/utils/evaluation_error_to_string.hpp>
 
 namespace intlib {
 namespace ast {
@@ -77,8 +78,9 @@ namespace ast {
 			aleprln, "Attempt to redeclare variable {}.", var_name
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Memory_Variable_Already_Exists},
-			std::vector{std::format("Redeclaration of variable {}.", var_name)}
+			Vec{evaluation_error_e::Memory_Variable_Already_Exists},
+			Vec{evaluation_function_e::Declaration},
+			Vec{std::format("Attempted to redeclare variable '{}'", var_name)}
 		);
 	}
 
@@ -110,8 +112,9 @@ namespace ast {
 			aleprln, "Attempt to redeclare variable {}.", var_name
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Memory_Variable_Already_Exists},
-			std::vector{std::format("Redeclaration of variable {}.", var_name)}
+			Vec{evaluation_error_e::Memory_Variable_Already_Exists},
+			Vec{evaluation_function_e::Declaration},
+			Vec{std::format("Attempted to redeclare variable '{}'", var_name)}
 		);
 	}
 
@@ -123,6 +126,15 @@ namespace ast {
 			"Could not convert value '{}' to a value of type '{}'.",
 			any_view{value_w},
 			var_type
+		);
+		return make_bad_evaluation_result(
+			Vec{evaluation_error_e::Conversion_Generic},
+			Vec{evaluation_function_e::Declaration},
+			Vec{std::format(
+				"Could not convert value '{}' to a value of type '{}'",
+				any_view{value_w},
+				var_type
+			)}
 		);
 	}
 
@@ -170,16 +182,25 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		while (var_iter_pos != var_iter_end) {
 			EvaluationResult res = *var_iter_pos;
 			if (not res) {
-				return res;
+				return append_error(
+					std::move(res.error()),
+					evaluation_error_e::List_Iteration,
+					evaluation_function_e::Declaration,
+					"Something went wrong when retrieving the next variable"
+				);
 			}
 			std::any name_w = std::move(*res);
-			std::string name = std::any_cast<const std::string&>(name_w);
+			std::string name = std::any_cast<std::string>(std::move(name_w));
 			std::string var_type = decl.get_variable_type();
-			auto declaration_result =
+			auto declaration_res =
 				declare_variable(ctx, std::move(name), std::move(var_type));
-			if (not declaration_result) {
-				return make_bad_evaluation_result(
-					std::move(declaration_result.error())
+
+			if (not declaration_res) {
+				return append_error(
+					std::move(declaration_res.error()),
+					evaluation_error_e::Declaration_Of_Variable,
+					evaluation_function_e::Declaration,
+					"Something went wrong when declaring a variable"
 				);
 			}
 			++var_iter_pos;
@@ -213,7 +234,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 				INTERPRETER_PRINT_LOC(
 					aleprln, "Error: '{}'", var_res.error().error[0]
 				);
-				return var_res;
+				return append_error(
+					std::move(var_res.error()),
+					evaluation_error_e::List_Iteration,
+					evaluation_function_e::Declaration,
+					"Something went wrong when retrieving the next variable"
+				);
 			}
 
 			EvaluationResult value_res = *value_iter_pos;
@@ -222,7 +248,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 					aleprln,
 					"Something went wrong when computing the next value."
 				);
-				return value_res;
+				return append_error(
+					std::move(value_res.error()),
+					evaluation_error_e::List_Iteration,
+					evaluation_function_e::Declaration,
+					"Something went wrong when retrieving the next value"
+				);
 			}
 
 			std::any var_name_w = std::move(*var_res);
@@ -241,7 +272,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
 			);
 			if (not decl_res) {
-				return decl_res;
+				return append_error(
+					std::move(decl_res.error()),
+					evaluation_error_e::Declaration_Of_Variable,
+					evaluation_function_e::Declaration,
+					"Something went wrong when declaring a variable"
+				);
 			}
 
 			++value_iter_pos;
@@ -252,21 +288,34 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 			INTERPRETER_PRINT_LOC(
 				aleprln, "Too many values in the right hand side"
 			);
-			return make_bad_evaluation_result();
+			return make_bad_evaluation_result(
+				Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
+				Vec{evaluation_function_e::Declaration},
+				Vec{"Too many values in the right hand side"s}
+			);
 		}
 
 		if (value_iter_pos != value_iter_end) {
 			INTERPRETER_PRINT_LOC(
 				aleprln, "Too many values in the left hand side"
 			);
-			return make_bad_evaluation_result();
+			return make_bad_evaluation_result(
+				Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
+				Vec{evaluation_function_e::Declaration},
+				Vec{"Too many values in the left hand side"s}
+			);
 		}
 	}
 	else {
 
 		EvaluationResult compute_res = interpret_node(ctx, right_child);
 		if (not compute_res) {
-			return compute_res;
+			return append_error(
+				std::move(compute_res.error()),
+				evaluation_error_e::Evaluation_Of_Node_Failed,
+				evaluation_function_e::Declaration,
+				"Something went wrong when evaluating a node"
+			);
 		}
 
 		std::any value_w = std::move(*compute_res);
@@ -283,7 +332,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 				INTERPRETER_PRINT_LOC(
 					aleprln, "Error: '{}'", var_res.error().error[0]
 				);
-				return var_res;
+				return append_error(
+					std::move(var_res.error()),
+					evaluation_error_e::List_Iteration,
+					evaluation_function_e::Declaration,
+					"Something went wrong when retrieving the next variable"
+				);
 			}
 
 			std::any var_name_w = std::move(*var_res);
@@ -300,7 +354,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
 			);
 			if (not decl_res) {
-				return decl_res;
+				return append_error(
+					std::move(var_res.error()),
+					evaluation_error_e::Declaration_Of_Variable,
+					evaluation_function_e::Declaration,
+					"Something went wrong when retrieving the next variable"
+				);
 			};
 			++var_iter_pos;
 		}

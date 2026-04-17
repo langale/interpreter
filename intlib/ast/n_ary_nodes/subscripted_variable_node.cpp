@@ -33,178 +33,80 @@
 
 #include <optional>
 #include <ranges>
-#include <any>
 
 #include <ale/logger/Logger.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
-#include <ale/detail/make_optional.hpp>
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/detail/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/variable_names.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-std::optional<std::string> make_full_variable_name(
-	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-	std::string full_variable_name = v.get_variable_name();
-	for (const auto& [i, c] : v.get_children() | std::views::enumerate) {
-		const EvaluationResult res = interpret_node(ctx, c);
-		if (not res) {
-			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Failed evaluation of child {} of subscripted variable {}.",
-				i,
-				v.get_variable_name()
-			);
-			return {};
-		}
-		const std::any& r = *res;
-
-		const bool is_uint64 = detail::is_type<uint64_t>(r);
-		const bool is_int64 = detail::is_type<int64_t>(r);
-		if (not is_uint64 and not is_int64) {
-			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Evaluation of child {} of subscripted variable {} is not an "
-				"integral number.",
-				i,
-				v.get_variable_name()
-			);
-			return {};
-		}
-
-		if (is_uint64) {
-			const auto j = std::any_cast<uint64_t>(r);
-			full_variable_name += "_" + std::to_string(j);
-		}
-		else {
-			const auto j = std::any_cast<int64_t>(r);
-			full_variable_name += "_" + std::to_string(j);
-		}
-	}
-
-	return ale::detail::make_optional<std::string>(
-		std::move(full_variable_name)
-	);
-}
-
-std::optional<std::vector<int64_t>> get_index_sequence(
-	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
-
-	std::vector<int64_t> indices(v.get_num_children());
-	std::size_t i = 0;
-	for (const auto& c : v.get_children()) {
-		const std::optional<std::any> res_int_w = interpret_node(ctx, c);
-		if (not res_int_w.has_value()) {
-			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Failed evaluation of child {} of subscripted variable {}.",
-				i,
-				v.get_variable_name()
-			);
-			return {};
-		}
-
-		const std::any& res_w = *res_int_w;
-		const bool is_uint64 = detail::is_type<uint64_t>(res_w);
-		const bool is_int64 = detail::is_type<int64_t>(res_w);
-		if (not is_uint64 and not is_int64) {
-			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Evaluation of child {} of subscripted variable {} is not an "
-				"integral number.",
-				i,
-				v.get_variable_name()
-			);
-			return {};
-		}
-
-		if (is_uint64) {
-			const uint64_t j = std::any_cast<uint64_t>(res_w);
-			indices[i++] = detail::to_int64(j);
-		}
-		else {
-			const int64_t j = std::any_cast<int64_t>(res_w);
-			indices[i++] = j;
-		}
-	}
-
-	return ale::detail::make_optional<std::vector<int64_t>>(
-		std::move(indices)
-	);
-}
-
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	const std::optional<std::string> full_variable_name_w =
-		make_full_variable_name(ctx, v);
-
-	if (not full_variable_name_w) {
+	EvaluationResult res = make_subscripted_variable_name(ctx, v);
+	if (not res) {
 		INTERPRETER_PRINT_LOC(
 			aleprln,
 			"Full variable name of subscripted variable {} could not be "
 			"retrieved.",
 			v.get_variable_name()
 		);
-		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Valueless_Variable},
-			std::vector{std::format(
+		return append_error(
+			std::move(res.error()),
+			evaluation_error_e::Valueless_Variable,
+			evaluation_function_e::Subscripted_Variable,
+			std::format(
 				"Full variable name of subscripted variable {} could not be "
 				"retrieved.",
 				v.get_variable_name()
-			)}
+			)
 		);
 	}
 
-	const std::string& full_variable_name = *full_variable_name_w;
-	if (not ctx.memory.variable_exists(full_variable_name)) {
+	std::any name_w = std::move(*res);
+	const std::string& full_var_name =
+		std::any_cast<std::string>(std::move(name_w));
+
+	if (not ctx.memory.variable_exists(full_var_name)) {
 		INTERPRETER_PRINT_LOC(
 			aleprln,
 			"Variable '{}' is not defined in this scope.",
-			full_variable_name
+			full_var_name
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Valueless_Variable},
-			std::vector{std::format(
-				"Variable '{}' is not defined in this scope.",
-				full_variable_name
+			Vec{evaluation_error_e::Undefined_Variable},
+			Vec{evaluation_function_e::Subscripted_Variable},
+			Vec{std::format(
+				"Variable '{}' is not defined in this scope.", full_var_name
 			)}
 		);
 	}
 
-	memory::VariableValue& res = ctx.memory.get_variable(full_variable_name);
+	memory::VariableValue& variable = ctx.memory.get_variable(full_var_name);
 
-	if (not res.value_w.has_value()) {
+	if (not variable.value_w.has_value()) {
 		INTERPRETER_PRINT_LOC(
-			aleprln,
-			"Variable '{}' has no value.",
-			full_variable_name
+			aleprln, "Variable '{}' has no value.", full_var_name
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Valueless_Variable},
-			std::vector{
-				std::format("Variable '{}' has no value.", full_variable_name)
-			}
+			Vec{evaluation_error_e::Valueless_Variable},
+			Vec{evaluation_function_e::Subscripted_Variable},
+			Vec{std::format("Variable '{}' has no value.", full_var_name)}
 		);
 	}
 
-	return make_good_evaluation_result<memory::VariableValue&>(res.value_w);
+	return make_good_evaluation_result<memory::VariableValue&>(
+		variable.value_w
+	);
 }
 
 } // namespace ast

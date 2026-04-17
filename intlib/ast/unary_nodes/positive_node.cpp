@@ -57,6 +57,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 		return append_error(
 			std::move(res_int_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Positive,
 			"Node evaluation failed"
 		);
 	}
@@ -80,9 +81,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 
 	if (detail::is_type<double>(res_w)) {
 		const auto ri = std::any_cast<double>(res_w);
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Evaluation of node is double: {}.", ri
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node is double: {}.", ri);
 		return make_good_evaluation_result<double>(ri);
 	}
 
@@ -92,10 +91,11 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 		detail::get_type_name(*res_int_w)
 	);
 	return make_bad_evaluation_result(
-		std::vector{evaluation_error_e::Unhandled_Variable_Type},
-		std::vector{
-			std::format("Unhandled type '{}'", detail::get_type_name(*res_int_w))
-		}
+		Vec{evaluation_error_e::Unhandled_Variable_Type},
+		Vec{evaluation_function_e::Positive},
+		Vec{std::format(
+			"Unhandled type '{}'", detail::get_type_name(*res_int_w)
+		)}
 	);
 }
 

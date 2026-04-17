@@ -57,28 +57,24 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 		return append_error(
 			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Negation,
 			"Node evaluation failed"
 		);
 	}
 
 	const std::optional res_bool_w = detail::any_to_bool(*res_w);
 	if (res_bool_w) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Evaluation of node: {}.", *res_bool_w
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node: {}.", *res_bool_w);
 		return make_good_evaluation_result<bool>(not *res_bool_w);
 	}
 
 	INTERPRETER_PRINT_LOC(
-		aleprln,
-		"Unhandled variable type '{}'.",
-		detail::get_type_name(*res_w)
+		aleprln, "Unhandled variable type '{}'.", detail::get_type_name(*res_w)
 	);
 	return make_bad_evaluation_result(
-		std::vector{evaluation_error_e::Unhandled_Variable_Type},
-		std::vector{
-			std::format("Unhandled type '{}'", detail::get_type_name(*res_w))
-		}
+		Vec{evaluation_error_e::Unhandled_Variable_Type},
+		Vec{evaluation_function_e::Negation},
+		Vec{std::format("Unhandled type '{}'", detail::get_type_name(*res_w))}
 	);
 }
 

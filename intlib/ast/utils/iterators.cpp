@@ -99,8 +99,9 @@ make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var)
 	const std::string& var_name = var.get_variable_name();
 	if (not ctx.memory.variable_exists(var_name)) {
 		co_yield make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Memory_Variable_Does_Not_Exist},
-			std::vector{std::format("Variable '{}' does not exist.", var_name)}
+			Vec{evaluation_error_e::Memory_Variable_Does_Not_Exist},
+			Vec{evaluation_function_e::Iterator_Value_Subscripted_Variable},
+			Vec{std::format("Variable '{}' does not exist.", var_name)}
 		);
 		co_return;
 	}
@@ -122,15 +123,21 @@ std::generator<EvaluationResult> make_value_iterator(
 		INTERPRETER_PRINT_LOC(
 			aleprln, "Could not make the name of the variable."
 		);
-		co_yield std::move(res);
+		co_yield append_error(
+			std::move(res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Iterator_Value_Subscripted_Variable,
+			"Could not make name of the variable"
+		);
 		co_return;
 	}
 
 	const std::string& var_name = var.get_variable_name();
 	if (not ctx.memory.variable_exists(var_name)) {
 		co_yield make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Memory_Variable_Does_Not_Exist},
-			std::vector{std::format("Variable '{}' does not exist.", var_name)}
+			Vec{evaluation_error_e::Memory_Variable_Does_Not_Exist},
+			Vec{evaluation_function_e::Iterator_Value_Subscripted_Variable},
+			Vec{std::format("Variable '{}' does not exist.", var_name)}
 		);
 		co_return;
 	}
@@ -155,9 +162,13 @@ std::generator<EvaluationResult> make_value_iterator(
 	);
 
 	if (is_node_interpretable(*sequence.get_operator_type())) {
-
 		EvaluationResult res = evaluate(ctx, sequence);
-		co_yield std::move(res);
+		co_yield append_error(
+			std::move(res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Iterator_Value_Sequence,
+			"Could not evaluate sequence"
+		);
 		co_return;
 	}
 
@@ -170,12 +181,22 @@ std::generator<EvaluationResult> make_value_iterator(
 
 	auto first_res = interpret_node(ctx, sequence.get_left_child());
 	if (not first_res) {
-		co_yield std::move(first_res);
+		co_yield append_error(
+			std::move(first_res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Iterator_Value_Sequence,
+			"Could not evaluate left child of sequence"
+		);
 		co_return;
 	}
 	auto second_res = interpret_node(ctx, sequence.get_right_child());
 	if (not second_res) {
-		co_yield std::move(second_res);
+		co_yield append_error(
+			std::move(second_res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Iterator_Value_Sequence,
+			"Could not evaluate right child of sequence"
+		);
 		co_return;
 	}
 
@@ -186,10 +207,10 @@ std::generator<EvaluationResult> make_value_iterator(
 		detail::any_to_numeric<int64_t>(first_value_w);
 	if (not first_val_w) {
 		co_yield make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Comparison_Operation_Failed},
-			std::vector{
-				"Evaluation of first value of sequence could not be converted to a numeric value."s
-			}
+			Vec{evaluation_error_e::Conversion_To_Numeric_Failed},
+			Vec{evaluation_function_e::Iterator_Value_Sequence},
+			Vec{"Evaluation of first value of sequence could not be converted "
+				"to a numeric value."s}
 		);
 		co_return;
 	}
@@ -198,10 +219,10 @@ std::generator<EvaluationResult> make_value_iterator(
 		detail::any_to_numeric<int64_t>(second_value_w);
 	if (not second_val_w) {
 		co_yield make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Comparison_Operation_Failed},
-			std::vector{
-				"Evaluation of second value of sequence could not be converted to a numeric value."s
-			}
+			Vec{evaluation_error_e::Conversion_To_Numeric_Failed},
+			Vec{evaluation_function_e::Iterator_Value_Sequence},
+			Vec{"Evaluation of second value of sequence could not be converted "
+				"to a numeric value."s}
 		);
 		co_return;
 	}
@@ -227,20 +248,14 @@ std::generator<EvaluationResult> make_value_iterator(
 			EvaluationResult res = interpret_node(ctx, child);
 			if (not res) {
 				INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
-				co_yield std::move(res);
+				co_yield append_error(
+					std::move(res.error()),
+					evaluation_error_e::Evaluation_Of_Node_Failed,
+					evaluation_function_e::Iterator_Value_Comma_Separated_Group,
+					"Evaluation of node failed."s
+				);
 				co_return;
 			}
-
-#if defined ALE_LOGGING_MESSAGES
-			const std::any& value_w = *res;
-			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Type returned from node evaluation is: '{}'. Value is: '{}'.",
-				detail::get_type_name(value_w),
-				any_view{value_w}
-			);
-#endif
-
 			co_yield std::move(res);
 		}
 		else if (t == ale::ast::node_type_e::Sequence) {
@@ -254,7 +269,12 @@ std::generator<EvaluationResult> make_value_iterator(
 			while (pos != end) {
 				EvaluationResult res = *pos;
 				if (not res) {
-					co_yield std::move(res);
+					co_yield make_bad_evaluation_result(
+						Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
+						Vec{evaluation_function_e::
+								Iterator_Value_Comma_Separated_Group},
+						Vec{"Evaluation of node failed."s}
+					);
 					co_return;
 				}
 				co_yield std::move(res);
@@ -359,12 +379,17 @@ std::generator<EvaluationResult> make_name_iterator(
 		INTERPRETER_PRINT_LOC(
 			aleprln, "Could not make the name of the variable."
 		);
-		co_yield make_bad_evaluation_result(std::move(res.error()));
+		co_yield append_error(
+			std::move(res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Iterator_Name_Subscripted_Variable,
+			"Could not evaluate right child of sequence"
+		);
 		co_return;
 	}
 
-	std::string var_name = std::any_cast<std::string>(std::move(*res));
-	co_yield make_good_evaluation_result<std::string>(var_name);
+	auto var_name = std::any_cast<std::string>(std::move(*res));
+	co_yield make_good_evaluation_result<std::string>(std::move(var_name));
 }
 
 std::generator<EvaluationResult> make_name_iterator(
@@ -380,7 +405,12 @@ std::generator<EvaluationResult> make_name_iterator(
 
 	auto res = make_shallow_sequence_indices(ctx, sequence);
 	if (not res) {
-		co_yield std::move(res);
+		co_yield append_error(
+			std::move(res.error()),
+			evaluation_error_e::Evaluation_Of_Indices_Failed,
+			evaluation_function_e::Iterator_Name_Sequence,
+			"Could not make indices for a sequence node"
+		);
 		co_return;
 	}
 
@@ -391,13 +421,12 @@ std::generator<EvaluationResult> make_name_iterator(
 #endif
 
 	auto idxs = std::any_cast<ShallowSequenceIndices&&>(std::move(idxs_w));
-	const std::string& base_name = idxs.base_name;
 
 	ale::utils::IndexIterator iter(std::move(idxs.left), std::move(idxs.right));
 
 	while (not iter.end()) {
 		const auto& indices = iter.get_current_indices();
-		std::string var_name = base_name;
+		std::string var_name = idxs.base_name;
 		append_variable_name(var_name, indices);
 
 		INTERPRETER_PRINT_LOC(
@@ -429,7 +458,17 @@ std::generator<EvaluationResult> make_name_iterator(
 
 			auto gen = make_name_iterator(ctx, var);
 			auto pos = gen.begin();
-			co_yield *pos;
+			EvaluationResult res = *pos;
+			if (not res) {
+				co_yield append_error(
+					std::move(res.error()),
+					evaluation_error_e::Evaluation_Of_Node_Failed,
+					evaluation_function_e::Iterator_Name_Sequence,
+					"Could not produce the name of a variable node"
+				);
+				co_return;
+			}
+			co_yield res;
 		}
 		else if (t == ale::ast::node_type_e::Subscripted_Variable) {
 			const ale::ast::SubscriptedVariableNode& subvar =
@@ -437,7 +476,17 @@ std::generator<EvaluationResult> make_name_iterator(
 
 			auto gen = make_name_iterator(ctx, subvar);
 			auto pos = gen.begin();
-			co_yield *pos;
+			EvaluationResult res = *pos;
+			if (not res) {
+				co_yield append_error(
+					std::move(res.error()),
+					evaluation_error_e::Evaluation_Of_Node_Failed,
+					evaluation_function_e::Iterator_Name_Sequence,
+					"Could not produce the name of a subscripted variable node"
+				);
+				co_return;
+			}
+			co_yield res;
 		}
 		else if (t == ale::ast::node_type_e::Sequence) {
 			const ale::ast::SequenceNode& seq =
@@ -447,7 +496,17 @@ std::generator<EvaluationResult> make_name_iterator(
 			auto pos = gen.begin();
 			auto end = gen.end();
 			while (pos != end) {
-				co_yield *pos;
+				EvaluationResult res = *pos;
+				if (not res) {
+					co_yield append_error(
+						std::move(res.error()),
+						evaluation_error_e::Evaluation_Of_Node_Failed,
+						evaluation_function_e::Iterator_Name_Sequence,
+						"Could not produce the name of a node within a sequence"
+					);
+					co_return;
+				}
+				co_yield res;
 				++pos;
 			}
 		}

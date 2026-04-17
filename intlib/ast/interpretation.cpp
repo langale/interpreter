@@ -154,8 +154,9 @@ interpret_node(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v)
 	}
 
 	return make_bad_evaluation_result(
-		std::vector{evaluation_error_e::Unhandled_Node_Type},
-		std::vector{std::format("Unhandled node type {}.", v->get_node_type())}
+		Vec{evaluation_error_e::Unhandled_Node_Type},
+		Vec{evaluation_function_e::Interpretation_Node},
+		Vec{std::format("Unhandled node type {}.", v->get_node_type())}
 	);
 }
 

@@ -32,6 +32,8 @@
  ********************************************************************/
 
 #include <optional>
+#include <string>
+using namespace std::string_literals;
 
 #include <ale/ast/ternary_nodes/IfElseNode.hpp>
 
@@ -56,26 +58,26 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	const auto& third_child = v.get_third_child();
 
 	if (first_child == nullptr) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Condition of if statement is null."
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Condition of if statement is null.");
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::If_Statement_Condition_Empty},
-			std::vector<std::string>{"Condition of if statement is null."}
+			Vec{evaluation_error_e::If_Statement_Condition_Empty},
+			Vec{evaluation_function_e::If_Else},
+			Vec{"Condition of if statement is null"s}
 		);
 	}
 
-	EvaluationResult cond_w = interpret_node(ctx, first_child);
-	if (not cond_w.has_value()) {
+	EvaluationResult cond_res = interpret_node(ctx, first_child);
+	if (not cond_res.has_value()) {
 		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
 		return append_error(
-			std::move(cond_w.error()),
+			std::move(cond_res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::If_Else,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::optional cond_bool_w = detail::any_to_bool(*cond_w);
+	const std::optional cond_bool_w = detail::any_to_bool(*cond_res);
 	if (not cond_bool_w) {
 		INTERPRETER_PRINT_LOC(
 			aleprln,
@@ -83,9 +85,11 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 			detail::get_type_name(*cond_bool_w)
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Unhandled_Variable_Type},
-			std::vector{std::format(
-				"Unhandled type '{}'", detail::get_type_name(*cond_bool_w)
+			Vec{evaluation_error_e::Conversion_To_Bool_Failed},
+			Vec{evaluation_function_e::If_Else},
+			Vec{std::format(
+				"Conversion to bool failed for type '{}'",
+				detail::get_type_name(*cond_bool_w)
 			)}
 		);
 	}
@@ -93,16 +97,12 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	if (*cond_bool_w) {
 		if (second_child == nullptr) {
 			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Condition is true but the first branch of if statement is "
-				"empty."
+				aleprln, "Condition is true but first branch of 'if' is empty."
 			);
 			return make_bad_evaluation_result(
-				std::vector{
-					evaluation_error_e::If_Statement_First_Branch_Empty
-				},
-				std::vector<std::string>{"Condition is true but the first "
-										 "branch of if statement is empty."}
+				Vec{evaluation_error_e::Node_Is_Malformed},
+				Vec{evaluation_function_e::If_Else},
+				Vec{"Condition is true but first branch of 'if' is empty"s}
 			);
 		}
 
@@ -115,9 +115,9 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 			"Condition is true but the second branch of if statement is empty."
 		);
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::If_Statement_Second_Branch_Empty},
-			std::vector<std::string>{"Condition is true but the second branch "
-									 "of if statement is empty."}
+			Vec{evaluation_error_e::Node_Is_Malformed},
+			Vec{evaluation_function_e::If_Else},
+			Vec{"Condition is true but second branch of 'if' is empty"s}
 		);
 	}
 

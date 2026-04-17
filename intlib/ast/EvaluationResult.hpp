@@ -41,17 +41,25 @@
 #include <ale/detail/make_expected.hpp>
 
 #include <intlib/ast/utils/evaluation_error_enum.hpp>
+#include <intlib/ast/utils/evaluation_function_enum.hpp>
 
 namespace intlib {
 namespace ast {
 
+template <typename type_t>
+using Vec = std::vector<type_t>;
+
 struct EvaluationError {
 	std::vector<evaluation_error_e> error;
+	std::vector<evaluation_function_e> functions;
 	std::vector<std::string> message;
 };
 
 [[nodiscard]] EvaluationError append_error(
-	EvaluationError&& err, const evaluation_error_e t, std::string&& msg
+	EvaluationError&& err,
+	const evaluation_error_e t,
+	const evaluation_function_e f,
+	std::string&& msg
 );
 
 using EvaluationResult = std::expected<std::any, EvaluationError>;

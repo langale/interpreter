@@ -54,13 +54,12 @@ evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	INTERPRETER_PRINT_LOC(
-		aleprln,
-		"Cannot evaluate nodes of type '{}'.",
-		v.get_node_type()
+		aleprln, "Cannot evaluate nodes of type '{}'.", v.get_node_type()
 	);
 	return make_bad_evaluation_result(
-		std::vector{evaluation_error_e::Forbidden_Evaluation_Of_Node},
-		std::vector{std::format(
+		Vec{evaluation_error_e::Evaluation_Of_Node_Is_Forbidden},
+		Vec{evaluation_function_e::Comma_Separated_Group},
+		Vec{std::format(
 			"Cannot evaluate nodes of type '{}'.", v.get_node_type()
 		)}
 	);

@@ -101,29 +101,27 @@ EvaluationResult evaluate_logical_node(
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	EvaluationResult res_int_w = interpret_node(ctx, c);
-	if (not res_int_w) {
+	EvaluationResult res_int = interpret_node(ctx, c);
+	if (not res_int) {
 		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
 		return append_error(
-			std::move(res_int_w.error()),
+			std::move(res_int.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Logical,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::any res_w = std::move(*res_int_w);
-	INTERPRETER_PRINT_LOC(
-		aleprln, "Evaluation of node '{}'", any_view{res_w}
-	);
+	const std::any res_w = std::move(*res_int);
+	INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node '{}'", any_view{res_w});
 
 	if (detail::is_type<void>(res_w)) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Evaluation of node failed."
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
 		return append_error(
-			std::move(res_int_w.error()),
-			evaluation_error_e::Evaluation_Of_Node_Failed,
-			"Evaluation of node did not produce any value."
+			std::move(res_int.error()),
+			evaluation_error_e::Evaluation_Of_Node_Is_Void,
+			evaluation_function_e::Logical,
+			"Evaluation of node produced a void value"
 		);
 	}
 
@@ -137,8 +135,9 @@ EvaluationResult evaluate_logical_node(
 			any_view{r_conv_w}
 		);
 		return append_error(
-			std::move(res_int_w.error()),
+			std::move(res_int.error()),
 			evaluation_error_e::Conversion_To_Bool_Failed,
+			evaluation_function_e::Logical,
 			"Evaluation of node could not be converted to a Boolean value."
 		);
 	}
@@ -156,15 +155,15 @@ EvaluationResult evaluate(
 
 	const auto& children = v.get_children();
 
-	EvaluationResult res_w = evaluate_logical_node(ctx, children.at(0));
-	if (not res_w) {
+	EvaluationResult res = evaluate_logical_node(ctx, children.at(0));
+	if (not res) {
 		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
-		return res_w.error();
+		return res.error();
 	}
 
 	const bool when_to_break = break_when(t);
 
-	bool rc_value = std::any_cast<bool>(*res_w);
+	bool rc_value = std::any_cast<bool>(*res);
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
@@ -172,15 +171,13 @@ EvaluationResult evaluate(
 			break;
 		}
 
-		EvaluationResult rv_w = evaluate_logical_node(ctx, c);
-		if (not rv_w) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Node evaluation failed."
-			);
-			return res_w.error();
+		EvaluationResult rv = evaluate_logical_node(ctx, c);
+		if (not rv) {
+			INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+			return res.error();
 		}
 
-		const bool rv_value = std::any_cast<bool>(*rv_w);
+		const bool rv_value = std::any_cast<bool>(*rv);
 		rc_value = compute_logical_expression(t, rc_value, rv_value);
 	}
 

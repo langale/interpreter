@@ -60,6 +60,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 			return append_error(
 				std::move(res_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
+				evaluation_function_e::Subscope_Modifier,
 				"Node evaluation failed"
 			);
 		}

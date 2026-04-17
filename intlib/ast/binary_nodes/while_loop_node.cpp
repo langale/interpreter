@@ -32,6 +32,8 @@
  ********************************************************************/
 
 #include <optional>
+#include <string>
+using namespace std::string_literals;
 
 #include <ale/ast/binary_nodes/WhileLoopNode.hpp>
 
@@ -56,22 +58,23 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 	const auto& right_child = v.get_right_child();
 
 	if (left_child == nullptr) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Condition in while loop is missing."
+		INTERPRETER_PRINT_LOC(aleprln, "Condition in while loop is missing.");
+		return make_bad_evaluation_result(
+			Vec{evaluation_error_e::Node_Is_Malformed},
+			Vec{evaluation_function_e::While_Loop},
+			Vec{"Condition in while loop is missing."s}
 		);
-		return make_good_evaluation_result<std::any>();
 	}
 
 	bool stop = false;
 	while (not stop) {
 		EvaluationResult cond_w = interpret_node(ctx, left_child);
 		if (not cond_w) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Node evaluation failed."
-			);
+			INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
 			return append_error(
 				std::move(cond_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
+				evaluation_function_e::While_Loop,
 				"Node evaluation failed"
 			);
 		}
@@ -86,6 +89,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 			return append_error(
 				std::move(cond_w.error()),
 				evaluation_error_e::Conversion_To_Bool_Failed,
+				evaluation_function_e::While_Loop,
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
 			);
@@ -102,12 +106,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 			EvaluationResult res_w = interpret_node(ctx, right_child);
 			if (not res_w) {
 				INTERPRETER_PRINT_LOC(
-					aleprln,
-					"Evaluation of while loop body failed."
+					aleprln, "Evaluation of while loop body failed."
 				);
 				return append_error(
 					std::move(cond_w.error()),
 					evaluation_error_e::Evaluation_Of_Node_While_Loop_Failed,
+					evaluation_function_e::While_Loop,
 					"Evaluation of while loop body failed."
 				);
 			}
