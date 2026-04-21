@@ -356,7 +356,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 			);
 			if (not decl_res) {
 				return append_error(
-					std::move(var_res.error()),
+					std::move(decl_res.error()),
 					evaluation_error_e::Declaration_Of_Variable,
 					evaluation_function_e::Declaration,
 					"Something went wrong when retrieving the next variable"
