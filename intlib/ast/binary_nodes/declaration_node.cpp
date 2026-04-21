@@ -189,11 +189,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 					"Something went wrong when retrieving the next variable"
 				);
 			}
-			std::any name_w = std::move(*res);
-			std::string name = std::any_cast<std::string>(std::move(name_w));
+
+			std::any var_name_w = std::move(*res);
+			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
+
 			std::string var_type = decl.get_variable_type();
 			auto declaration_res =
-				declare_variable(ctx, std::move(name), std::move(var_type));
+				declare_variable(ctx, std::move(var_name), std::move(var_type));
 
 			if (not declaration_res) {
 				return append_error(
@@ -258,8 +260,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 
 			std::any var_name_w = std::move(*var_res);
 			std::any value_w = std::move(*value_res);
-
-			std::string var_name = std::any_cast<std::string>(var_name_w);
+			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
 			std::string var_type = decl.get_variable_type();
 
 			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
@@ -341,7 +342,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 			}
 
 			std::any var_name_w = std::move(*var_res);
-			std::string var_name = std::any_cast<std::string>(var_name_w);
+			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
 			std::string var_type = decl.get_variable_type();
 
 			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);

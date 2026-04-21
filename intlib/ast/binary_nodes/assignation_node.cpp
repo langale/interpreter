@@ -202,11 +202,10 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 				);
 			}
 
-			std::any var_name_w = std::move(*var_res);
-			std::any value_w = std::move(*value_res);
-
-			const std::string& var_name =
-				*std::any_cast<std::string>(&var_name_w);
+			const std::any& var_name_w = *var_res;
+			const std::any& value_w = *value_res;
+			const auto& var_name =
+				std::any_cast<const std::string&>(var_name_w);
 
 			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
 			INTERPRETER_PRINT_LOC(
@@ -265,7 +264,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 			);
 		}
 
-		std::any value_w = std::move(*compute_res);
+		const std::any& value_w = *compute_res;
 
 		while (var_iter_pos != var_iter_end) {
 			INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
@@ -287,9 +286,9 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 				);
 			}
 
-			std::any var_name_w = std::move(*var_res);
-			const std::string& var_name =
-				*std::any_cast<std::string>(&var_name_w);
+			const std::any& var_name_w = *var_res;
+			const auto& var_name =
+				std::any_cast<const std::string&>(var_name_w);
 
 			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
 			INTERPRETER_PRINT_LOC(

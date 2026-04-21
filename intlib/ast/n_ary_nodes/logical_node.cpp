@@ -112,7 +112,7 @@ EvaluationResult evaluate_logical_node(
 		);
 	}
 
-	const std::any res_w = std::move(*res_int);
+	const std::any& res_w = *res_int;
 	INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node '{}'", any_view{res_w});
 
 	if (detail::is_type<void>(res_w)) {

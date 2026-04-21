@@ -72,35 +72,30 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		);
 	}
 
-	std::any name_w = std::move(*res);
-	const std::string& full_var_name =
-		std::any_cast<std::string>(std::move(name_w));
+	const std::any& var_name_w = *res;
+	const auto& var_name = std::any_cast<const std::string&>(var_name_w);
 
-	if (not ctx.memory.variable_exists(full_var_name)) {
+	if (not ctx.memory.variable_exists(var_name)) {
 		INTERPRETER_PRINT_LOC(
-			aleprln,
-			"Variable '{}' is not defined in this scope.",
-			full_var_name
+			aleprln, "Variable '{}' is not defined in this scope.", var_name
 		);
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Undefined_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},
 			Vec{std::format(
-				"Variable '{}' is not defined in this scope.", full_var_name
+				"Variable '{}' is not defined in this scope.", var_name
 			)}
 		);
 	}
 
-	memory::VariableValue& variable = ctx.memory.get_variable(full_var_name);
+	memory::VariableValue& variable = ctx.memory.get_variable(var_name);
 
 	if (not variable.value_w.has_value()) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Variable '{}' has no value.", full_var_name
-		);
+		INTERPRETER_PRINT_LOC(aleprln, "Variable '{}' has no value.", var_name);
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},
-			Vec{std::format("Variable '{}' has no value.", full_var_name)}
+			Vec{std::format("Variable '{}' has no value.", var_name)}
 		);
 	}
 
