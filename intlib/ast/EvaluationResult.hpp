@@ -55,14 +55,14 @@ struct EvaluationError {
 	std::vector<std::string> message;
 };
 
-[[nodiscard]] EvaluationError append_error(
+using EvaluationResult = std::expected<std::any, EvaluationError>;
+
+[[nodiscard]] EvaluationResult append_error(
 	EvaluationError&& err,
 	const evaluation_error_e t,
 	const evaluation_function_e f,
 	std::string&& msg
 );
-
-using EvaluationResult = std::expected<std::any, EvaluationError>;
 
 template <typename content_t, typename... params_t>
 EvaluationResult make_good_evaluation_result(params_t&&...params)
