@@ -215,6 +215,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 			EvaluationResult assign_res =
 				assign_variable(ctx, var_name, value_w);
 			if (not assign_res) {
+				INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
 				return append_error(
 					std::move(var_res.error()),
 					evaluation_error_e::Assignation_Of_Variable,
@@ -298,8 +299,9 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 			EvaluationResult assign_res =
 				assign_variable(ctx, var_name, value_w);
 			if (not assign_res) {
+				INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
 				return append_error(
-					std::move(var_res.error()),
+					std::move(assign_res.error()),
 					evaluation_error_e::Assignation_Of_Variable,
 					evaluation_function_e::Assignation,
 					"Something went wrong when retrieving the next variable"
