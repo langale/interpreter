@@ -76,9 +76,15 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 
 	case evaluation_error_e::Evaluation_Of_Node_Is_Forbidden:
 		return "Forbidden_Evaluation_Of_Node";
+	case evaluation_error_e::Evaluation_Of_Indices_Failed:
+		return "Evaluation_Of_Indices_Failed";
 
 	case evaluation_error_e::Conversion_To_Bool_Failed:
 		return "Conversion_To_Bool_Failed";
+	case evaluation_error_e::Conversion_To_Numeric_Failed:
+		return "Conversion_To_Numeric_Failed";
+	case evaluation_error_e::Conversion_Generic:
+		return "Conversion_Generic";
 
 	case evaluation_error_e::Memory_Variable_Does_Not_Exist:
 		return "Memory_Variable_Does_Not_Exist";
@@ -90,8 +96,22 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 		Memory_Attempt_To_Assign_Value_To_Constant_Variable:
 		return "Memory_Attempt_To_Assign_Value_To_Constant_Variable";
 
-	default: return "?";
+	case evaluation_error_e::Assignation_Of_Variable:
+		return "Assignation_Of_Variable";
+	case evaluation_error_e::Declaration_Of_Variable:
+		return "Declaration_Of_Variable";
+
+	case evaluation_error_e::Overfull_Left_Hand_Side_Values:
+		return "Overfull_Left_Hand_Side_Values";
+	case evaluation_error_e::Overfull_Right_Hand_Side_Values:
+		return "Overfull_Right_Hand_Side_Values";
+	case evaluation_error_e::List_Iteration:
+		return "List_Iteration";
+	case evaluation_error_e::Node_Is_Malformed:
+		return "Node_Is_Malformed";
 	}
+
+	return "evaluation_error_to_string: ??";
 }
 
 } // namespace ast
