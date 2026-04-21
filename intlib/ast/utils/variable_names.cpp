@@ -252,13 +252,10 @@ EvaluationResult make_shallow_sequence_indices(
 	assert(detail::is_type<Veci64>(right_idxs_w));
 #endif
 
-	ShallowSequenceIndices idxs_limits{
-		.left = std::any_cast<Veci64&&>(std::move(left_idxs_w)),
-		.right = std::any_cast<Veci64&&>(std::move(right_idxs_w)),
-		.base_name = left_subscripted_variable.get_variable_name()
-	};
 	return make_good_evaluation_result<ShallowSequenceIndices>(
-		std::move(idxs_limits)
+		std::any_cast<Veci64&&>(std::move(left_idxs_w)),
+		std::any_cast<Veci64&&>(std::move(right_idxs_w)),
+		left_subscripted_variable.get_variable_name()
 	);
 }
 
