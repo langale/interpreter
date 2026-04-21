@@ -212,9 +212,9 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 				aleprln, "Of value: '{}'.", any_view{value_w}
 			);
 
-			EvaluationResult assign_res =
+			EvaluationResult assignation_res =
 				assign_variable(ctx, var_name, value_w);
-			if (not assign_res) {
+			if (not assignation_res) {
 				INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
 				return append_error(
 					std::move(var_res.error()),
@@ -296,12 +296,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 				aleprln, "Of value: '{}'.", any_view{value_w}
 			);
 
-			EvaluationResult assign_res =
+			EvaluationResult assignation_res =
 				assign_variable(ctx, var_name, value_w);
-			if (not assign_res) {
+			if (not assignation_res) {
 				INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
 				return append_error(
-					std::move(assign_res.error()),
+					std::move(assignation_res.error()),
 					evaluation_error_e::Assignation_Of_Variable,
 					evaluation_function_e::Assignation,
 					"Something went wrong when retrieving the next variable"

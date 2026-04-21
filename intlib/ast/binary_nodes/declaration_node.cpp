@@ -269,12 +269,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 				aleprln, "Of value: '{}'.", any_view{value_w}
 			);
 
-			EvaluationResult decl_res = declare_variable(
+			EvaluationResult declaration_res = declare_variable(
 				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
 			);
-			if (not decl_res) {
+			if (not declaration_res) {
 				return append_error(
-					std::move(decl_res.error()),
+					std::move(declaration_res.error()),
 					evaluation_error_e::Declaration_Of_Variable,
 					evaluation_function_e::Declaration,
 					"Something went wrong when declaring a variable"
@@ -351,12 +351,12 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 				aleprln, "Of value: '{}'.", any_view{value_w}
 			);
 
-			EvaluationResult decl_res = declare_variable(
+			EvaluationResult declaration_res = declare_variable(
 				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
 			);
-			if (not decl_res) {
+			if (not declaration_res) {
 				return append_error(
-					std::move(decl_res.error()),
+					std::move(declaration_res.error()),
 					evaluation_error_e::Declaration_Of_Variable,
 					evaluation_function_e::Declaration,
 					"Something went wrong when retrieving the next variable"
