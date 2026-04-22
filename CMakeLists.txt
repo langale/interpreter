@@ -150,12 +150,10 @@ message(STATUS "INTERPRETER_DIR: ${INTERPRETER_DIR}")
 # Path to ALE's directory
 
 if (NOT DEFINED ALE_DIR)
-	message(STATUS "ALE's development root directory was not given.")
-	message(STATUS "    Note that even if the library is installed in the system, this interpreter")
-	message(STATUS "    use 'private' headers of the library, which are not distributed.")
-	message(STATUS "    Please, rerun 'cmake' with the location of ALE's development root directory:")
-	message(STATUS "        -DALE_DIR=/path/to/ale")
-	message(STATUS "    Make sure it is an absolute path!")
+	message(STATUS      "ALE's root directory was not given.")
+	message(STATUS      "    Please, rerun 'cmake' with the location of ALE's root directory:")
+	message(STATUS      "        -DALE_DIR=/path/to/ale")
+	message(STATUS      "    Make sure it is an absolute path!")
 	message(FATAL_ERROR "Please, read the last few lines above and follow the instructions given.")
 endif()
 
