@@ -42,6 +42,8 @@
 #include <ale/logger/Logger.hpp>
 
 #include <intlib/Program.hpp>
+#include <intlib/ast/utils/evaluation_error_to_string.hpp>
+#include <intlib/ast/utils/evaluation_function_to_string.hpp>
 
 using TokenType = ale::lexer::TokenType;
 using Token = ale::lexer::Token;
@@ -112,8 +114,17 @@ int main(int argc, char *argv[])
 	intlib::Program p;
 	p.set_program_node(std::move(m.node));
 
-	std::cout << "---------------\n";
-	std::cout << "Program's evaluation:\n";
+	auto res = p.run_program();
+	if (not res.has_value()) {
+		intlib::ast::EvaluationError err = std::move(res.error());
 
-	p.run_program();
+		std::println("Program execution failed.");
+		std::println("    Errors: {}.", err.errors.size());
+		for (size_t i = 0; i < err.errors.size(); ++i) {
+			std::println("    {})", i);
+			std::println("    Error: '{}'.", err.errors.at(i));
+			std::println("    In function: '{}'.", err.functions.at(i));
+			std::println("    Message: '{}'.", err.messages.at(i));
+		}
+	}
 }
