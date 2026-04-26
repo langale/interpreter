@@ -41,9 +41,9 @@ namespace intlib {
 namespace ast {
 
 [[nodiscard]] constexpr std::string_view
-evaluation_error_to_string(const evaluation_error_e r) noexcept
+evaluation_error_to_string(const evaluation_error_e e) noexcept
 {
-	switch (r) {
+	switch (e) {
 	case evaluation_error_e::Unhandled_Node_Type: return "Unhandled_Node_Type";
 	case evaluation_error_e::Unhandled_Variable_Type:
 		return "Unhandled_Variable_Type";
@@ -101,6 +101,9 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 	case evaluation_error_e::Declaration_Of_Variable:
 		return "Declaration_Of_Variable";
 
+	case evaluation_error_e::Index_Mismatch_In_Sequence:
+		return "Index_Mismatch_In_Sequence";
+
 	case evaluation_error_e::Overfull_Left_Hand_Side_Values:
 		return "Overfull_Left_Hand_Side_Values";
 	case evaluation_error_e::Overfull_Right_Hand_Side_Values:
@@ -111,7 +114,7 @@ evaluation_error_to_string(const evaluation_error_e r) noexcept
 		return "Node_Is_Malformed";
 	}
 
-	return "evaluation_error_to_string: ??";
+	return "??";
 }
 
 } // namespace ast

@@ -67,6 +67,8 @@ enum class evaluation_error_e : uint8_t {
 
 	List_Iteration,
 
+	Index_Mismatch_In_Sequence,
+
 	If_Statement_Condition_Empty,
 	If_Statement_First_Branch_Empty,
 	If_Statement_Second_Branch_Empty,

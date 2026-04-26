@@ -69,11 +69,12 @@ enum class evaluation_function_e : uint8_t {
 	Iterator_Value_Subscripted_Variable,
 	Iterator_Value_Sequence,
 	Iterator_Value_Comma_Separated_Group,
-
 	Iterator_Name_Variable,
 	Iterator_Name_Subscripted_Variable,
 	Iterator_Name_Sequence,
 	Iterator_Name_Comma_Separated_Group,
+
+	Sequence_Index_Extraction,
 
 	Interpretation_Node
 };
