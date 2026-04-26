@@ -234,7 +234,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 					"Something went wrong when retrieving the next variable."
 				);
 				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().error.at(0)
+					aleprln, "Error: '{}'", var_res.error().errors.at(0)
 				);
 				return append_error(
 					std::move(var_res.error()),
@@ -251,7 +251,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 					"Something went wrong when computing the next value."
 				);
 				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", value_res.error().error.at(0)
+					aleprln, "Error: '{}'", value_res.error().errors.at(0)
 				);
 				return append_error(
 					std::move(value_res.error()),
@@ -334,7 +334,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 					"Something went wrong when retrieving the next variable."
 				);
 				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().error.at(0)
+					aleprln, "Error: '{}'", var_res.error().errors.at(0)
 				);
 				return append_error(
 					std::move(var_res.error()),

@@ -44,9 +44,9 @@ EvaluationResult append_error(
 	std::string&& msg
 )
 {
-	err.error.push_back(t);
+	err.errors.push_back(t);
 	err.functions.push_back(f);
-	err.message.push_back(std::move(msg));
+	err.messages.push_back(std::move(msg));
 	return make_bad_evaluation_result(std::move(err));
 }
 

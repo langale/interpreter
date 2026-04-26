@@ -50,9 +50,9 @@ template <typename type_t>
 using Vec = std::vector<type_t>;
 
 struct EvaluationError {
-	std::vector<evaluation_error_e> error;
+	std::vector<evaluation_error_e> errors;
 	std::vector<evaluation_function_e> functions;
-	std::vector<std::string> message;
+	std::vector<std::string> messages;
 };
 
 using EvaluationResult = std::expected<std::any, EvaluationError>;
