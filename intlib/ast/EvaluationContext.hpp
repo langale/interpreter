@@ -33,6 +33,9 @@
 
 #pragma once
 
+#include <optional>
+#include <span>
+
 #include <intlib/memory/Memory.hpp>
 
 namespace intlib {
@@ -40,7 +43,14 @@ namespace ast {
 
 struct EvaluationContext {
 	memory::Memory& memory;
+	std::optional<std::span<int64_t>> variable_index_distances;
 };
+
+[[nodiscard]] inline EvaluationContext
+new_evaluation_context(memory::Memory& mem)
+{
+	return EvaluationContext{.memory = mem, .variable_index_distances = {}};
+}
 
 } // namespace ast
 } // namespace intlib
