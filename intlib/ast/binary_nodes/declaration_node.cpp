@@ -215,10 +215,14 @@ namespace ast {
 			);
 		}
 		std::any value_w = std::move(*value_res);
-		std::any *actual_value_w = nullptr;
+		const std::any *actual_value_w = nullptr;
 		if (detail::is_type<memory::RefMemVar>(value_w)) {
 			actual_value_w =
 				&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
+		}
+		else if (detail::is_type<memory::RefConstMemVar>(value_w)) {
+			actual_value_w =
+				&std::any_cast<memory::RefConstMemVar>(value_w).get().value_w;
 		}
 		else {
 			actual_value_w = &value_w;
@@ -300,10 +304,16 @@ namespace ast {
 	}
 
 	std::any value_w = std::move(*compute_res);
-	std::any *actual_value_w = nullptr;
+	const std::any *actual_value_w = nullptr;
 	if (detail::is_type<memory::RefMemVar>(value_w)) {
+		INTERPRETER_PRINT_LOC(aleprln, "Value is a variable reference.");
 		actual_value_w =
 			&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
+	}
+	else if (detail::is_type<memory::RefConstMemVar>(value_w)) {
+		INTERPRETER_PRINT_LOC(aleprln, "Value is a variable const-reference.");
+		actual_value_w =
+			&std::any_cast<memory::RefConstMemVar>(value_w).get().value_w;
 	}
 	else {
 		actual_value_w = &value_w;

@@ -193,6 +193,10 @@ namespace ast {
 			actual_value_w =
 				&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
 		}
+		else if (detail::is_type<memory::RefConstMemVar>(value_w)) {
+			actual_value_w =
+				&std::any_cast<memory::RefConstMemVar>(value_w).get().value_w;
+		}
 		else {
 			actual_value_w = &value_w;
 		}
@@ -269,6 +273,10 @@ namespace ast {
 	if (detail::is_type<memory::RefMemVar>(value_w)) {
 		actual_value_w =
 			&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
+	}
+	else if (detail::is_type<const memory::RefMemVar>(value_w)) {
+		actual_value_w =
+			&std::any_cast<const memory::RefMemVar>(value_w).get().value_w;
 	}
 	else {
 		actual_value_w = &value_w;
