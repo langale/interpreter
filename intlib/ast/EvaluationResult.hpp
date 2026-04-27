@@ -64,6 +64,9 @@ using EvaluationResult = std::expected<std::any, EvaluationError>;
 	std::string&& msg
 );
 
+template <typename type_t>
+using Vec = std::vector<type_t>;
+
 template <typename content_t, typename... params_t>
 EvaluationResult make_good_evaluation_result(params_t&&...params)
 {
