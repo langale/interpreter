@@ -38,14 +38,32 @@
 
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/concepts.hpp>
+#include <intlib/memory/VariableValue.hpp>
 
 namespace intlib {
 namespace detail {
 
 template <numeric_c to_type_t>
 [[nodiscard]] std::optional<to_type_t>
-any_to_numeric(const std::any& value_w) noexcept
+any_to_numeric(const std::any& wrapped_value_w) noexcept
 {
+	const std::any& value_w = [&]()
+	{
+		if (detail::is_type<memory::RefMemVar>(wrapped_value_w)) {
+			return std::cref(
+				std::any_cast<memory::RefMemVar>(wrapped_value_w).get().value_w
+			);
+		}
+		if (detail::is_type<memory::RefConstMemVar>(wrapped_value_w)) {
+			return std::cref(
+				std::any_cast<memory::RefConstMemVar>(wrapped_value_w)
+					.get()
+					.value_w
+			);
+		}
+		return std::cref(wrapped_value_w);
+	}();
+
 	const std::string name = get_type_name(value_w);
 
 	if (is_builtin_type<bool>(name)) {
