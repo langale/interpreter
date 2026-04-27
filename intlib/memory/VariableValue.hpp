@@ -54,6 +54,7 @@ static constinit VariableValue empty_variable{
 };
 
 using RefMemVar = std::reference_wrapper<VariableValue>;
+using RefConstMemVar = std::reference_wrapper<const VariableValue>;
 
 } // namespace memory
 } // namespace intlib
