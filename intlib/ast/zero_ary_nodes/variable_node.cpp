@@ -63,9 +63,9 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 		);
 	}
 
-	memory::VariableValue& res = ctx.memory.get_variable(name);
+	memory::VariableValue& variable = ctx.memory.get_variable(name);
 
-	if (not res.value_w.has_value()) {
+	if (not variable.value_w.has_value()) {
 		INTERPRETER_PRINT_LOC(aleprln, "Variable '{}' has no value.", name);
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Valueless_Variable},
@@ -74,12 +74,14 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 		);
 	}
 
-	if (res.is_constant) {
-		return make_good_evaluation_result<const memory::VariableValue&>(
-			res.value_w
+	if (variable.is_constant) {
+		return make_good_evaluation_result<
+			std::reference_wrapper<const memory::VariableValue>>(
+			std::cref(variable)
 		);
 	}
-	return make_good_evaluation_result<memory::VariableValue&>(res.value_w);
+	return make_good_evaluation_result<
+		std::reference_wrapper<memory::VariableValue>>(std::ref(variable));
 }
 
 } // namespace ast

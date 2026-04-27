@@ -99,9 +99,14 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		);
 	}
 
-	return make_good_evaluation_result<memory::VariableValue&>(
-		variable.value_w
-	);
+	if (variable.is_constant) {
+		return make_good_evaluation_result<
+			std::reference_wrapper<const memory::VariableValue>>(
+			std::cref(variable)
+		);
+	}
+	return make_good_evaluation_result<
+		std::reference_wrapper<memory::VariableValue>>(std::ref(variable));
 }
 
 } // namespace ast

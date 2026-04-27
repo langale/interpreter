@@ -59,6 +59,8 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
+using RefMemVar = std::reference_wrapper<memory::VariableValue>;
+
 [[nodiscard]] static EvaluationResult declare_variable(
 	EvaluationContext& ctx, std::string&& var_name, std::string&& var_type
 )
@@ -163,6 +165,201 @@ namespace ast {
 	return make_good_evaluation_result<std::any>();
 }
 
+[[nodiscard]] static EvaluationResult declare_multiple_values_rhs(
+	EvaluationContext& ctx,
+	const ale::ast::DeclarationNode& decl,
+	const ale::ast::node_type_e decl_t,
+	const std::unique_ptr<ale::ast::Node>& left_child,
+	const std::unique_ptr<ale::ast::Node>& right_child
+)
+{
+	auto var_iter = make_name_iterator(ctx, left_child);
+	auto var_iter_pos = var_iter.begin();
+	auto var_iter_end = var_iter.end();
+
+	auto value_iter = make_value_iterator(ctx, right_child);
+	auto value_iter_pos = value_iter.begin();
+	auto value_iter_end = value_iter.end();
+
+	while (var_iter_pos != var_iter_end and value_iter_pos != value_iter_end) {
+		INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
+
+		EvaluationResult var_res = *var_iter_pos;
+		if (not var_res) {
+			INTERPRETER_PRINT_LOC(
+				aleprln,
+				"Something went wrong when retrieving the next variable."
+			);
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Error: '{}'", var_res.error().errors.at(0)
+			);
+			return append_error(
+				std::move(var_res.error()),
+				evaluation_error_e::List_Iteration,
+				evaluation_function_e::Declaration,
+				"Something went wrong when retrieving the next variable"
+			);
+		}
+
+		EvaluationResult value_res = *value_iter_pos;
+		if (not value_res) {
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Something went wrong when computing the next value."
+			);
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Error: '{}'", value_res.error().errors.at(0)
+			);
+			return append_error(
+				std::move(value_res.error()),
+				evaluation_error_e::List_Iteration,
+				evaluation_function_e::Declaration,
+				"Something went wrong when retrieving the next value"
+			);
+		}
+		std::any value_w = std::move(*value_res);
+		std::any *actual_value_w = nullptr;
+		if (detail::is_type<RefMemVar>(value_w)) {
+			actual_value_w = &std::any_cast<RefMemVar>(value_w).get().value_w;
+		}
+		else {
+			actual_value_w = &value_w;
+		}
+
+		std::any var_name_w = std::move(*var_res);
+		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
+		std::string var_type = decl.get_variable_type();
+
+		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
+		INTERPRETER_PRINT_LOC(
+			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
+		);
+
+		EvaluationResult declaration_res = declare_variable(
+			ctx,
+			decl_t,
+			std::move(var_name),
+			std::move(var_type),
+			*actual_value_w
+		);
+		if (not declaration_res) {
+			return append_error(
+				std::move(declaration_res.error()),
+				evaluation_error_e::Declaration_Of_Variable,
+				evaluation_function_e::Declaration,
+				"Something went wrong when declaring a variable"
+			);
+		}
+
+		++value_iter_pos;
+		++var_iter_pos;
+	}
+
+	if (var_iter_pos != var_iter_end) {
+		INTERPRETER_PRINT_LOC(
+			aleprln, "Too many values in the right hand side"
+		);
+		return make_bad_evaluation_result(
+			Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
+			Vec{evaluation_function_e::Declaration},
+			Vec{"Too many values in the right hand side"s}
+		);
+	}
+
+	if (value_iter_pos != value_iter_end) {
+		INTERPRETER_PRINT_LOC(aleprln, "Too many values in the left hand side");
+		return make_bad_evaluation_result(
+			Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
+			Vec{evaluation_function_e::Declaration},
+			Vec{"Too many values in the left hand side"s}
+		);
+	}
+
+	return make_good_evaluation_result<std::any>();
+}
+
+[[nodiscard]] static EvaluationResult declare_single_values_rhs(
+	EvaluationContext& ctx,
+	const ale::ast::DeclarationNode& decl,
+	const ale::ast::node_type_e decl_t,
+	const std::unique_ptr<ale::ast::Node>& left_child,
+	const std::unique_ptr<ale::ast::Node>& right_child
+)
+{
+	auto var_iter = make_name_iterator(ctx, left_child);
+	auto var_iter_pos = var_iter.begin();
+	auto var_iter_end = var_iter.end();
+
+	EvaluationResult compute_res = interpret_node(ctx, right_child);
+	if (not compute_res) {
+		return append_error(
+			std::move(compute_res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Declaration,
+			"Something went wrong when evaluating a node"
+		);
+	}
+
+	std::any value_w = std::move(*compute_res);
+	std::any *actual_value_w = nullptr;
+	if (detail::is_type<RefMemVar>(value_w)) {
+		actual_value_w = &std::any_cast<RefMemVar>(value_w).get().value_w;
+	}
+	else {
+		actual_value_w = &value_w;
+	}
+
+	while (var_iter_pos != var_iter_end) {
+		INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
+
+		EvaluationResult var_res = *var_iter_pos;
+		if (not var_res) {
+			INTERPRETER_PRINT_LOC(
+				aleprln,
+				"Something went wrong when retrieving the next variable."
+			);
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Error: '{}'", var_res.error().errors.at(0)
+			);
+			return append_error(
+				std::move(var_res.error()),
+				evaluation_error_e::List_Iteration,
+				evaluation_function_e::Declaration,
+				"Something went wrong when retrieving the next variable"
+			);
+		}
+
+		std::any var_name_w = std::move(*var_res);
+		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
+		std::string var_type = decl.get_variable_type();
+
+		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
+		INTERPRETER_PRINT_LOC(
+			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
+		);
+
+		EvaluationResult declaration_res = declare_variable(
+			ctx,
+			decl_t,
+			std::move(var_name),
+			std::move(var_type),
+			*actual_value_w
+		);
+		if (not declaration_res) {
+			return append_error(
+				std::move(declaration_res.error()),
+				evaluation_error_e::Declaration_Of_Variable,
+				evaluation_function_e::Declaration,
+				"Something went wrong when retrieving the next variable"
+			);
+		};
+		++var_iter_pos;
+	}
+
+	return make_good_evaluation_result<std::any>();
+}
+
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 {
@@ -174,11 +371,11 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 	assert(left_child != nullptr);
 #endif
 
-	auto var_iter = make_name_iterator(ctx, left_child);
-	auto var_iter_pos = var_iter.begin();
-	auto var_iter_end = var_iter.end();
-
 	if (decl_t == ale::ast::node_type_e::Declaration_Declare) {
+		auto var_iter = make_name_iterator(ctx, left_child);
+		auto var_iter_pos = var_iter.begin();
+		auto var_iter_end = var_iter.end();
+
 		while (var_iter_pos != var_iter_end) {
 			EvaluationResult res = *var_iter_pos;
 			if (not res) {
@@ -219,157 +416,14 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 	if (right_t == ale::ast::node_type_e::Sequence or
 		right_t == ale::ast::node_type_e::Comma_Separated_Group) {
 
-		auto value_iter = make_value_iterator(ctx, right_child);
-		auto value_iter_pos = value_iter.begin();
-		auto value_iter_end = value_iter.end();
-
-		while (var_iter_pos != var_iter_end and
-			   value_iter_pos != value_iter_end) {
-			INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
-
-			EvaluationResult var_res = *var_iter_pos;
-			if (not var_res) {
-				INTERPRETER_PRINT_LOC(
-					aleprln,
-					"Something went wrong when retrieving the next variable."
-				);
-				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().errors.at(0)
-				);
-				return append_error(
-					std::move(var_res.error()),
-					evaluation_error_e::List_Iteration,
-					evaluation_function_e::Declaration,
-					"Something went wrong when retrieving the next variable"
-				);
-			}
-
-			EvaluationResult value_res = *value_iter_pos;
-			if (not value_res) {
-				INTERPRETER_PRINT_LOC(
-					aleprln,
-					"Something went wrong when computing the next value."
-				);
-				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", value_res.error().errors.at(0)
-				);
-				return append_error(
-					std::move(value_res.error()),
-					evaluation_error_e::List_Iteration,
-					evaluation_function_e::Declaration,
-					"Something went wrong when retrieving the next value"
-				);
-			}
-
-			std::any var_name_w = std::move(*var_res);
-			std::any value_w = std::move(*value_res);
-			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-			std::string var_type = decl.get_variable_type();
-
-			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-			INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Of value: '{}'.", any_view{value_w}
-			);
-
-			EvaluationResult declaration_res = declare_variable(
-				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
-			);
-			if (not declaration_res) {
-				return append_error(
-					std::move(declaration_res.error()),
-					evaluation_error_e::Declaration_Of_Variable,
-					evaluation_function_e::Declaration,
-					"Something went wrong when declaring a variable"
-				);
-			}
-
-			++value_iter_pos;
-			++var_iter_pos;
-		}
-
-		if (var_iter_pos != var_iter_end) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Too many values in the right hand side"
-			);
-			return make_bad_evaluation_result(
-				Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
-				Vec{evaluation_function_e::Declaration},
-				Vec{"Too many values in the right hand side"s}
-			);
-		}
-
-		if (value_iter_pos != value_iter_end) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Too many values in the left hand side"
-			);
-			return make_bad_evaluation_result(
-				Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
-				Vec{evaluation_function_e::Declaration},
-				Vec{"Too many values in the left hand side"s}
-			);
-		}
-	}
-	else {
-
-		EvaluationResult compute_res = interpret_node(ctx, right_child);
-		if (not compute_res) {
-			return append_error(
-				std::move(compute_res.error()),
-				evaluation_error_e::Evaluation_Of_Node_Failed,
-				evaluation_function_e::Declaration,
-				"Something went wrong when evaluating a node"
-			);
-		}
-
-		std::any value_w = std::move(*compute_res);
-
-		while (var_iter_pos != var_iter_end) {
-			INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
-
-			EvaluationResult var_res = *var_iter_pos;
-			if (not var_res) {
-				INTERPRETER_PRINT_LOC(
-					aleprln,
-					"Something went wrong when retrieving the next variable."
-				);
-				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().errors.at(0)
-				);
-				return append_error(
-					std::move(var_res.error()),
-					evaluation_error_e::List_Iteration,
-					evaluation_function_e::Declaration,
-					"Something went wrong when retrieving the next variable"
-				);
-			}
-
-			std::any var_name_w = std::move(*var_res);
-			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-			std::string var_type = decl.get_variable_type();
-
-			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-			INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Of value: '{}'.", any_view{value_w}
-			);
-
-			EvaluationResult declaration_res = declare_variable(
-				ctx, decl_t, std::move(var_name), std::move(var_type), value_w
-			);
-			if (not declaration_res) {
-				return append_error(
-					std::move(declaration_res.error()),
-					evaluation_error_e::Declaration_Of_Variable,
-					evaluation_function_e::Declaration,
-					"Something went wrong when retrieving the next variable"
-				);
-			};
-			++var_iter_pos;
-		}
+		return declare_multiple_values_rhs(
+			ctx, decl, decl_t, left_child, right_child
+		);
 	}
 
-	return make_good_evaluation_result<std::any>();
+	return declare_single_values_rhs(
+		ctx, decl, decl_t, left_child, right_child
+	);
 }
 
 } // namespace ast

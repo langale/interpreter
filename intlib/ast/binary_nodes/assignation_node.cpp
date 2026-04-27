@@ -59,6 +59,8 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
+using RefMemVar = std::reference_wrapper<memory::VariableValue>;
+
 [[nodiscard]] static EvaluationResult assign_variable(
 	EvaluationContext& ctx, const std::string& var_name, const std::any& value_w
 )
@@ -139,6 +141,188 @@ namespace ast {
 	return make_good_evaluation_result<std::any>();
 }
 
+[[nodiscard]] static EvaluationResult assign_multiple_values_rhs(
+	EvaluationContext& ctx,
+	const std::unique_ptr<ale::ast::Node>& left_child,
+	const std::unique_ptr<ale::ast::Node>& right_child
+)
+{
+	auto var_iter = make_name_iterator(ctx, left_child);
+	auto var_iter_pos = var_iter.begin();
+	auto var_iter_end = var_iter.end();
+
+	auto value_iter = make_value_iterator(ctx, right_child);
+	auto value_iter_pos = value_iter.begin();
+	auto value_iter_end = value_iter.end();
+
+	while (var_iter_pos != var_iter_end and value_iter_pos != value_iter_end) {
+
+		INTERPRETER_PRINT_LOC(aleprln, "Going to assign a variable.");
+
+		EvaluationResult var_res = *var_iter_pos;
+		if (not var_res) {
+			INTERPRETER_PRINT_LOC(
+				aleprln,
+				"Something went wrong when retrieving the next variable."
+			);
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Error: '{}'", var_res.error().errors.at(0)
+			);
+			return append_error(
+				std::move(var_res.error()),
+				evaluation_error_e::List_Iteration,
+				evaluation_function_e::Assignation,
+				"Something went wrong when retrieving the next variable"
+			);
+		}
+
+		EvaluationResult value_res = *value_iter_pos;
+		if (not value_res) {
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Something went wrong when computing the next value."
+			);
+			return append_error(
+				std::move(value_res.error()),
+				evaluation_error_e::List_Iteration,
+				evaluation_function_e::Assignation,
+				"Something went wrong when retrieving the next value"
+			);
+		}
+
+		const std::any& value_w = *value_res;
+		const std::any *actual_value_w = nullptr;
+		if (detail::is_type<RefMemVar>(value_w)) {
+			actual_value_w = &std::any_cast<RefMemVar>(value_w).get().value_w;
+		}
+		else {
+			actual_value_w = &value_w;
+		}
+
+		const std::any& var_name_w = *var_res;
+		const auto& var_name = std::any_cast<const std::string&>(var_name_w);
+
+		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT_LOC(
+			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
+		);
+
+		EvaluationResult assignation_res =
+			assign_variable(ctx, var_name, *actual_value_w);
+
+		if (not assignation_res) {
+			INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
+			return append_error(
+				std::move(var_res.error()),
+				evaluation_error_e::Assignation_Of_Variable,
+				evaluation_function_e::Assignation,
+				std::format(
+					"Something went wrong when assigning  variable '{}'",
+					var_name
+				)
+			);
+		}
+
+		++value_iter_pos;
+		++var_iter_pos;
+	}
+
+	if (var_iter_pos != var_iter_end) {
+		INTERPRETER_PRINT_LOC(
+			aleprln, "Too many values in the right hand side"
+		);
+		return make_bad_evaluation_result(
+			Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
+			Vec{evaluation_function_e::Assignation},
+			Vec{"Too many values in the right hand side"s}
+		);
+	}
+
+	if (value_iter_pos != value_iter_end) {
+		INTERPRETER_PRINT_LOC(aleprln, "Too many values in the left hand side");
+		return make_bad_evaluation_result(
+			Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
+			Vec{evaluation_function_e::Assignation},
+			Vec{"Too many values in the left hand side"s}
+		);
+	}
+	return make_good_evaluation_result<std::any>();
+}
+
+[[nodiscard]] static EvaluationResult assign_single_values_rhs(
+	EvaluationContext& ctx,
+	const std::unique_ptr<ale::ast::Node>& left_child,
+	const std::unique_ptr<ale::ast::Node>& right_child
+)
+{
+
+	EvaluationResult compute_res = interpret_node(ctx, right_child);
+	if (not compute_res) {
+		return append_error(
+			std::move(compute_res.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Assignation,
+			"Something went wrong when evaluating a node"
+		);
+	}
+
+	const std::any& value_w = *compute_res;
+	const std::any *actual_value_w = nullptr;
+	if (detail::is_type<RefMemVar>(value_w)) {
+		actual_value_w = &std::any_cast<RefMemVar>(value_w).get().value_w;
+	}
+	else {
+		actual_value_w = &value_w;
+	}
+
+	auto var_iter = make_name_iterator(ctx, left_child);
+	auto var_iter_pos = var_iter.begin();
+	auto var_iter_end = var_iter.end();
+
+	while (var_iter_pos != var_iter_end) {
+		INTERPRETER_PRINT_LOC(aleprln, "Going to assign a variable.");
+
+		EvaluationResult var_res = *var_iter_pos;
+		if (not var_res) {
+			INTERPRETER_PRINT_LOC(
+				aleprln,
+				"Something went wrong when retrieving the next variable."
+			);
+			INTERPRETER_PRINT_LOC(
+				aleprln, "Error: '{}'", var_res.error().errors.at(0)
+			);
+			return append_error(
+				std::move(var_res.error()),
+				evaluation_error_e::List_Iteration,
+				evaluation_function_e::Assignation,
+				"Something went wrong when retrieving the next variable"
+			);
+		}
+
+		const std::any& var_name_w = *var_res;
+		const auto& var_name = std::any_cast<const std::string&>(var_name_w);
+
+		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT_LOC(
+			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
+		);
+
+		EvaluationResult assignation_res =
+			assign_variable(ctx, var_name, *actual_value_w);
+
+		if (not assignation_res) {
+			INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
+			return append_error(
+				std::move(assignation_res.error()),
+				evaluation_error_e::Assignation_Of_Variable,
+				evaluation_function_e::Assignation,
+				"Something went wrong when retrieving the next variable"
+			);
+		};
+		++var_iter_pos;
+	}
+	return make_good_evaluation_result<std::any>();
+}
+
 EvaluationResult
 evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 {
@@ -149,10 +333,6 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 	assert(left_child != nullptr);
 #endif
 
-	auto var_iter = make_name_iterator(ctx, left_child);
-	auto var_iter_pos = var_iter.begin();
-	auto var_iter_end = var_iter.end();
-
 	const auto& right_child = assign.get_right_child();
 #if defined DEBUG
 	assert(right_child != nullptr);
@@ -162,156 +342,10 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 	if (right_t == ale::ast::node_type_e::Sequence or
 		right_t == ale::ast::node_type_e::Comma_Separated_Group) {
 
-		auto value_iter = make_value_iterator(ctx, right_child);
-		auto value_iter_pos = value_iter.begin();
-		auto value_iter_end = value_iter.end();
-
-		while (var_iter_pos != var_iter_end and
-			   value_iter_pos != value_iter_end) {
-
-			INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
-
-			EvaluationResult var_res = *var_iter_pos;
-			if (not var_res) {
-				INTERPRETER_PRINT_LOC(
-					aleprln,
-					"Something went wrong when retrieving the next variable."
-				);
-				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().errors.at(0)
-				);
-				return append_error(
-					std::move(var_res.error()),
-					evaluation_error_e::List_Iteration,
-					evaluation_function_e::Assignation,
-					"Something went wrong when retrieving the next variable"
-				);
-			}
-
-			EvaluationResult value_res = *value_iter_pos;
-			if (not value_res) {
-				INTERPRETER_PRINT_LOC(
-					aleprln,
-					"Something went wrong when computing the next value."
-				);
-				return append_error(
-					std::move(value_res.error()),
-					evaluation_error_e::List_Iteration,
-					evaluation_function_e::Assignation,
-					"Something went wrong when retrieving the next value"
-				);
-			}
-
-			const std::any& var_name_w = *var_res;
-			const std::any& value_w = *value_res;
-			const auto& var_name =
-				std::any_cast<const std::string&>(var_name_w);
-
-			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Of value: '{}'.", any_view{value_w}
-			);
-
-			EvaluationResult assignation_res =
-				assign_variable(ctx, var_name, value_w);
-			if (not assignation_res) {
-				INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
-				return append_error(
-					std::move(var_res.error()),
-					evaluation_error_e::Assignation_Of_Variable,
-					evaluation_function_e::Assignation,
-					std::format(
-						"Something went wrong when assigning  variable '{}'",
-						var_name
-					)
-				);
-			}
-
-			++value_iter_pos;
-			++var_iter_pos;
-		}
-
-		if (var_iter_pos != var_iter_end) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Too many values in the right hand side"
-			);
-			return make_bad_evaluation_result(
-				Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
-				Vec{evaluation_function_e::Assignation},
-				Vec{"Too many values in the right hand side"s}
-			);
-		}
-
-		if (value_iter_pos != value_iter_end) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Too many values in the left hand side"
-			);
-			return make_bad_evaluation_result(
-				Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
-				Vec{evaluation_function_e::Assignation},
-				Vec{"Too many values in the left hand side"s}
-			);
-		}
-	}
-	else {
-
-		EvaluationResult compute_res = interpret_node(ctx, right_child);
-		if (not compute_res) {
-			return append_error(
-				std::move(compute_res.error()),
-				evaluation_error_e::Evaluation_Of_Node_Failed,
-				evaluation_function_e::Assignation,
-				"Something went wrong when evaluating a node"
-			);
-		}
-
-		const std::any& value_w = *compute_res;
-
-		while (var_iter_pos != var_iter_end) {
-			INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
-
-			EvaluationResult var_res = *var_iter_pos;
-			if (not var_res) {
-				INTERPRETER_PRINT_LOC(
-					aleprln,
-					"Something went wrong when retrieving the next variable."
-				);
-				INTERPRETER_PRINT_LOC(
-					aleprln, "Error: '{}'", var_res.error().errors.at(0)
-				);
-				return append_error(
-					std::move(var_res.error()),
-					evaluation_error_e::List_Iteration,
-					evaluation_function_e::Assignation,
-					"Something went wrong when retrieving the next variable"
-				);
-			}
-
-			const std::any& var_name_w = *var_res;
-			const auto& var_name =
-				std::any_cast<const std::string&>(var_name_w);
-
-			INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Of value: '{}'.", any_view{value_w}
-			);
-
-			EvaluationResult assignation_res =
-				assign_variable(ctx, var_name, value_w);
-			if (not assignation_res) {
-				INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
-				return append_error(
-					std::move(assignation_res.error()),
-					evaluation_error_e::Assignation_Of_Variable,
-					evaluation_function_e::Assignation,
-					"Something went wrong when retrieving the next variable"
-				);
-			};
-			++var_iter_pos;
-		}
+		return assign_multiple_values_rhs(ctx, left_child, right_child);
 	}
 
-	return make_good_evaluation_result<std::any>();
+	return assign_single_values_rhs(ctx, left_child, right_child);
 }
 
 } // namespace ast
