@@ -75,13 +75,11 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 	}
 
 	if (variable.is_constant) {
-		return make_good_evaluation_result<
-			std::reference_wrapper<const memory::VariableValue>>(
+		return make_good_evaluation_result<memory::RefConstMemVar>(
 			std::cref(variable)
 		);
 	}
-	return make_good_evaluation_result<
-		std::reference_wrapper<memory::VariableValue>>(std::ref(variable));
+	return make_good_evaluation_result<memory::RefMemVar>(std::ref(variable));
 }
 
 } // namespace ast
