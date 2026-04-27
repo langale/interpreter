@@ -62,7 +62,7 @@ public:
 	 */
 	void push_local_scope() noexcept
 	{
-		m_local_scopes.emplace_back(LocalScope{});
+		m_local_scopes.emplace_back();
 	}
 	/**
 	 * @brief Pops a subscope.
@@ -106,8 +106,8 @@ public:
 	 * @param name The name of the variable to look for.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] const VariableValue& get_variable(const std::string& name
-	) const noexcept;
+	[[nodiscard]] const VariableValue&
+	get_variable(const std::string& name) const noexcept;
 
 	/**
 	 * @brief Get the value of a variable.
@@ -122,8 +122,8 @@ public:
 	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept;
 
 	/// Does a variable exist in the current subscope?
-	[[nodiscard]] bool variable_exists_shallow(const std::string& name
-	) const noexcept;
+	[[nodiscard]] bool
+	variable_exists_shallow(const std::string& name) const noexcept;
 
 private:
 

@@ -37,7 +37,6 @@
 #include <map>
 #include <any>
 
-#include <intlib/memory/memory_error_enum.hpp>
 #include <intlib/memory/VariableValue.hpp>
 
 namespace intlib {
@@ -51,6 +50,11 @@ namespace memory {
  * mutable.
  */
 class LocalScope {
+public:
+
+	/// Useful typedef.
+	using Collection = std::map<std::string, VariableValue>;
+
 public:
 
 	/* MODIFIERS */
@@ -86,8 +90,8 @@ public:
 	 * @param name The name of the variable to create.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] const VariableValue& get_variable(const std::string& name
-	) const noexcept;
+	[[nodiscard]] const VariableValue&
+	get_variable(const std::string& name) const noexcept;
 
 	/**
 	 * @brief Returns the value of variable @e s.
@@ -104,9 +108,6 @@ public:
 
 private:
 
-	/// Useful typedef.
-	using Collection = std::map<std::string, VariableValue>;
-
 	/// Find a variable.
 	[[nodiscard]] Collection::const_iterator find(const std::string& name
 	) const noexcept
@@ -118,6 +119,7 @@ private:
 	{
 		return m_variables.find(name);
 	}
+
 
 private:
 

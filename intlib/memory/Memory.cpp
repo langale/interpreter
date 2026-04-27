@@ -121,6 +121,8 @@ FunctionScope& Memory::get_current_scope() noexcept
 
 const FunctionScope& Memory::get_current_scope() const noexcept
 {
+	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	
 #if defined DEBUG
 	assert(not is_current_scope_global());
 #endif
