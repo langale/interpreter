@@ -68,9 +68,7 @@ std::optional<bool> any_comparison(
 	case ale::ast::node_type_e::Comparison_Greater_Equal:
 		return any_comparison_greater_than_equal_to(left_w, right_w);
 	default:
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Wrong node type '{}' for comparison.", t
-		);
+		INTERPRETER_PRINT(aleprln, "Wrong node type '{}' for comparison.", t);
 		return {};
 	}
 }

@@ -53,7 +53,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 
 	EvaluationResult res_int_w = interpret_node(ctx, child);
 	if (not res_int_w.has_value()) {
-		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
 			std::move(res_int_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -65,27 +65,23 @@ evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 	const std::any& res_w = *res_int_w;
 	if (detail::is_type<uint64_t>(res_w)) {
 		const auto ri = std::any_cast<uint64_t>(res_w);
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Evaluation of node is uint64_t: {}.", ri
-		);
+		INTERPRETER_PRINT(aleprln, "Evaluation of node is uint64_t: {}.", ri);
 		return make_good_evaluation_result<uint64_t>(detail::to_uint64(ri));
 	}
 
 	if (detail::is_type<int64_t>(res_w)) {
 		const auto ri = std::any_cast<int64_t>(res_w);
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Evaluation of node is int64_t: {}.", ri
-		);
+		INTERPRETER_PRINT(aleprln, "Evaluation of node is int64_t: {}.", ri);
 		return make_good_evaluation_result<int64_t>(ri);
 	}
 
 	if (detail::is_type<double>(res_w)) {
 		const auto ri = std::any_cast<double>(res_w);
-		INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node is double: {}.", ri);
+		INTERPRETER_PRINT(aleprln, "Evaluation of node is double: {}.", ri);
 		return make_good_evaluation_result<double>(ri);
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Unhandled variable type '{}'.",
 		detail::get_type_name(*res_int_w)

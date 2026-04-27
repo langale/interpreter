@@ -69,20 +69,18 @@ namespace ast {
 	Vec<int64_t> indices;
 	const auto& children = subscripted_variable.get_children();
 
-	INTERPRETER_PRINT_LOC(
-		aleprln, "Variable has {} subindices.", children.size()
-	);
+	INTERPRETER_PRINT(aleprln, "Variable has {} subindices.", children.size());
 
 	for (const auto& [i, child] : children | std::views::enumerate) {
 
-		INTERPRETER_PRINT_LOC(aleprln, "Made index for child {}.", i);
+		INTERPRETER_PRINT(aleprln, "Made index for child {}.", i);
 
 		auto val_int_w = interpret_node(ctx, child);
 		if (not val_int_w.has_value()) {
 			return val_int_w;
 		}
 
-		INTERPRETER_PRINT_LOC(aleprln, "Successfully evaluated child.");
+		INTERPRETER_PRINT(aleprln, "Successfully evaluated child.");
 
 		const std::any& val_w = *val_int_w;
 		std::optional<int64_t> idx_w;
@@ -93,7 +91,7 @@ namespace ast {
 			idx_w = detail::any_to_numeric<int64_t>(memory_variable.value_w);
 
 			if (not idx_w) {
-				INTERPRETER_PRINT_LOC(
+				INTERPRETER_PRINT(
 					aleprln,
 					"Could not convert node evaluation '{}' into a numeric "
 					"int64_t.",
@@ -105,7 +103,7 @@ namespace ast {
 			idx_w = detail::any_to_numeric<int64_t>(val_w);
 
 			if (not idx_w) {
-				INTERPRETER_PRINT_LOC(
+				INTERPRETER_PRINT(
 					aleprln,
 					"Could not convert node evaluation '{}' into a numeric "
 					"int64_t.",
@@ -124,7 +122,7 @@ namespace ast {
 		}
 
 		const auto idx = *idx_w;
-		INTERPRETER_PRINT_LOC(aleprln, "Made index {}.", idx);
+		INTERPRETER_PRINT(aleprln, "Made index {}.", idx);
 		indices.push_back(idx);
 	}
 
@@ -156,8 +154,8 @@ std::string make_indexed_variable_name(
 	return n;
 }
 
-const std::string&
-get_variable_name(const ale::ast::SequenceNode& sequence) noexcept
+const std::string& get_variable_name(const ale::ast::SequenceNode& sequence
+) noexcept
 {
 	return static_cast<ale::ast::SubscriptedVariableNode *>(
 			   sequence.get_left_child().get()
@@ -177,18 +175,18 @@ EvaluationResult make_subscripted_variable_name(
 		return res_w;
 	}
 
-	INTERPRETER_PRINT_LOC(aleprln, "Successfully made indices.");
+	INTERPRETER_PRINT(aleprln, "Successfully made indices.");
 
 	std::any indices_w = std::move(*res_w);
 
 	std::string name = subscripted_variable.get_variable_name();
 
-	INTERPRETER_PRINT_LOC(aleprln, "Make indices for variable {}.", name);
+	INTERPRETER_PRINT(aleprln, "Make indices for variable {}.", name);
 
 	const auto indices = std::any_cast<Vec<int64_t>&&>(std::move(indices_w));
 	append_variable_name(name, indices, ctx.variable_index_distances);
 
-	INTERPRETER_PRINT_LOC(aleprln, "Name constructed '{}'.", name);
+	INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
 
 	return make_good_evaluation_result<std::string>(std::move(name));
 }
@@ -224,8 +222,7 @@ EvaluationResult make_shallow_sequence_indices(
 
 	// left indices
 	const auto& left_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(
-			left_child.get()
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(left_child.get()
 		);
 	auto res_left_indices_w = get_indices(ctx, left_subscripted_variable);
 	if (not res_left_indices_w.has_value()) {
@@ -234,9 +231,8 @@ EvaluationResult make_shallow_sequence_indices(
 
 	// right indices
 	const auto& right_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(
-			right_child.get()
-		);
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(right_child.get(
+		));
 	auto res_right_indices_w = get_indices(ctx, right_subscripted_variable);
 	if (not res_right_indices_w.has_value()) {
 		return std::move(res_right_indices_w.error());
@@ -245,12 +241,12 @@ EvaluationResult make_shallow_sequence_indices(
 	std::any left_idxs_w = std::move(*res_left_indices_w);
 	std::any right_idxs_w = std::move(*res_right_indices_w);
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Type inside left indices: {}.",
 		detail::get_type_name(left_idxs_w)
 	);
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Type inside right indices: {}.",
 		detail::get_type_name(right_idxs_w)

@@ -53,7 +53,7 @@ evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Cannot evaluate nodes of type '{}'.", v.get_node_type()
 	);
 	return make_bad_evaluation_result(

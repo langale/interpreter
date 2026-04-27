@@ -68,7 +68,7 @@ namespace ast {
 		return l or r;
 	}
 
-	INTERPRETER_PRINT_LOC(aleprln, "Wrong node type {}.", t);
+	INTERPRETER_PRINT(aleprln, "Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -87,7 +87,7 @@ namespace ast {
 		return true;
 	}
 
-	INTERPRETER_PRINT_LOC(aleprln, "Wrong node type {}.", t);
+	INTERPRETER_PRINT(aleprln, "Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -103,7 +103,7 @@ EvaluationResult evaluate_logical_node(
 
 	EvaluationResult res_int = interpret_node(ctx, c);
 	if (not res_int) {
-		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
 			std::move(res_int.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -113,10 +113,10 @@ EvaluationResult evaluate_logical_node(
 	}
 
 	const std::any& res_w = *res_int;
-	INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node '{}'", any_view{res_w});
+	INTERPRETER_PRINT(aleprln, "Evaluation of node '{}'", any_view{res_w});
 
 	if (detail::is_type<void>(res_w)) {
-		INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
+		INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 		return append_error(
 			std::move(res_int.error()),
 			evaluation_error_e::Evaluation_Of_Node_Is_Void,
@@ -127,7 +127,7 @@ EvaluationResult evaluate_logical_node(
 
 	const std::optional r_conv_w = detail::any_to_bool(res_w);
 	if (not r_conv_w) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Evaluation of node '{}' could not be converted to a Boolean value "
 			"'{}'.",
@@ -157,7 +157,7 @@ EvaluationResult evaluate(
 
 	EvaluationResult res = evaluate_logical_node(ctx, children.at(0));
 	if (not res) {
-		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return res.error();
 	}
 
@@ -173,7 +173,7 @@ EvaluationResult evaluate(
 
 		EvaluationResult rv = evaluate_logical_node(ctx, c);
 		if (not rv) {
-			INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+			INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 			return res.error();
 		}
 

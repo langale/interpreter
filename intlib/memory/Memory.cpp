@@ -88,8 +88,8 @@ void Memory::declare_constant_variable(
 
 /* GETTERS */
 
-const VariableValue&
-Memory::get_variable(const std::string& name) const noexcept
+const VariableValue& Memory::get_variable(const std::string& name
+) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 

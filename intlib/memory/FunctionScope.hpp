@@ -82,8 +82,9 @@ public:
 	 * @param type The type of the variable to create.
 	 * @pre The variable does not exist.
 	 */
-	void
-	declare_variable(std::string&& name, std::any&& value_w, std::string&& type);
+	void declare_variable(
+		std::string&& name, std::any&& value_w, std::string&& type
+	);
 
 	/**
 	 * @brief Sets the value of a non-constant variable to the current scope.
@@ -105,8 +106,8 @@ public:
 	 * @param name The name of the variable to look for.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] const VariableValue&
-	get_variable(const std::string& name) const noexcept;
+	[[nodiscard]] const VariableValue& get_variable(const std::string& name
+	) const noexcept;
 
 	/**
 	 * @brief Get the value of a variable.
@@ -121,8 +122,8 @@ public:
 	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept;
 
 	/// Does a variable exist in the current subscope?
-	[[nodiscard]] bool
-	variable_exists_shallow(const std::string& name) const noexcept;
+	[[nodiscard]] bool variable_exists_shallow(const std::string& name
+	) const noexcept;
 
 private:
 

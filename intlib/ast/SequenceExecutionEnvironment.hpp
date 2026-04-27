@@ -46,8 +46,8 @@ namespace ast {
 class SequenceExecutionEnvironment {
 public:
 
-	void
-	set_expression(const std::unique_ptr<ale::ast::Node> * const expr) noexcept
+	void set_expression(const std::unique_ptr<ale::ast::Node> * const expr
+	) noexcept
 	{
 		m_expression = expr;
 	}

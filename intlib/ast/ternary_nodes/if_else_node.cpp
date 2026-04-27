@@ -58,7 +58,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	const auto& third_child = v.get_third_child();
 
 	if (first_child == nullptr) {
-		INTERPRETER_PRINT_LOC(aleprln, "Condition of if statement is null.");
+		INTERPRETER_PRINT(aleprln, "Condition of if statement is null.");
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::If_Statement_Condition_Empty},
 			Vec{evaluation_function_e::If_Else},
@@ -68,7 +68,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	EvaluationResult cond_res = interpret_node(ctx, first_child);
 	if (not cond_res.has_value()) {
-		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
 			std::move(cond_res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -79,7 +79,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	const std::optional cond_bool_w = detail::any_to_bool(*cond_res);
 	if (not cond_bool_w) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Unhandled variable type '{}'.",
 			detail::get_type_name(*cond_bool_w)
@@ -96,7 +96,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	if (*cond_bool_w) {
 		if (second_child == nullptr) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Condition is true but first branch of 'if' is empty."
 			);
 			return make_bad_evaluation_result(
@@ -110,7 +110,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	}
 
 	if (third_child == nullptr) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Condition is true but the second branch of if statement is empty."
 		);

@@ -65,10 +65,10 @@ namespace ast {
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	INTERPRETER_PRINT_LOC(aleprln, "Going to assign variable '{}'.", var_name);
+	INTERPRETER_PRINT(aleprln, "Going to assign variable '{}'.", var_name);
 
 	if (not ctx.memory.variable_exists(var_name)) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Attempted to assign a value to non-existent variable {}.",
 			var_name
@@ -86,7 +86,7 @@ namespace ast {
 	auto& var_in_memory = ctx.memory.get_variable(var_name);
 
 	if (var_in_memory.is_constant) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Attempted to assign a value to constant variable {}.",
 			var_name
@@ -106,7 +106,7 @@ namespace ast {
 		detail::any_convert_to_type(value_w, var_in_memory.type);
 
 	if (detail::is_type<void>(value_conv_w)) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Could not convert value '{}' to a value of type '{}'.",
 			any_view{value_w},
@@ -123,7 +123,7 @@ namespace ast {
 		);
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Value after conversion to '{}' is: '{}'.",
 		var_in_memory.type,
@@ -132,7 +132,7 @@ namespace ast {
 
 	var_in_memory.value_w = std::move(value_conv_w);
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Successfully assigned variable '{}'.", var_name
 	);
 
@@ -155,15 +155,15 @@ namespace ast {
 
 	while (var_iter_pos != var_iter_end and value_iter_pos != value_iter_end) {
 
-		INTERPRETER_PRINT_LOC(aleprln, "Going to assign a variable.");
+		INTERPRETER_PRINT(aleprln, "Going to assign a variable.");
 
 		EvaluationResult var_res = *var_iter_pos;
 		if (not var_res) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln,
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Error: '{}'", var_res.error().errors.at(0)
 			);
 			return append_error(
@@ -176,7 +176,7 @@ namespace ast {
 
 		EvaluationResult value_res = *value_iter_pos;
 		if (not value_res) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Something went wrong when computing the next value."
 			);
 			return append_error(
@@ -204,8 +204,8 @@ namespace ast {
 		const std::any& var_name_w = *var_res;
 		const auto& var_name = std::any_cast<const std::string&>(var_name_w);
 
-		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT(
 			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
 		);
 
@@ -213,7 +213,7 @@ namespace ast {
 			assign_variable(ctx, var_name, *actual_value_w);
 
 		if (not assignation_res) {
-			INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
+			INTERPRETER_PRINT(aleprln, "An error occurred.");
 			return append_error(
 				std::move(var_res.error()),
 				evaluation_error_e::Assignation_Of_Variable,
@@ -230,9 +230,7 @@ namespace ast {
 	}
 
 	if (var_iter_pos != var_iter_end) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Too many values in the right hand side"
-		);
+		INTERPRETER_PRINT(aleprln, "Too many values in the right hand side");
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
 			Vec{evaluation_function_e::Assignation},
@@ -241,7 +239,7 @@ namespace ast {
 	}
 
 	if (value_iter_pos != value_iter_end) {
-		INTERPRETER_PRINT_LOC(aleprln, "Too many values in the left hand side");
+		INTERPRETER_PRINT(aleprln, "Too many values in the left hand side");
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
 			Vec{evaluation_function_e::Assignation},
@@ -287,15 +285,15 @@ namespace ast {
 	auto var_iter_end = var_iter.end();
 
 	while (var_iter_pos != var_iter_end) {
-		INTERPRETER_PRINT_LOC(aleprln, "Going to assign a variable.");
+		INTERPRETER_PRINT(aleprln, "Going to assign a variable.");
 
 		EvaluationResult var_res = *var_iter_pos;
 		if (not var_res) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln,
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Error: '{}'", var_res.error().errors.at(0)
 			);
 			return append_error(
@@ -309,8 +307,8 @@ namespace ast {
 		const std::any& var_name_w = *var_res;
 		const auto& var_name = std::any_cast<const std::string&>(var_name_w);
 
-		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT(
 			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
 		);
 
@@ -318,7 +316,7 @@ namespace ast {
 			assign_variable(ctx, var_name, *actual_value_w);
 
 		if (not assignation_res) {
-			INTERPRETER_PRINT_LOC(aleprln, "An error occurred.");
+			INTERPRETER_PRINT(aleprln, "An error occurred.");
 			return append_error(
 				std::move(assignation_res.error()),
 				evaluation_error_e::Assignation_Of_Variable,

@@ -50,19 +50,19 @@ any_comparison_not_equal(const std::any& a, const std::any& b);
 [[nodiscard]] std::optional<bool>
 any_comparison_less_than(const std::any& a, const std::any& b);
 
-[[nodiscard]] std::optional<bool> any_comparison_less_than_equal_to(
-	const std::any& a, const std::any& b
-);
+[[nodiscard]] std::optional<bool>
+any_comparison_less_than_equal_to(const std::any& a, const std::any& b);
 
 [[nodiscard]] std::optional<bool>
 any_comparison_greater_than(const std::any& a, const std::any& b);
 
-[[nodiscard]] std::optional<bool> any_comparison_greater_than_equal_to(
-	const std::any& a, const std::any& b
-);
+[[nodiscard]] std::optional<bool>
+any_comparison_greater_than_equal_to(const std::any& a, const std::any& b);
 
 [[nodiscard]] std::optional<bool> any_comparison(
-	const ale::ast::node_type_e t, const std::any& left_w, const std::any& right_w
+	const ale::ast::node_type_e t,
+	const std::any& left_w,
+	const std::any& right_w
 );
 
 } // namespace detail

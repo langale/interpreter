@@ -69,12 +69,12 @@ namespace ast {
 	const std::string variable_name_copy = var_name;
 #endif
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Going to declare variable '{}'.", variable_name_copy
 	);
 
 	if (ctx.memory.variable_exists_shallow(var_name)) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln, "Attempt to redeclare variable {}.", var_name
 		);
 		return make_bad_evaluation_result(
@@ -103,12 +103,12 @@ namespace ast {
 	const std::string variable_name_copy = var_name;
 #endif
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Going to declare variable '{}'.", variable_name_copy
 	);
 
 	if (ctx.memory.variable_exists_shallow(var_name)) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln, "Attempt to redeclare variable {}.", var_name
 		);
 		return make_bad_evaluation_result(
@@ -121,7 +121,7 @@ namespace ast {
 	std::any value_conv_w = detail::any_convert_to_type(value_w, var_type);
 
 	if (detail::is_type<void>(value_conv_w)) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Could not convert value '{}' to a value of type '{}'.",
 			any_view{value_w},
@@ -138,7 +138,7 @@ namespace ast {
 		);
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Value after conversion to '{}' is: '{}'.",
 		var_type,
@@ -156,7 +156,7 @@ namespace ast {
 		);
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Successfully declared variable '{}'.", variable_name_copy
 	);
 
@@ -180,15 +180,15 @@ namespace ast {
 	auto value_iter_end = value_iter.end();
 
 	while (var_iter_pos != var_iter_end and value_iter_pos != value_iter_end) {
-		INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
+		INTERPRETER_PRINT(aleprln, "Going to declare a variable.");
 
 		EvaluationResult var_res = *var_iter_pos;
 		if (not var_res) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln,
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Error: '{}'", var_res.error().errors.at(0)
 			);
 			return append_error(
@@ -201,10 +201,10 @@ namespace ast {
 
 		EvaluationResult value_res = *value_iter_pos;
 		if (not value_res) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Something went wrong when computing the next value."
 			);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Error: '{}'", value_res.error().errors.at(0)
 			);
 			return append_error(
@@ -232,9 +232,9 @@ namespace ast {
 		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
 		std::string var_type = decl.get_variable_type();
 
-		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-		INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
+		INTERPRETER_PRINT(
 			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
 		);
 
@@ -259,9 +259,7 @@ namespace ast {
 	}
 
 	if (var_iter_pos != var_iter_end) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Too many values in the right hand side"
-		);
+		INTERPRETER_PRINT(aleprln, "Too many values in the right hand side");
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
 			Vec{evaluation_function_e::Declaration},
@@ -270,7 +268,7 @@ namespace ast {
 	}
 
 	if (value_iter_pos != value_iter_end) {
-		INTERPRETER_PRINT_LOC(aleprln, "Too many values in the left hand side");
+		INTERPRETER_PRINT(aleprln, "Too many values in the left hand side");
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
 			Vec{evaluation_function_e::Declaration},
@@ -306,12 +304,12 @@ namespace ast {
 	std::any value_w = std::move(*compute_res);
 	const std::any *actual_value_w = nullptr;
 	if (detail::is_type<memory::RefMemVar>(value_w)) {
-		INTERPRETER_PRINT_LOC(aleprln, "Value is a variable reference.");
+		INTERPRETER_PRINT(aleprln, "Value is a variable reference.");
 		actual_value_w =
 			&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
 	}
 	else if (detail::is_type<memory::RefConstMemVar>(value_w)) {
-		INTERPRETER_PRINT_LOC(aleprln, "Value is a variable const-reference.");
+		INTERPRETER_PRINT(aleprln, "Value is a variable const-reference.");
 		actual_value_w =
 			&std::any_cast<memory::RefConstMemVar>(value_w).get().value_w;
 	}
@@ -320,15 +318,15 @@ namespace ast {
 	}
 
 	while (var_iter_pos != var_iter_end) {
-		INTERPRETER_PRINT_LOC(aleprln, "Going to declare a variable.");
+		INTERPRETER_PRINT(aleprln, "Going to declare a variable.");
 
 		EvaluationResult var_res = *var_iter_pos;
 		if (not var_res) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln,
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Error: '{}'", var_res.error().errors.at(0)
 			);
 			return append_error(
@@ -343,9 +341,9 @@ namespace ast {
 		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
 		std::string var_type = decl.get_variable_type();
 
-		INTERPRETER_PRINT_LOC(aleprln, "Of name:  '{}'.", var_name);
-		INTERPRETER_PRINT_LOC(aleprln, "Of type:  '{}'.", var_type);
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
+		INTERPRETER_PRINT(
 			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
 		);
 

@@ -45,17 +45,14 @@ namespace intlib {
 namespace ast {
 
 [[nodiscard]] EvaluationResult make_sequence_execution_environment(
-	EvaluationContext& ctx,
-	const ale::ast::SequenceNode& n
+	EvaluationContext& ctx, const ale::ast::SequenceNode& n
 );
 
-[[nodiscard]] std::generator<EvaluationResult>
-enumerate_values_sequence(
+[[nodiscard]] std::generator<EvaluationResult> enumerate_values_sequence(
 	EvaluationContext& ctx, const SequenceExecutionEnvironment& env
 );
 
-[[nodiscard]] std::generator<EvaluationResult>
-enumerate_names_sequence(
+[[nodiscard]] std::generator<EvaluationResult> enumerate_names_sequence(
 	EvaluationContext& ctx, const SequenceExecutionEnvironment& env
 );
 

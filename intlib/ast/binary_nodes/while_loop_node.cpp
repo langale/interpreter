@@ -58,7 +58,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 	const auto& right_child = v.get_right_child();
 
 	if (left_child == nullptr) {
-		INTERPRETER_PRINT_LOC(aleprln, "Condition in while loop is missing.");
+		INTERPRETER_PRINT(aleprln, "Condition in while loop is missing.");
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Node_Is_Malformed},
 			Vec{evaluation_function_e::While_Loop},
@@ -70,7 +70,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 	while (not stop) {
 		EvaluationResult cond_w = interpret_node(ctx, left_child);
 		if (not cond_w) {
-			INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+			INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 			return append_error(
 				std::move(cond_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -81,7 +81,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 
 		const std::optional cond_res_w = detail::any_to_bool(*cond_w);
 		if (not cond_res_w) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln,
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
@@ -95,7 +95,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 			);
 		}
 
-		stop = not *cond_res_w;
+		stop = not * cond_res_w;
 		if (*cond_res_w) {
 
 			if (right_child == nullptr) {
@@ -105,7 +105,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 
 			EvaluationResult res_w = interpret_node(ctx, right_child);
 			if (not res_w) {
-				INTERPRETER_PRINT_LOC(
+				INTERPRETER_PRINT(
 					aleprln, "Evaluation of while loop body failed."
 				);
 				return append_error(

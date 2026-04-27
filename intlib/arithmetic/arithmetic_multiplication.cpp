@@ -52,13 +52,11 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 	if (detail::is_type<uint64_t>(left_type)) {
 		const auto left = std::any_cast<uint64_t>(left_w);
-		INTERPRETER_PRINT_LOC(
-			aleprln, "First component is uint64_t: {}.", left
-		);
+		INTERPRETER_PRINT(aleprln, "First component is uint64_t: {}.", left);
 
 		if (detail::is_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
 			);
 
@@ -68,7 +66,7 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
 			);
 
@@ -78,14 +76,14 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is double: {}.", right
 			);
 
 			return detail::to_double(left) * right;
 		}
 
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Parameter right type {} is not handled.",
 			detail::get_type_name(right_w)
@@ -94,13 +92,11 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 	if (detail::is_type<int64_t>(left_type)) {
 		const auto left = std::any_cast<int64_t>(left_w);
-		INTERPRETER_PRINT_LOC(
-			aleprln, "First component is int64_t: {}.", left
-		);
+		INTERPRETER_PRINT(aleprln, "First component is int64_t: {}.", left);
 
 		if (detail::is_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
 			);
 
@@ -110,7 +106,7 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
 			);
 
@@ -120,14 +116,14 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is double: {}.", right
 			);
 
 			return detail::to_double(left) * right;
 		}
 
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Parameter right type {} is not handled.",
 			detail::get_type_name(right_w)
@@ -136,13 +132,11 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 	if (detail::is_type<double>(left_type)) {
 		const auto left = std::any_cast<double>(left_w);
-		INTERPRETER_PRINT_LOC(
-			aleprln, "First component is double: {}.", left
-		);
+		INTERPRETER_PRINT(aleprln, "First component is double: {}.", left);
 
 		if (detail::is_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
 			);
 
@@ -151,7 +145,7 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
 			);
 
@@ -160,21 +154,21 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w)
 
 		if (detail::is_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Second component is double: {}.", right
 			);
 
 			return left * right;
 		}
 
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Parameter right type {} is not handled.",
 			detail::get_type_name(right_w)
 		);
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Parameter left type {} is not handled.",
 		detail::get_type_name(left_w)

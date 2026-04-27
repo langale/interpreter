@@ -62,8 +62,8 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-[[nodiscard]] static bool
-is_node_interpretable(const ale::ast::node_type_e t) noexcept
+[[nodiscard]] static bool is_node_interpretable(const ale::ast::node_type_e t
+) noexcept
 {
 
 	return ale::ast::is_node_numerical_literal(t) or
@@ -93,7 +93,7 @@ template <typename node_t>
 std::generator<EvaluationResult>
 make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var)
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Make a value iterator for a '{}'.", var.get_node_type()
 	);
 
@@ -115,15 +115,13 @@ std::generator<EvaluationResult> make_value_iterator(
 	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& var
 )
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Make a value iterator for a '{}'.", var.get_node_type()
 	);
 
 	EvaluationResult res = make_subscripted_variable_name(ctx, var);
 	if (not res) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Could not make the name of the variable."
-		);
+		INTERPRETER_PRINT(aleprln, "Could not make the name of the variable.");
 		co_yield append_error(
 			std::move(res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -151,7 +149,7 @@ std::generator<EvaluationResult> make_value_iterator(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence
 )
 {
-	INTERPRETER_PRINT_LOC(aleprln, "Interpreting left child.");
+	INTERPRETER_PRINT(aleprln, "Interpreting left child.");
 	auto first_res = interpret_node(ctx, sequence.get_left_child());
 	if (not first_res) {
 		co_yield append_error(
@@ -163,7 +161,7 @@ std::generator<EvaluationResult> make_value_iterator(
 		co_return;
 	}
 
-	INTERPRETER_PRINT_LOC(aleprln, "Interpreting right child.");
+	INTERPRETER_PRINT(aleprln, "Interpreting right child.");
 	auto second_res = interpret_node(ctx, sequence.get_right_child());
 	if (not second_res) {
 		co_yield append_error(
@@ -178,7 +176,7 @@ std::generator<EvaluationResult> make_value_iterator(
 	std::any first_value_w = std::move(*first_res);
 	std::any second_value_w = std::move(*second_res);
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Converting left value '{}'.", any_view{first_value_w}
 	);
 	const std::optional<int64_t> first_val_w =
@@ -194,7 +192,7 @@ std::generator<EvaluationResult> make_value_iterator(
 		co_return;
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Converting right value '{}'.", any_view{second_value_w}
 	);
 	const std::optional<int64_t> second_val_w =
@@ -209,11 +207,11 @@ std::generator<EvaluationResult> make_value_iterator(
 		co_return;
 	}
 
-	INTERPRETER_PRINT_LOC(aleprln, "First value: '{}'.", *first_val_w);
-	INTERPRETER_PRINT_LOC(aleprln, "Second value: '{}'.", *second_val_w);
+	INTERPRETER_PRINT(aleprln, "First value: '{}'.", *first_val_w);
+	INTERPRETER_PRINT(aleprln, "Second value: '{}'.", *second_val_w);
 
 	for (int64_t i = *first_val_w; i <= *second_val_w; ++i) {
-		INTERPRETER_PRINT_LOC(aleprln, "Making next value: '{}'.", i);
+		INTERPRETER_PRINT(aleprln, "Making next value: '{}'.", i);
 		co_yield make_good_evaluation_result<int64_t>(i);
 	}
 }
@@ -226,7 +224,7 @@ std::generator<EvaluationResult> make_value_iterator(
 	assert(sequence.get_operator_type().has_value());
 #endif
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Make a value iterator for a '{}' with operator type '{}'.",
 		sequence.get_node_type(),
@@ -244,13 +242,13 @@ std::generator<EvaluationResult> make_value_iterator(
 		co_return;
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Going to make the sequence execution environment."
 	);
 
 	auto res = make_sequence_execution_environment(ctx, sequence);
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Successfully constructed the sequence execution environment."
 	);
 
@@ -268,7 +266,7 @@ std::generator<EvaluationResult> make_value_iterator(
 		std::any_cast<SequenceExecutionEnvironment&&>(std::move(*res));
 
 	const size_t env_depth = seq_env.get_depth();
-	INTERPRETER_PRINT_LOC(aleprln, "Environment's depth: {}.", env_depth);
+	INTERPRETER_PRINT(aleprln, "Environment's depth: {}.", env_depth);
 
 	if (env_depth > 0) {
 		auto gen = enumerate_values_sequence(ctx, seq_env);
@@ -314,7 +312,7 @@ std::generator<EvaluationResult> make_value_iterator(
 	EvaluationContext& ctx, const ale::ast::CommaSeparatedGroupNode& comma
 )
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Make a value iterator for a '{}'.", comma.get_node_type()
 	);
 
@@ -325,7 +323,7 @@ std::generator<EvaluationResult> make_value_iterator(
 		if (is_node_interpretable(child.get(), t)) {
 			EvaluationResult res = interpret_node(ctx, child);
 			if (not res) {
-				INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
+				INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 				co_yield append_error(
 					std::move(res.error()),
 					evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -366,7 +364,7 @@ std::generator<EvaluationResult> make_value_iterator(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& node
 )
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Make a value iterator for a node of type '{}'.",
 		node->get_node_type()
@@ -432,7 +430,7 @@ std::generator<EvaluationResult> make_value_iterator(
 std::generator<EvaluationResult>
 make_name_iterator(EvaluationContext&, const ale::ast::VariableNode& var)
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Make a name iterator for a node of type '{}'.",
 		var.get_node_type()
@@ -446,7 +444,7 @@ std::generator<EvaluationResult> make_name_iterator(
 	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& var
 )
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Make a name iterator for a node of type '{}'.",
 		var.get_node_type()
@@ -454,9 +452,7 @@ std::generator<EvaluationResult> make_name_iterator(
 
 	EvaluationResult res = make_subscripted_variable_name(ctx, var);
 	if (not res.has_value()) {
-		INTERPRETER_PRINT_LOC(
-			aleprln, "Could not make the name of the variable."
-		);
+		INTERPRETER_PRINT(aleprln, "Could not make the name of the variable.");
 		co_yield append_error(
 			std::move(res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -474,20 +470,20 @@ std::generator<EvaluationResult> make_name_iterator(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence
 )
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Make a name iterator for a '{}' with operator type '{}'.",
 		sequence.get_node_type(),
 		*sequence.get_operator_type()
 	);
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Going to make the sequence execution environment."
 	);
 
 	auto res = make_sequence_execution_environment(ctx, sequence);
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Successfully constructed the sequence execution environment."
 	);
 
@@ -527,7 +523,7 @@ std::generator<EvaluationResult> make_name_iterator(
 	EvaluationContext& ctx, const ale::ast::CommaSeparatedGroupNode& comma
 )
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Make a name iterator for a node of type '{}'.",
 		comma.get_node_type()
@@ -602,7 +598,7 @@ std::generator<EvaluationResult> make_name_iterator(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& node
 )
 {
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln,
 		"Make a name iterator for a node of type '{}'.",
 		node->get_node_type()

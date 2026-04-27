@@ -54,9 +54,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 	for (const auto& w : v.get_children()) {
 		EvaluationResult res_w = interpret_node(ctx, w);
 		if (not res_w) {
-			INTERPRETER_PRINT_LOC(
-				aleprln, "Evaluation of node failed."
-			);
+			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 			return append_error(
 				std::move(res_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -67,9 +65,8 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 
 		const std::any& value = *res_w;
 		if (value.has_value()) {
-			INTERPRETER_PRINT_LOC(
-				aleprln,
-				"Potentially-ignored return value or expression."
+			INTERPRETER_PRINT(
+				aleprln, "Potentially-ignored return value or expression."
 			);
 		}
 	}

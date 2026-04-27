@@ -49,7 +49,8 @@ arithmetic_division(const std::any& left_w, const std::any& right_w);
 [[nodiscard]] std::any
 arithmetic_exponentiation(const std::any& left_w, const std::any& right_w);
 
-[[nodiscard]] std::any arithmetic_modulus(const std::any& left_w, const std::any& right_w);
+[[nodiscard]] std::any
+arithmetic_modulus(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::any
 arithmetic_multiplication(const std::any& left_w, const std::any& right_w);
@@ -58,7 +59,9 @@ arithmetic_multiplication(const std::any& left_w, const std::any& right_w);
 arithmetic_subtraction(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::any any_arithmetic(
-	const ale::ast::node_type_e t, const std::any& left_w, const std::any& right_w
+	const ale::ast::node_type_e t,
+	const std::any& left_w,
+	const std::any& right_w
 );
 
 } // namespace arithmetic

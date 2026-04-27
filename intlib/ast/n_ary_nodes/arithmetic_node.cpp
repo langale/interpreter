@@ -69,12 +69,12 @@ EvaluationResult evaluate(
 	assert(children.size() >= 2);
 #endif
 
-	const auto node_eval =
-		[&](const std::unique_ptr<ale::ast::Node>& c) -> EvaluationResult
+	const auto node_eval = [&](const std::unique_ptr<ale::ast::Node>& c
+						   ) -> EvaluationResult
 	{
 		EvaluationResult res = interpret_node(ctx, c);
 		if (not res) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Evaluation of node within arithmetic node failed."
 			);
 			return make_bad_evaluation_result(
@@ -85,7 +85,7 @@ EvaluationResult evaluate(
 		}
 
 		if (detail::is_type<void>(*res)) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln, "Evaluation of node returned a void value."
 			);
 			return make_bad_evaluation_result(
@@ -126,7 +126,7 @@ EvaluationResult evaluate(
 			arithmetic::any_arithmetic(t, expr_res_w, *res);
 
 		if (not operation_res_w.has_value()) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln,
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()

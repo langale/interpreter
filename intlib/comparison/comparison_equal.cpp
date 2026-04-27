@@ -84,8 +84,9 @@ any_comparison_equal(const std::any& left_w, const std::any& right_w)
 }
 
 template <typename left_t>
-[[nodiscard]] static std::optional<bool>
-any_comparison_equal_right_numeric(const std::any& left_w, const std::any& right_w)
+[[nodiscard]] static std::optional<bool> any_comparison_equal_right_numeric(
+	const std::any& left_w, const std::any& right_w
+)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
@@ -113,11 +114,13 @@ any_comparison_equal(const std::any& left_w, const std::any& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
-	if (const auto r = any_comparison_equal_right_numeric<bool>(left_w, right_w);
+	if (const auto r =
+			any_comparison_equal_right_numeric<bool>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal_right_numeric<int64_t>(left_w, right_w);
+	if (const auto r =
+			any_comparison_equal_right_numeric<int64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
@@ -126,7 +129,8 @@ any_comparison_equal(const std::any& left_w, const std::any& right_w)
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal_right_numeric<double>(left_w, right_w);
+	if (const auto r =
+			any_comparison_equal_right_numeric<double>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}

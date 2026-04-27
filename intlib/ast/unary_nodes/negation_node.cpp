@@ -53,7 +53,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 
 	EvaluationResult res_w = interpret_node(ctx, child);
 	if (not res_w.has_value()) {
-		INTERPRETER_PRINT_LOC(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
 			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -64,11 +64,11 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 
 	const std::optional res_bool_w = detail::any_to_bool(*res_w);
 	if (res_bool_w) {
-		INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node: {}.", *res_bool_w);
-		return make_good_evaluation_result<bool>(not *res_bool_w);
+		INTERPRETER_PRINT(aleprln, "Evaluation of node: {}.", *res_bool_w);
+		return make_good_evaluation_result<bool>(not*res_bool_w);
 	}
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Unhandled variable type '{}'.", detail::get_type_name(*res_w)
 	);
 	return make_bad_evaluation_result(

@@ -67,8 +67,8 @@
 namespace intlib {
 namespace ast {
 
-[[nodiscard]] std::optional<std::any>
-get_variable_value(const std::string& var);
+[[nodiscard]] std::optional<std::any> get_variable_value(const std::string& var
+);
 
 /* n-ary nodes */
 
@@ -185,11 +185,13 @@ evaluate(const EvaluationContext& ctx, const ale::ast::LiteralStringNode& v);
 [[nodiscard]] EvaluationResult
 evaluate(const EvaluationContext& ctx, const ale::ast::LiteralDecimalNode& v);
 
-[[nodiscard]] EvaluationResult
-evaluate(const EvaluationContext& ctx, const ale::ast::LiteralUnsignedIntegerNode& v);
+[[nodiscard]] EvaluationResult evaluate(
+	const EvaluationContext& ctx, const ale::ast::LiteralUnsignedIntegerNode& v
+);
 
-[[nodiscard]] EvaluationResult
-evaluate(const EvaluationContext& ctx, const ale::ast::LiteralSignedIntegerNode& v);
+[[nodiscard]] EvaluationResult evaluate(
+	const EvaluationContext& ctx, const ale::ast::LiteralSignedIntegerNode& v
+);
 
 [[nodiscard]] EvaluationResult
 evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v);

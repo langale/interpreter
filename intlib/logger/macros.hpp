@@ -110,7 +110,7 @@
 
 #define ALE_FUNC_LOCATION_NAME(func) func##loc
 
-#define INTERPRETER_PRINT_LOC(func, fmt, ...)                                  \
+#define INTERPRETER_PRINT(func, fmt, ...)                                      \
 	ALE_FUNC_LOCATION_NAME(func)(                                              \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
@@ -130,6 +130,6 @@
 
 #define INTERPRETER_ENTER_FUNCTION(func)
 
-#define INTERPRETER_PRINT_LOC(func, fmt, ...)
+#define INTERPRETER_PRINT(func, fmt, ...)
 
 #endif

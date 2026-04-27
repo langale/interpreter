@@ -103,7 +103,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 		if (not has_index) {
 			if (detail::is_type<int64_t>(new_index_w)) {
 				const int64_t idx = std::any_cast<int64_t>(new_index_w);
-				INTERPRETER_PRINT_LOC(
+				INTERPRETER_PRINT(
 					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
@@ -114,7 +114,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 			}
 			else if (detail::is_type<uint64_t>(new_index_w)) {
 				const uint64_t idx = std::any_cast<uint64_t>(new_index_w);
-				INTERPRETER_PRINT_LOC(
+				INTERPRETER_PRINT(
 					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
@@ -127,7 +127,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 				const std::any idx_w =
 					detail::any_convert_to_type(new_index_w, "int64_t");
 				const int64_t idx = std::any_cast<int64_t>(idx_w);
-				INTERPRETER_PRINT_LOC(
+				INTERPRETER_PRINT(
 					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
@@ -140,7 +140,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 		else {
 			const std::any& known_index_w = indices.get_index(d, name);
 			if (not check_equal_anys(new_index_w, known_index_w)) {
-				INTERPRETER_PRINT_LOC(
+				INTERPRETER_PRINT(
 					aleprln,
 					"Mismatch between known index value '{}' and new "
 					"computed index value '{}', for variable '{}'",
@@ -150,8 +150,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 				);
 
 				return make_bad_evaluation_result(
-					Vec{
-						evaluation_error_e::Sequence_Environment_Index_Mismatch
+					Vec{evaluation_error_e::Sequence_Environment_Index_Mismatch
 					},
 					Vec{evaluation_function_e::
 							Sequence_Execution_Environment_Construction},
@@ -286,7 +285,7 @@ EvaluationResult make_sequence_execution_environment(
 
 	SequenceExecutionEnvironment env;
 
-	INTERPRETER_PRINT_LOC(aleprln, "Going to extract first indices.");
+	INTERPRETER_PRINT(aleprln, "Going to extract first indices.");
 
 	const auto& left = seq.get_left_child();
 	auto res_left = add_indices<indices_type_e::first>(
@@ -296,7 +295,7 @@ EvaluationResult make_sequence_execution_environment(
 		return res_left;
 	}
 
-	INTERPRETER_PRINT_LOC(aleprln, "Going to extract last indices.");
+	INTERPRETER_PRINT(aleprln, "Going to extract last indices.");
 
 	const auto& right = seq.get_right_child();
 	auto res_right = add_indices<indices_type_e::last>(
@@ -306,15 +305,14 @@ EvaluationResult make_sequence_execution_environment(
 		return res_right;
 	}
 
-	INTERPRETER_PRINT_LOC(aleprln, "Going to check correctness.");
+	INTERPRETER_PRINT(aleprln, "Going to check correctness.");
 
 	// check correctness: variables match
 	const auto depth_start = env.get_first_indices().depth();
 	const auto depth_end = env.get_first_indices().depth();
 	if (depth_start != depth_end) {
 		return make_bad_evaluation_result(
-			std::vector{
-				evaluation_error_e::Sequence_Environment_Mismatch_Depth
+			std::vector{evaluation_error_e::Sequence_Environment_Mismatch_Depth
 			},
 			std::vector{evaluation_function_e::
 							Sequence_Execution_Environment_Construction},
@@ -455,7 +453,7 @@ std::generator<EvaluationResult> enumerate_names_sequence(
 	);
 #endif
 
-	INTERPRETER_PRINT_LOC(
+	INTERPRETER_PRINT(
 		aleprln, "Going to enumerate the variable names of a sequence."
 	);
 

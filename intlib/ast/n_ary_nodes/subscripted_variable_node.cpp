@@ -54,7 +54,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 
 	EvaluationResult res = make_subscripted_variable_name(ctx, v);
 	if (not res) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln,
 			"Full variable name of subscripted variable {} could not be "
 			"retrieved.",
@@ -76,7 +76,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	const auto& var_name = std::any_cast<const std::string&>(var_name_w);
 
 	if (not ctx.memory.variable_exists(var_name)) {
-		INTERPRETER_PRINT_LOC(
+		INTERPRETER_PRINT(
 			aleprln, "Variable '{}' is not defined in this scope.", var_name
 		);
 		return make_bad_evaluation_result(
@@ -91,7 +91,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	memory::VariableValue& variable = ctx.memory.get_variable(var_name);
 
 	if (not variable.value_w.has_value()) {
-		INTERPRETER_PRINT_LOC(aleprln, "Variable '{}' has no value.", var_name);
+		INTERPRETER_PRINT(aleprln, "Variable '{}' has no value.", var_name);
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},

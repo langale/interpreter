@@ -75,7 +75,7 @@ EvaluationResult evaluate(
 	{
 		EvaluationResult res = interpret_node(ctx, children.at(0));
 		if (not res.has_value()) {
-			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
+			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 			return append_error(
 				std::move(res.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -91,7 +91,7 @@ EvaluationResult evaluate(
 
 		EvaluationResult res = interpret_node(ctx, c);
 		if (not res.has_value()) {
-			INTERPRETER_PRINT_LOC(aleprln, "Evaluation of node failed.");
+			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 			return append_error(
 				std::move(res.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -105,7 +105,7 @@ EvaluationResult evaluate(
 			detail::any_comparison(t, previous_w, current_w);
 
 		if (not comparison_result_w.has_value()) {
-			INTERPRETER_PRINT_LOC(
+			INTERPRETER_PRINT(
 				aleprln,
 				"Could not compare two std::any values: '{}' and '{}'.",
 				any_view{previous_w},
@@ -122,7 +122,7 @@ EvaluationResult evaluate(
 			);
 		}
 
-		if (not *comparison_result_w) {
+		if (not*comparison_result_w) {
 			return false;
 		}
 		previous_w = std::move(current_w);

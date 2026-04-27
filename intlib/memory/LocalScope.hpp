@@ -64,8 +64,9 @@ public:
 	 * @param type The type of the variable to create.
 	 * @pre The variable does not exist.
 	 */
-	void
-	declare_variable(std::string&& name, std::any&& value_w, std::string&& type);
+	void declare_variable(
+		std::string&& name, std::any&& value_w, std::string&& type
+	);
 
 	/**
 	 * @brief Adds a new constant variable to this subscope.
@@ -85,8 +86,8 @@ public:
 	 * @param name The name of the variable to create.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] const VariableValue&
-	get_variable(const std::string& name) const noexcept;
+	[[nodiscard]] const VariableValue& get_variable(const std::string& name
+	) const noexcept;
 
 	/**
 	 * @brief Returns the value of variable @e s.
@@ -107,8 +108,8 @@ private:
 	using Collection = std::map<std::string, VariableValue>;
 
 	/// Find a variable.
-	[[nodiscard]] Collection::const_iterator
-	find(const std::string& name) const noexcept
+	[[nodiscard]] Collection::const_iterator find(const std::string& name
+	) const noexcept
 	{
 		return m_variables.find(name);
 	}
