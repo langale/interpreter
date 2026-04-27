@@ -34,6 +34,7 @@
 #if defined DEBUG
 #include <cassert>
 #endif
+#include <optional>
 #include <memory>
 #include <string>
 #include <ranges>
@@ -44,13 +45,13 @@ using namespace std::string_literals;
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/utils/IndexIterator.hpp>
 
-#include <intlib/ast/interpretation.hpp>
-#include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/detail/any_type.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/detail/any_output.hpp>
 #endif
 #include <intlib/detail/any_to_numeric.hpp>
+#include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/logger/macros.hpp>
 
 namespace intlib {
@@ -58,7 +59,7 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-[[nodiscard]] EvaluationResult get_indices(
+[[nodiscard]] static EvaluationResult get_indices(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
@@ -78,7 +79,7 @@ namespace ast {
 
 		auto val_int_w = interpret_node(ctx, child);
 		if (not val_int_w.has_value()) {
-			return std::move(val_int_w.error());
+			return val_int_w;
 		}
 
 		INTERPRETER_PRINT_LOC(aleprln, "Successfully evaluated child.");
@@ -130,18 +131,28 @@ namespace ast {
 	return make_good_evaluation_result<Vec<int64_t>>(std::move(indices));
 }
 
-void append_variable_name(std::string& name, const Vec<int64_t>& idxs)
+void append_variable_name(
+	std::string& name,
+	const Vec<int64_t>& idxs,
+	const std::optional<std::span<int64_t>>& distances
+)
 {
-	for (const int64_t idx : idxs) {
-		name += "_" + std::to_string(idx);
+	const bool has_distances = distances.has_value();
+	for (const auto [i, idx] : std::views::enumerate(idxs)) {
+		const size_t ii = static_cast<size_t>(i);
+		const int64_t value = idx + (has_distances ? (*distances)[ii] : 0);
+		name += "_" + std::to_string(value);
 	}
 }
 
-std::string
-make_indexed_variable_name(const std::string& name, const Vec<int64_t>& indices)
+std::string make_indexed_variable_name(
+	const std::string& name,
+	const Vec<int64_t>& indices,
+	const std::optional<std::span<int64_t>>& distances
+)
 {
 	std::string n = name;
-	append_variable_name(n, indices);
+	append_variable_name(n, indices, distances);
 	return n;
 }
 
@@ -163,19 +174,19 @@ EvaluationResult make_subscripted_variable_name(
 
 	auto res_w = get_indices(ctx, subscripted_variable);
 	if (not res_w.has_value()) {
-		return make_bad_evaluation_result(std::move(res_w.error()));
+		return res_w;
 	}
 
 	INTERPRETER_PRINT_LOC(aleprln, "Successfully made indices.");
 
-	std::any idxs_w = std::move(*res_w);
+	std::any indices_w = std::move(*res_w);
 
 	std::string name = subscripted_variable.get_variable_name();
 
 	INTERPRETER_PRINT_LOC(aleprln, "Make indices for variable {}.", name);
 
-	auto idxs = std::any_cast<Vec<int64_t>&&>(std::move(idxs_w));
-	append_variable_name(name, idxs);
+	const auto indices = std::any_cast<Vec<int64_t>&&>(std::move(indices_w));
+	append_variable_name(name, indices, ctx.variable_index_distances);
 
 	INTERPRETER_PRINT_LOC(aleprln, "Name constructed '{}'.", name);
 
@@ -216,9 +227,9 @@ EvaluationResult make_shallow_sequence_indices(
 		*static_cast<const ale::ast::SubscriptedVariableNode *>(
 			left_child.get()
 		);
-	auto res_left_idxs_w = get_indices(ctx, left_subscripted_variable);
-	if (not res_left_idxs_w.has_value()) {
-		return std::move(res_left_idxs_w.error());
+	auto res_left_indices_w = get_indices(ctx, left_subscripted_variable);
+	if (not res_left_indices_w.has_value()) {
+		return std::move(res_left_indices_w.error());
 	}
 
 	// right indices
@@ -226,13 +237,13 @@ EvaluationResult make_shallow_sequence_indices(
 		*static_cast<const ale::ast::SubscriptedVariableNode *>(
 			right_child.get()
 		);
-	auto res_right_idxs_w = get_indices(ctx, right_subscripted_variable);
-	if (not res_right_idxs_w.has_value()) {
-		return std::move(res_right_idxs_w.error());
+	auto res_right_indices_w = get_indices(ctx, right_subscripted_variable);
+	if (not res_right_indices_w.has_value()) {
+		return std::move(res_right_indices_w.error());
 	}
 
-	std::any left_idxs_w = std::move(*res_left_idxs_w);
-	std::any right_idxs_w = std::move(*res_right_idxs_w);
+	std::any left_idxs_w = std::move(*res_left_indices_w);
+	std::any right_idxs_w = std::move(*res_right_indices_w);
 
 	INTERPRETER_PRINT_LOC(
 		aleprln,
@@ -255,7 +266,7 @@ EvaluationResult make_shallow_sequence_indices(
 	return make_good_evaluation_result<ShallowSequenceIndices>(
 		std::any_cast<Veci64&&>(std::move(left_idxs_w)),
 		std::any_cast<Veci64&&>(std::move(right_idxs_w)),
-		left_subscripted_variable.get_variable_name()
+		std::string_view{left_subscripted_variable.get_variable_name()}
 	);
 }
 

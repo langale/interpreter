@@ -36,7 +36,6 @@
 #include <memory>
 #include <string>
 
-#include <ale/ast/Node.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 
@@ -47,10 +46,14 @@ namespace intlib {
 namespace ast {
 
 void append_variable_name(
-	std::string& name, const std::vector<int64_t>& indices
+	std::string& name,
+	const std::vector<int64_t>& indices,
+	const std::optional<std::span<int64_t>>& distances
 );
 [[nodiscard]] std::string make_indexed_variable_name(
-	const std::string& name, const std::vector<int64_t>& indices
+	const std::string& name,
+	const std::vector<int64_t>& indices,
+	const std::optional<std::span<int64_t>>& distances
 );
 
 [[nodiscard]] const std::string&
@@ -64,7 +67,7 @@ get_variable_name(const ale::ast::SequenceNode& sequence) noexcept;
 struct ShallowSequenceIndices {
 	std::vector<int64_t> left;
 	std::vector<int64_t> right;
-	std::string base_name;
+	std::string_view base_name;
 };
 
 [[nodiscard]] EvaluationResult make_shallow_sequence_indices(
