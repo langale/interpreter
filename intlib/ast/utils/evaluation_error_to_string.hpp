@@ -101,8 +101,18 @@ evaluation_error_to_string(const evaluation_error_e e) noexcept
 	case evaluation_error_e::Declaration_Of_Variable:
 		return "Declaration_Of_Variable";
 
-	case evaluation_error_e::Index_Mismatch_In_Sequence:
-		return "Index_Mismatch_In_Sequence";
+	case evaluation_error_e::Sequence_Environment_Index_Mismatch:
+		return "Sequence_Environment_Index_Mismatch";
+	case evaluation_error_e::Sequence_Environment_Could_Not_Construct:
+		return "Sequence_Environment_Could_Not_Construct";
+	case evaluation_error_e::Sequence_Environment_Enumeration_Step_Failed:
+		return "Sequence_Environment_Enumeration_Step_Failed";
+	case evaluation_error_e::Sequence_Environment_Mismatch_Depth:
+		return "Sequence_Environment_Mismatch_Depth";
+	case evaluation_error_e::Sequence_Environment_Missing_Right_Variable:
+		return "Sequence_Environment_Missing_Right_Variable";
+	case evaluation_error_e::Sequence_Environment_Mismatch_Distance:
+		return "Sequence_Environment_Mismatch_Distance";
 
 	case evaluation_error_e::Overfull_Left_Hand_Side_Values:
 		return "Overfull_Left_Hand_Side_Values";

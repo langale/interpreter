@@ -67,7 +67,12 @@ enum class evaluation_error_e : uint8_t {
 
 	List_Iteration,
 
-	Index_Mismatch_In_Sequence,
+	Sequence_Environment_Index_Mismatch,
+	Sequence_Environment_Could_Not_Construct,
+	Sequence_Environment_Enumeration_Step_Failed,
+	Sequence_Environment_Mismatch_Depth,
+	Sequence_Environment_Missing_Right_Variable,
+	Sequence_Environment_Mismatch_Distance,
 
 	If_Statement_Condition_Empty,
 	If_Statement_First_Branch_Empty,

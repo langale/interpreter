@@ -39,10 +39,11 @@
 
 namespace intlib {
 namespace ast {
+
 [[nodiscard]] constexpr std::string_view
-evaluation_function_to_string(const evaluation_function_e e) noexcept
+evaluation_function_to_string(const evaluation_function_e f) noexcept
 {
-	switch (e) {
+	switch (f) {
 	case evaluation_function_e::Assignation: return "Assignation";
 	case evaluation_function_e::Declaration: return "Declaration";
 	case evaluation_function_e::Sequence:	 return "Sequence";
@@ -88,7 +89,7 @@ evaluation_function_to_string(const evaluation_function_e e) noexcept
 	case evaluation_function_e::Iterator_Name_Comma_Separated_Group:
 		return "Iterator_Name_Comma_Separated_Group";
 
-	case evaluation_function_e::Sequence_Index_Extraction:
+	case evaluation_function_e::Sequence_Execution_Environment_Construction:
 		return "Sequence_Index_Extraction";
 
 	case evaluation_function_e::Interpretation_Node:
@@ -97,6 +98,7 @@ evaluation_function_to_string(const evaluation_function_e e) noexcept
 
 	return "??";
 }
+
 } // namespace ast
 } // namespace intlib
 

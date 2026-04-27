@@ -74,7 +74,7 @@ enum class evaluation_function_e : uint8_t {
 	Iterator_Name_Sequence,
 	Iterator_Name_Comma_Separated_Group,
 
-	Sequence_Index_Extraction,
+	Sequence_Execution_Environment_Construction,
 
 	Interpretation_Node
 };
