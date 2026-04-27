@@ -1,5 +1,5 @@
 /*********************************************************************
-*
+ *
  * ALE interpreter library -- the base utilities for a command line utility
  * to run programs written in ALE
  *
@@ -52,6 +52,8 @@ struct VariableValue {
 static constinit VariableValue empty_variable{
 	.value_w = {}, .type = "void", .is_constant = true
 };
+
+using RefMemVar = std::reference_wrapper<VariableValue>;
 
 } // namespace memory
 } // namespace intlib

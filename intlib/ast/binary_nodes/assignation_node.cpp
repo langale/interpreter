@@ -59,8 +59,6 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-using RefMemVar = std::reference_wrapper<memory::VariableValue>;
-
 [[nodiscard]] static EvaluationResult assign_variable(
 	EvaluationContext& ctx, const std::string& var_name, const std::any& value_w
 )
@@ -191,8 +189,9 @@ using RefMemVar = std::reference_wrapper<memory::VariableValue>;
 
 		const std::any& value_w = *value_res;
 		const std::any *actual_value_w = nullptr;
-		if (detail::is_type<RefMemVar>(value_w)) {
-			actual_value_w = &std::any_cast<RefMemVar>(value_w).get().value_w;
+		if (detail::is_type<memory::RefMemVar>(value_w)) {
+			actual_value_w =
+				&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
 		}
 		else {
 			actual_value_w = &value_w;
@@ -267,8 +266,9 @@ using RefMemVar = std::reference_wrapper<memory::VariableValue>;
 
 	const std::any& value_w = *compute_res;
 	const std::any *actual_value_w = nullptr;
-	if (detail::is_type<RefMemVar>(value_w)) {
-		actual_value_w = &std::any_cast<RefMemVar>(value_w).get().value_w;
+	if (detail::is_type<memory::RefMemVar>(value_w)) {
+		actual_value_w =
+			&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
 	}
 	else {
 		actual_value_w = &value_w;
