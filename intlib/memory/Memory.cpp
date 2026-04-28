@@ -51,45 +51,45 @@ void Memory::initialize() noexcept
 }
 
 void Memory::declare_variable(
-	std::string&& name, std::any&& value_w, std::string&& type
+	std::string&& name, std::any&& value_w, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		m_function_scopes.top().declare_variable(
-			std::move(name), std::move(value_w), std::move(type)
+			std::move(name), std::move(value_w), type
 		);
 	}
 	else {
 		m_global_scope.declare_variable(
-			std::move(name), std::move(value_w), std::move(type)
+			std::move(name), std::move(value_w), type
 		);
 	}
 }
 
 void Memory::declare_constant_variable(
-	std::string&& name, std::any&& value_w, std::string&& type
+	std::string&& name, std::any&& value_w, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	if (not is_current_scope_global()) {
 		m_function_scopes.top().declare_constant_variable(
-			std::move(name), std::move(value_w), std::move(type)
+			std::move(name), std::move(value_w), type
 		);
 	}
 	else {
 		m_global_scope.declare_constant_variable(
-			std::move(name), std::move(value_w), std::move(type)
+			std::move(name), std::move(value_w), type
 		);
 	}
 }
 
 /* GETTERS */
 
-const VariableValue& Memory::get_variable(const std::string& name
-) const noexcept
+const VariableValue&
+Memory::get_variable(const std::string& name) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
@@ -122,7 +122,7 @@ FunctionScope& Memory::get_current_scope() noexcept
 const FunctionScope& Memory::get_current_scope() const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
-	
+
 #if defined DEBUG
 	assert(not is_current_scope_global());
 #endif

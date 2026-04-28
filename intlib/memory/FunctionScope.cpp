@@ -53,24 +53,24 @@ void FunctionScope::initialize()
 }
 
 void FunctionScope::declare_variable(
-	std::string&& name, std::any&& value_w, std::string&& type
+	std::string&& name, std::any&& value_w, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	m_local_scopes.back().declare_variable(
-		std::move(name), std::move(value_w), std::move(type)
+		std::move(name), std::move(value_w), type
 	);
 }
 
 void FunctionScope::declare_constant_variable(
-	std::string&& name, std::any&& value_w, std::string&& type
+	std::string&& name, std::any&& value_w, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	m_local_scopes.back().declare_constant_variable(
-		std::move(name), std::move(value_w), std::move(type)
+		std::move(name), std::move(value_w), type
 	);
 }
 

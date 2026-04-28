@@ -84,7 +84,7 @@ public:
 	 * @pre The variable does not exist.
 	 */
 	void declare_variable(
-		std::string&& name, std::any&& value_w, std::string&& type
+		std::string&& name, std::any&& value_w, const std::string_view type
 	);
 
 	/**
@@ -95,7 +95,7 @@ public:
 	 * @pre The variable does not exist.
 	 */
 	void declare_constant_variable(
-		std::string&& name, std::any&& value_w, std::string&& type
+		std::string&& name, std::any&& value_w, const std::string_view type
 	);
 
 	/* GETTERS */
