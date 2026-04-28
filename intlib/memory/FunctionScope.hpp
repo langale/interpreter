@@ -60,10 +60,11 @@ public:
 	 * This should be called when entering a sub scope delimited by '{' '}',
 	 * such as when entering an if statement, a loop, ...
 	 */
-	void push_local_scope() noexcept
+	void push_local_scope()
 	{
 		m_local_scopes.emplace_back();
 	}
+
 	/**
 	 * @brief Pops a subscope.
 	 *
@@ -102,7 +103,7 @@ public:
 	/**
 	 * @brief Get the value of a variable.
 	 *
-	 * This method looks for @e s in @ref m_subscopes in a right-to-left order.
+	 * Looks for @e s in @ref m_local_scopes in a right-to-left order.
 	 * @param name The name of the variable to look for.
 	 * @pre The variable exists.
 	 */
@@ -112,7 +113,7 @@ public:
 	/**
 	 * @brief Get the value of a variable.
 	 *
-	 * This method looks for @e s in @ref m_subscopes in a right-to-left order.
+	 * Looks for @e s in @ref m_local_scopes in a right-to-left order.
 	 * @param name The name of the variable to look for.
 	 * @pre The variable exists.
 	 */

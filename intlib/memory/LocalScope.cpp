@@ -45,8 +45,6 @@ namespace memory {
 
 /* MODIFIERS */
 
-void LocalScope::initialize() { }
-
 void LocalScope::declare_variable(
 	std::string&& name, std::any&& value_w, std::string&& type
 )
@@ -59,12 +57,14 @@ void LocalScope::declare_variable(
 	assert(it == m_variables.end());
 #endif
 
-	m_variables.emplace(std::pair<std::string, VariableValue>{
+	m_variables.emplace(
 		std::move(name),
-		{.value_w = std::move(value_w),
-		 .type = std::move(type),
-		 .is_constant = false}
-	});
+		VariableValue{
+			.value_w = std::move(value_w),
+			.type = std::move(type),
+			.is_constant = false
+		}
+	);
 }
 
 void LocalScope::declare_constant_variable(
@@ -79,18 +79,20 @@ void LocalScope::declare_constant_variable(
 	assert(it == m_variables.end());
 #endif
 
-	m_variables.emplace(std::pair<std::string, VariableValue>{
+	m_variables.emplace(
 		std::move(name),
-		{.value_w = std::move(value_w),
-		 .type = std::move(type),
-		 .is_constant = true}
-	});
+		VariableValue{
+			.value_w = std::move(value_w),
+			.type = std::move(type),
+			.is_constant = true
+		}
+	);
 }
 
 /* GETTERS */
 
-const VariableValue& LocalScope::get_variable(const std::string& name
-) const noexcept
+const VariableValue&
+LocalScope::get_variable(const std::string& name) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 

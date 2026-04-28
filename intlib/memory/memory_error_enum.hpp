@@ -34,11 +34,11 @@
 #pragma once
 
 #include <cstdint>
-#include <format>
 
 namespace intlib {
 namespace memory {
 
+/// List of errors that can arise during any operation to memory
 enum class memory_error_e : int8_t {
 	Variable_Does_Not_Exist,
 	Variable_Already_Exists,

@@ -43,10 +43,10 @@ namespace intlib {
 namespace memory {
 
 /**
- * @brief Subscope class.
+ * @brief LocalScope class.
  *
  * This implements a simple association of variable names (std::string) to their
- * value (@ref interpreter::memory::variable_value). Variables can be constant or
+ * value (@ref interpreter::memory::VariableValue). Variables can be constant or
  * mutable.
  */
 class LocalScope {
@@ -59,7 +59,7 @@ public:
 
 	/* MODIFIERS */
 
-	void initialize();
+	void initialize() { }
 
 	/**
 	 * @brief Adds a new mutable variable to this subscope.
@@ -109,8 +109,8 @@ public:
 private:
 
 	/// Find a variable.
-	[[nodiscard]] Collection::const_iterator find(const std::string& name
-	) const noexcept
+	[[nodiscard]] Collection::const_iterator
+	find(const std::string& name) const noexcept
 	{
 		return m_variables.find(name);
 	}
@@ -120,10 +120,9 @@ private:
 		return m_variables.find(name);
 	}
 
-
 private:
 
-	/// The collection of non-constant variables in this subscope.
+	/// The collection of variables in this subscope.
 	Collection m_variables;
 };
 

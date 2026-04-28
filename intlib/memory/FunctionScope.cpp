@@ -49,7 +49,7 @@ void FunctionScope::initialize()
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
-	m_local_scopes.emplace_back(LocalScope{});
+	m_local_scopes.emplace_back();
 }
 
 void FunctionScope::declare_variable(

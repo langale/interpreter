@@ -39,18 +39,25 @@
 namespace intlib {
 namespace memory {
 
-/// Data associated to each variable name.
+/**
+ * @brief Variable model.
+ *
+ * The contents of a variable are:
+ * - its value (@ref value_w),
+ * - its type (@ref type),
+ * - and whether it is mutable or not (@ref is_constant).
+ */
 struct VariableValue {
 	/// The actual value that the variable holds.
 	std::any value_w;
-	/// The type of this variable.
-	const std::string type;
-	/// Whether or not the variable is declared with 'const'.
+	/// The type of this variable. This is an ALE's type.
+	const std::string_view type;
+	/// Whether the variable is declared with 'const'.
 	const bool is_constant;
 };
 
 static constinit VariableValue empty_variable{
-	.value_w = {}, .type = "void", .is_constant = true
+	.value_w = {}, .type = "", .is_constant = true
 };
 
 using RefMemVar = std::reference_wrapper<VariableValue>;
