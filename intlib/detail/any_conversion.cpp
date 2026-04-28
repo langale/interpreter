@@ -34,12 +34,17 @@
 #include <string>
 #include <any>
 
+#include <ale/logger/Logger.hpp>
+
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/detail/ale_type.hpp>
+#include <intlib/logger/macros.hpp>
 
 namespace intlib {
 namespace detail {
+
+#define aleprln ale::logger::println
 
 #define OPTIONAL_TO_ANY(func, value)                                           \
 	const auto o = func(value);                                                \
@@ -48,14 +53,20 @@ namespace detail {
 	}                                                                          \
 	return {};
 
-std::any
-any_to_ale_type(const std::any& value_w, const std::string_view type)
+std::any any_to_ale_type(const std::any& value_w, const std::string_view type)
 {
+	INTERPRETER_ENTER_DETAIL_FUNCTION(aleprln);
+
+	INTERPRETER_PRINT(
+		aleprln, "Convert std::any object to a value of ALE type '{}'.", type
+	);
+
 	if (type == "bool") {
 		OPTIONAL_TO_ANY(any_to_bool, value_w);
 	}
 
 	if (is_ale_type_numeric(type)) {
+
 		if (type == "u8") {
 			OPTIONAL_TO_ANY(any_to_numeric<uint8_t>, value_w);
 		}
