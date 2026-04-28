@@ -75,14 +75,14 @@ namespace ast {
 
 		INTERPRETER_PRINT(aleprln, "Made index for child {}.", i);
 
-		auto val_int_w = interpret_node(ctx, child);
-		if (not val_int_w.has_value()) {
-			return val_int_w;
+		auto res = interpret_node(ctx, child);
+		if (not res.has_value()) {
+			return res;
 		}
 
 		INTERPRETER_PRINT(aleprln, "Successfully evaluated child.");
 
-		const std::any& val_w = *val_int_w;
+		const std::any& val_w = *res;
 		std::optional<int64_t> idx_w;
 
 		if (detail::holds_cpp_type<memory::VariableValue>(val_w)) {
@@ -129,28 +129,18 @@ namespace ast {
 	return make_good_evaluation_result<Vec<int64_t>>(std::move(indices));
 }
 
-void append_variable_name(
-	std::string& name,
-	const Vec<int64_t>& idxs,
-	const std::optional<std::span<int64_t>>& distances
-)
+void append_variable_name(std::string& name, const Vec<int64_t>& indices)
 {
-	const bool has_distances = distances.has_value();
-	for (const auto [i, idx] : std::views::enumerate(idxs)) {
-		const size_t ii = static_cast<size_t>(i);
-		const int64_t value = idx + (has_distances ? (*distances)[ii] : 0);
-		name += "_" + std::to_string(value);
+	for (const int64_t idx : indices) {
+		name += "_" + std::to_string(idx);
 	}
 }
 
-std::string make_indexed_variable_name(
-	const std::string& name,
-	const Vec<int64_t>& indices,
-	const std::optional<std::span<int64_t>>& distances
-)
+std::string
+make_indexed_variable_name(const std::string& name, const Vec<int64_t>& indices)
 {
 	std::string n = name;
-	append_variable_name(n, indices, distances);
+	append_variable_name(n, indices);
 	return n;
 }
 
@@ -161,6 +151,55 @@ EvaluationResult make_subscripted_variable_name(
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
+	std::string name = subscripted_variable.get_variable_name();
+
+	if (ctx.sequence_execution_environment.has_value()) {
+		INTERPRETER_PRINT(
+			aleprln,
+			"There is a sequence environment so using the precomputed data."
+		);
+
+#if defined DEBUG
+		assert(*ctx.sequence_execution_environment != nullptr);
+#endif
+
+		const auto& indices_order = subscripted_variable.get_indices_order();
+
+		const auto env = *ctx.sequence_execution_environment;
+		for (size_t i = 0; i < subscripted_variable.get_num_children(); ++i) {
+#if defined DEBUG
+			assert(i < indices_order.size());
+#endif
+
+			const size_t depth = indices_order[i];
+
+			const int64_t first_index =
+				env->get_first_indices().get_index(depth, name);
+			const int64_t plus_distance = env->get_working_distance(depth);
+			const int64_t idx = first_index + plus_distance;
+
+			INTERPRETER_PRINT(
+				aleprln, "Index '{}' corresponds to depth '{}'.", i, depth
+			);
+			INTERPRETER_PRINT(aleprln, "First index value: '{}'.", first_index);
+			INTERPRETER_PRINT(
+				aleprln, "Working distance: '{}'.", plus_distance
+			);
+			INTERPRETER_PRINT(aleprln, "Resulting index: '{}'.", idx);
+
+			name += "_" + std::to_string(idx);
+		}
+
+		INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
+
+		return make_good_evaluation_result<std::string>(std::move(name));
+	}
+
+	INTERPRETER_PRINT(
+		aleprln,
+		"There is no sequence environment so retrieving the indices normally."
+	);
+
 	auto res_w = get_indices(ctx, subscripted_variable);
 	if (not res_w.has_value()) {
 		return res_w;
@@ -170,12 +209,10 @@ EvaluationResult make_subscripted_variable_name(
 
 	std::any indices_w = std::move(*res_w);
 
-	std::string name = subscripted_variable.get_variable_name();
-
 	INTERPRETER_PRINT(aleprln, "Make indices for variable {}.", name);
 
 	const auto indices = std::any_cast<Vec<int64_t>&&>(std::move(indices_w));
-	append_variable_name(name, indices, ctx.variable_index_distances);
+	append_variable_name(name, indices);
 
 	INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
 

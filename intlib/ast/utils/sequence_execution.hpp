@@ -49,11 +49,11 @@ namespace ast {
 );
 
 [[nodiscard]] std::generator<EvaluationResult> enumerate_values_sequence(
-	EvaluationContext& ctx, const SequenceExecutionEnvironment& env
+	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 );
 
 [[nodiscard]] std::generator<EvaluationResult> enumerate_names_sequence(
-	EvaluationContext& ctx, const SequenceExecutionEnvironment& env
+	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 );
 
 } // namespace ast

@@ -78,14 +78,15 @@ public:
 	}
 
 	[[nodiscard]] int64_t
-	get_index(const size_t d, const std::string_view var) noexcept
+	get_index(const size_t d, const std::string_view var) const noexcept
 	{
 #if defined DEBUG
 		assert(d < m_indices.size());
 		assert(m_indices[d].contains(var));
 #endif
-		return m_indices[d][var];
+		return m_indices[d].find(var)->second;
 	}
+
 	[[nodiscard]] bool
 	has_index(const size_t d, const std::string_view var) const noexcept
 	{

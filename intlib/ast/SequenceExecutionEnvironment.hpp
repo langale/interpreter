@@ -46,10 +46,34 @@ namespace ast {
 class SequenceExecutionEnvironment {
 public:
 
-	void set_expression(const std::unique_ptr<ale::ast::Node> * const expr
-	) noexcept
+	/* MODIFIERS */
+
+	void
+	set_expression(const std::unique_ptr<ale::ast::Node> * const expr) noexcept
 	{
 		m_expression = expr;
+	}
+
+	[[nodiscard]] EvaluationResult make_distances();
+
+	void
+	set_working_distance(const uint64_t depth, const int64_t distance) noexcept
+	{
+#if defined DEBUG
+		assert(depth < m_working_distances.size());
+#endif
+		m_working_distances[depth] = distance;
+	}
+
+	/* GETTERS */
+
+	[[nodiscard]] int64_t
+	get_working_distance(const uint64_t depth) const noexcept
+	{
+#if defined DEBUG
+		assert(depth < m_working_distances.size());
+#endif
+		return m_working_distances[depth];
 	}
 
 	[[nodiscard]] const std::unique_ptr<ale::ast::Node>&
@@ -72,8 +96,6 @@ public:
 		return (self.m_last_indices);
 	}
 
-	[[nodiscard]] EvaluationResult make_distances();
-
 	[[nodiscard]] int64_t get_distance(const size_t depth) const noexcept
 	{
 #if defined DEBUG
@@ -87,7 +109,9 @@ private:
 	const std::unique_ptr<ale::ast::Node> *m_expression = nullptr;
 	SequenceIndices m_first_indices;
 	SequenceIndices m_last_indices;
+
 	std::vector<int64_t> m_distances;
+	std::vector<int64_t> m_working_distances;
 };
 
 } // namespace ast

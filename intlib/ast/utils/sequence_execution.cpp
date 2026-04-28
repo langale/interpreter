@@ -342,25 +342,27 @@ EvaluationResult make_sequence_execution_environment(
 
 [[nodiscard]] static std::generator<EvaluationResult> enumerate_values_sequence(
 	EvaluationContext& ctx,
-	const SequenceExecutionEnvironment& env,
-	std::vector<int64_t>& working_distances,
+	SequenceExecutionEnvironment& env,
 	const size_t depth
 )
 {
 	if (depth == env.get_depth()) {
-		ctx.variable_index_distances = working_distances;
+		ctx.sequence_execution_environment = std::optional{&env};
 		EvaluationResult res = interpret_node(ctx, env.get_expression());
-		ctx.variable_index_distances = {};
+		ctx.sequence_execution_environment = {};
 		co_yield std::move(res);
 		co_return;
 	}
 
+#if defined DEBUG
+	assert(env.get_distance(depth) > 0);
+#endif
+
 	const int64_t distance = env.get_distance(depth);
 	for (int64_t i = 0; i < distance; ++i) {
-		working_distances[depth] = i;
+		env.set_working_distance(depth, i);
 
-		auto gen =
-			enumerate_values_sequence(ctx, env, working_distances, depth + 1);
+		auto gen = enumerate_values_sequence(ctx, env, depth + 1);
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
@@ -378,11 +380,10 @@ EvaluationResult make_sequence_execution_environment(
 }
 
 std::generator<EvaluationResult> enumerate_values_sequence(
-	EvaluationContext& ctx, const SequenceExecutionEnvironment& env
+	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 )
 {
-	std::vector<int64_t> working_distances(env.get_depth(), 0);
-	auto gen = enumerate_values_sequence(ctx, env, working_distances, 0);
+	auto gen = enumerate_values_sequence(ctx, env, 0);
 	auto pos = gen.begin();
 	const auto end = gen.end();
 	while (pos != end) {
@@ -398,8 +399,7 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 
 [[nodiscard]] static std::generator<EvaluationResult> enumerate_names_sequence(
 	EvaluationContext& ctx,
-	const SequenceExecutionEnvironment& env,
-	std::vector<int64_t>& working_distances,
+	SequenceExecutionEnvironment& env,
 	const size_t depth
 )
 {
@@ -414,20 +414,23 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 		const ale::ast::SubscriptedVariableNode& sub =
 			*static_cast<const ale::ast::SubscriptedVariableNode *>(expr.get());
 
-		ctx.variable_index_distances = working_distances;
+		ctx.sequence_execution_environment = {&env};
 		EvaluationResult res = make_subscripted_variable_name(ctx, sub);
-		ctx.variable_index_distances = {};
+		ctx.sequence_execution_environment = {};
 
 		co_yield std::move(res);
 		co_return;
 	}
 
+#if defined DEBUG
+	assert(env.get_distance(depth) > 0);
+#endif
+
 	const int64_t distance = env.get_distance(depth);
 	for (int64_t i = 0; i < distance; ++i) {
-		working_distances[depth] = i;
+		env.set_working_distance(depth, i);
 
-		auto gen =
-			enumerate_names_sequence(ctx, env, working_distances, depth + 1);
+		auto gen = enumerate_names_sequence(ctx, env, depth + 1);
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
@@ -445,7 +448,7 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 }
 
 std::generator<EvaluationResult> enumerate_names_sequence(
-	EvaluationContext& ctx, const SequenceExecutionEnvironment& env
+	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 )
 {
 #if defined DEBUG
@@ -459,8 +462,7 @@ std::generator<EvaluationResult> enumerate_names_sequence(
 		aleprln, "Going to enumerate the variable names of a sequence."
 	);
 
-	std::vector<int64_t> working_distances(env.get_depth(), 0);
-	auto gen = enumerate_names_sequence(ctx, env, working_distances, 0);
+	auto gen = enumerate_names_sequence(ctx, env, 0);
 	auto pos = gen.begin();
 	const auto end = gen.end();
 	while (pos != end) {

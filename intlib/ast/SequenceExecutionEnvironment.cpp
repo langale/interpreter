@@ -37,6 +37,7 @@
 #include <cassert>
 #endif
 #include <optional>
+#include <ranges>
 
 #include <intlib/ast/EvaluationResult.hpp>
 
@@ -98,6 +99,9 @@ EvaluationResult SequenceExecutionEnvironment::make_distances()
 #endif
 		m_distances[depth] = *distance;
 	}
+
+	m_working_distances.resize(m_distances.size());
+	std::ranges::fill(m_working_distances, 0);
 
 	return make_good_evaluation_result<std::any>();
 }

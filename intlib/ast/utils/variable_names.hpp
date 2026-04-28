@@ -46,14 +46,10 @@ namespace intlib {
 namespace ast {
 
 void append_variable_name(
-	std::string& name,
-	const std::vector<int64_t>& indices,
-	const std::optional<std::span<int64_t>>& distances
+	std::string& name, const std::vector<int64_t>& indices
 );
 [[nodiscard]] std::string make_indexed_variable_name(
-	const std::string& name,
-	const std::vector<int64_t>& indices,
-	const std::optional<std::span<int64_t>>& distances
+	const std::string& name, const std::vector<int64_t>& indices
 );
 
 [[nodiscard]] EvaluationResult make_subscripted_variable_name(

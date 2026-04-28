@@ -34,22 +34,26 @@
 #pragma once
 
 #include <optional>
-#include <span>
 
 #include <intlib/memory/Memory.hpp>
+#include <intlib/ast/SequenceExecutionEnvironment.hpp>
 
 namespace intlib {
 namespace ast {
 
 struct EvaluationContext {
 	memory::Memory& memory;
-	std::optional<std::span<int64_t>> variable_index_distances;
+
+	std::optional<const SequenceExecutionEnvironment *>
+		sequence_execution_environment;
 };
 
 [[nodiscard]] inline EvaluationContext
 new_evaluation_context(memory::Memory& mem)
 {
-	return EvaluationContext{.memory = mem, .variable_index_distances = {}};
+	return EvaluationContext{
+		.memory = mem, .sequence_execution_environment = {}
+	};
 }
 
 } // namespace ast
