@@ -94,7 +94,7 @@
 		}                                                                      \
 	)
 
-#define INTERPRETER_ENTER_FUNCTION(func)                                       \
+#define INTERPRETER_ENTER_DETAIL_FUNCTION(func)                                \
 	ale::logger::YellowTab ale_tabulator_variable_do_not_use(                  \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
@@ -128,7 +128,7 @@
 
 #define INTERPRETER_ENTER_MEMORY_FUNCTION(func)
 
-#define INTERPRETER_ENTER_FUNCTION(func)
+#define INTERPRETER_ENTER_DETAIL_FUNCTION(func)
 
 #define INTERPRETER_PRINT(func, fmt, ...)
 
