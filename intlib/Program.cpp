@@ -62,11 +62,13 @@ void Program::print_tree(ale::logger::Stream& os) const
 	os.out() << "'PROGRAM'\n";
 	ale::ast::print_xml_tree(
 		m_program_node,
-		{.os = os.out(),
-		 .start = " ",
-		 .sep = " ",
-		 .use_tab = true,
-		 .include_attributes = true}
+		ale::ast::PrintXMLTreeParams{
+			.os = os.out(),
+			.start = " ",
+			.sep = " ",
+			.use_tab = true,
+			.include_attributes = true
+		}
 	);
 }
 

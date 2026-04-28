@@ -74,16 +74,14 @@ public:
 
 	/* GETTERS */
 
-	/**
-	 * @brief Adds a list of instructions to the Program.
-	 * @returns A constant reference to the main node of this program.
-	*/
+	/// Returns a constant reference to the program's main node.
 	[[nodiscard]] const std::unique_ptr<ale::ast::Node>&
 	get_program_node() noexcept
 	{
 		return m_program_node;
 	}
 
+	/// Returns a constant reference to the program's context memory.
 	[[nodiscard]] const memory::Memory& get_memory() const noexcept
 	{
 		return m_memory;
@@ -92,7 +90,7 @@ public:
 	/* OTHER */
 
 	/// Execute this Program.
-	ast::EvaluationResult run_program();
+	[[nodiscard]] ast::EvaluationResult run_program();
 
 	/// Output a Program in a tree (AST) format to an output stream.
 	void print_tree(ale::logger::Stream& os) const;
