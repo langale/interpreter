@@ -48,68 +48,68 @@ std::formatter<intlib::detail::AnyView>::format(
 		return std::format_to(ctx.out(), "<empty>");
 	}
 
-	if (intlib::detail::holds_cpp_type<bool>(name)) {
+	if (intlib::detail::is_cpp_type<bool>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<bool>(value_w));
 	}
 
-	if (intlib::detail::holds_cpp_type<int8_t>(name)) {
+	if (intlib::detail::is_cpp_type<int8_t>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<int8_t>(value_w));
 	}
-	if (intlib::detail::holds_cpp_type<uint8_t>(name)) {
+	if (intlib::detail::is_cpp_type<uint8_t>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<uint8_t>(value_w));
 	}
 
-	if (intlib::detail::holds_cpp_type<int16_t>(name)) {
+	if (intlib::detail::is_cpp_type<int16_t>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<int16_t>(value_w));
 	}
-	if (intlib::detail::holds_cpp_type<uint16_t>(name)) {
+	if (intlib::detail::is_cpp_type<uint16_t>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<uint16_t>(value_w)
 		);
 	}
 
-	if (intlib::detail::holds_cpp_type<int32_t>(name)) {
+	if (intlib::detail::is_cpp_type<int32_t>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<int32_t>(value_w));
 	}
-	if (intlib::detail::holds_cpp_type<uint32_t>(name)) {
+	if (intlib::detail::is_cpp_type<uint32_t>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<uint32_t>(value_w)
 		);
 	}
 
-	if (intlib::detail::holds_cpp_type<int64_t>(name)) {
+	if (intlib::detail::is_cpp_type<int64_t>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<int64_t>(value_w));
 	}
-	if (intlib::detail::holds_cpp_type<uint64_t>(name)) {
+	if (intlib::detail::is_cpp_type<uint64_t>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<uint64_t>(value_w)
 		);
 	}
 
-	if (intlib::detail::holds_cpp_type<float16_t>(name)) {
+	if (intlib::detail::is_cpp_type<float16_t>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<float16_t>(value_w)
 		);
 	}
-	if (intlib::detail::holds_cpp_type<float32_t>(name)) {
+	if (intlib::detail::is_cpp_type<float32_t>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<float32_t>(value_w)
 		);
 	}
-	if (intlib::detail::holds_cpp_type<float64_t>(name)) {
+	if (intlib::detail::is_cpp_type<float64_t>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<float64_t>(value_w)
 		);
 	}
 
-	if (intlib::detail::holds_cpp_type<float>(name)) {
+	if (intlib::detail::is_cpp_type<float>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<float>(value_w));
 	}
-	if (intlib::detail::holds_cpp_type<double>(name)) {
+	if (intlib::detail::is_cpp_type<double>(name)) {
 		return std::format_to(ctx.out(), "{}", std::any_cast<double>(value_w));
 	}
 
-	if (intlib::detail::holds_cpp_type<std::string>(name)) {
+	if (intlib::detail::is_cpp_type<std::string>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<std::string>(value_w)
 		);
