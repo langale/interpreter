@@ -60,7 +60,9 @@ namespace ast {
 #define aleprln ale::logger::println
 
 [[nodiscard]] static EvaluationResult declare_variable(
-	EvaluationContext& ctx, std::string&& var_name, std::string&& var_type
+	EvaluationContext& ctx,
+	std::string&& var_name,
+	const std::string_view var_type
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
@@ -85,7 +87,7 @@ namespace ast {
 	}
 
 	// This is a 'declare' node.
-	ctx.memory.declare_variable(std::move(var_name), {}, std::move(var_type));
+	ctx.memory.declare_variable(std::move(var_name), {}, var_type);
 	return make_good_evaluation_result<std::any>();
 }
 
@@ -93,7 +95,7 @@ namespace ast {
 	EvaluationContext& ctx,
 	const ale::ast::node_type_e t,
 	std::string&& var_name,
-	std::string&& var_type,
+	const std::string_view var_type,
 	const std::any& value_w
 )
 {
@@ -147,12 +149,12 @@ namespace ast {
 
 	if (t == ale::ast::node_type_e::Declaration_Const) {
 		ctx.memory.declare_constant_variable(
-			std::move(var_name), std::move(value_conv_w), std::move(var_type)
+			std::move(var_name), std::move(value_conv_w), var_type
 		);
 	}
 	else {
 		ctx.memory.declare_variable(
-			std::move(var_name), std::move(value_conv_w), std::move(var_type)
+			std::move(var_name), std::move(value_conv_w), var_type
 		);
 	}
 
@@ -230,7 +232,7 @@ namespace ast {
 
 		std::any var_name_w = std::move(*var_res);
 		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-		std::string var_type = decl.get_variable_type();
+		const std::string& var_type = decl.get_variable_type();
 
 		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
@@ -239,11 +241,7 @@ namespace ast {
 		);
 
 		EvaluationResult declaration_res = declare_variable(
-			ctx,
-			decl_t,
-			std::move(var_name),
-			std::move(var_type),
-			*actual_value_w
+			ctx, decl_t, std::move(var_name), var_type, *actual_value_w
 		);
 		if (not declaration_res) {
 			return append_error(
@@ -339,7 +337,7 @@ namespace ast {
 
 		std::any var_name_w = std::move(*var_res);
 		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-		std::string var_type = decl.get_variable_type();
+		const std::string& var_type = decl.get_variable_type();
 
 		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
@@ -348,11 +346,7 @@ namespace ast {
 		);
 
 		EvaluationResult declaration_res = declare_variable(
-			ctx,
-			decl_t,
-			std::move(var_name),
-			std::move(var_type),
-			*actual_value_w
+			ctx, decl_t, std::move(var_name), var_type, *actual_value_w
 		);
 		if (not declaration_res) {
 			return append_error(
@@ -397,10 +391,10 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 
 			std::any var_name_w = std::move(*res);
 			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
+			const std::string& var_type = decl.get_variable_type();
 
-			std::string var_type = decl.get_variable_type();
 			auto declaration_res =
-				declare_variable(ctx, std::move(var_name), std::move(var_type));
+				declare_variable(ctx, std::move(var_name), var_type);
 
 			if (not declaration_res) {
 				return append_error(
