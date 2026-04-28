@@ -40,29 +40,85 @@
 namespace intlib {
 namespace arithmetic {
 
+/**
+ * @brief Addition between two std::any objects.
+ * @param left_w Value.
+ * @param right_w Value.
+ * @returns If any of the two input values is a double, returns a std::any object
+ * that contains a double. Otherwise: if the result is positive, a std::any that
+ * contains a uint64_t; if the result is negative, a std::any that contains an
+ * int64_t.
+ */
 [[nodiscard]] std::any
-arithmetic_addition(const std::any& left_w, const std::any& right_w);
+arithmetic_addition(const std::any& left_w, const std::any& right_w) noexcept;
 
+/**
+ * @brief Subtraction between two std::any objects.
+ * @param left_w Value.
+ * @param right_w Value.
+ * @returns If any of the two input values is a double, returns a std::any object
+ * that contains a double. Otherwise: if the result is positive, a std::any that
+ * contains a uint64_t; if the result is negative, a std::any that contains an
+ * int64_t.
+ */
+[[nodiscard]] std::any arithmetic_subtraction(
+	const std::any& left_w, const std::any& right_w
+) noexcept;
+
+/**
+ * @brief Multiplication between two std::any objects.
+ * @param left_w Value.
+ * @param right_w Value.
+ * @returns If any of the two input values is a double, returns a std::any object
+ * that contains a double. Otherwise: if the result is positive, a std::any that
+ * contains a uint64_t; if the result is negative, a std::any that contains an
+ * int64_t.
+ */
+[[nodiscard]] std::any arithmetic_multiplication(
+	const std::any& left_w, const std::any& right_w
+) noexcept;
+
+/**
+ * @brief Division between two std::any objects.
+ * @param left_w Value.
+ * @param right_w Value.
+ * @returns If any of the two input values is a double, returns a std::any object
+ * that contains a double. Otherwise: if the result is positive, a std::any that
+ * contains a uint64_t; if the result is negative, a std::any that contains an
+ * int64_t.
+ */
 [[nodiscard]] std::any
-arithmetic_division(const std::any& left_w, const std::any& right_w);
+arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept;
 
+/**
+ * @brief Multiplication between two std::any objects.
+ * @param left_w Value.
+ * @param right_w Value.
+ * @returns A std::any object that contains a double, regardless of the two input
+ * values.
+ */
+[[nodiscard]] std::any arithmetic_exponentiation(
+	const std::any& left_w, const std::any& right_w
+) noexcept;
+
+/**
+ * @brief Modulus between two std::any objects.
+ *
+ * Floating-point values are cast-ed to integer values.
+ * @param left_w Value.
+ * @param right_w Value.
+ * @returns If the result is positive, a std::any that contains a uint64_t; if
+ * the result is negative, a std::any that contains an int64_t.
+ */
 [[nodiscard]] std::any
-arithmetic_exponentiation(const std::any& left_w, const std::any& right_w);
+arithmetic_modulus(const std::any& left_w, const std::any& right_w) noexcept;
 
-[[nodiscard]] std::any
-arithmetic_modulus(const std::any& left_w, const std::any& right_w);
-
-[[nodiscard]] std::any
-arithmetic_multiplication(const std::any& left_w, const std::any& right_w);
-
-[[nodiscard]] std::any
-arithmetic_subtraction(const std::any& left_w, const std::any& right_w);
-
+/// Arithmetic operation determined by @e t between two std::any objects
 [[nodiscard]] std::any any_arithmetic(
 	const ale::ast::node_type_e t,
 	const std::any& left_w,
 	const std::any& right_w
-);
+) noexcept;
 
 } // namespace arithmetic
 } // namespace intlib

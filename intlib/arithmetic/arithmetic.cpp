@@ -49,23 +49,29 @@ std::any any_arithmetic(
 	const ale::ast::node_type_e t,
 	const std::any& left_w,
 	const std::any& right_w
-)
+) noexcept
 {
 	INTERPRETER_ENTER_ARITHMETIC_FUNCTION(aleprln);
 
 	switch (t) {
 	case ale::ast::node_type_e::Arithmetic_Addition:
 		return arithmetic_addition(left_w, right_w);
+
 	case ale::ast::node_type_e::Arithmetic_Division:
 		return arithmetic_division(left_w, right_w);
+
 	case ale::ast::node_type_e::Arithmetic_Exponentiation:
 		return arithmetic_exponentiation(left_w, right_w);
+
 	case ale::ast::node_type_e::Arithmetic_Modulus:
 		return arithmetic_modulus(left_w, right_w);
+
 	case ale::ast::node_type_e::Arithmetic_Multiplication:
 		return arithmetic_multiplication(left_w, right_w);
+
 	case ale::ast::node_type_e::Arithmetic_Subtraction:
 		return arithmetic_subtraction(left_w, right_w);
+
 	default:
 		INTERPRETER_PRINT(aleprln, "Wrong node type '{}' for arithmetic.", t);
 		return {};
