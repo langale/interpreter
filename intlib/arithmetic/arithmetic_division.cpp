@@ -50,11 +50,11 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 	const std::string left_type = detail::get_type_name(left_w);
 	const std::string right_type = detail::get_type_name(right_w);
 
-	if (detail::holds_cpp_type<uint64_t>(left_type)) {
+	if (detail::is_cpp_type<uint64_t>(left_type)) {
 		const auto left = std::any_cast<uint64_t>(left_w);
 		INTERPRETER_PRINT(aleprln, "First component is uint64_t: {}.", left);
 
-		if (detail::holds_cpp_type<uint64_t>(right_type)) {
+		if (detail::is_cpp_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
@@ -63,7 +63,7 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 			return left / right;
 		}
 
-		if (detail::holds_cpp_type<int64_t>(right_type)) {
+		if (detail::is_cpp_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
@@ -73,7 +73,7 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 			return detail::adapt_type(res);
 		}
 
-		if (detail::holds_cpp_type<double>(right_type)) {
+		if (detail::is_cpp_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is double: {}.", right
@@ -89,11 +89,11 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 		);
 	}
 
-	if (detail::holds_cpp_type<int64_t>(left_type)) {
+	if (detail::is_cpp_type<int64_t>(left_type)) {
 		const auto left = std::any_cast<int64_t>(left_w);
 		INTERPRETER_PRINT(aleprln, "First component is int64_t: {}.", left);
 
-		if (detail::holds_cpp_type<uint64_t>(right_type)) {
+		if (detail::is_cpp_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
@@ -103,7 +103,7 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 			return detail::adapt_type(res);
 		}
 
-		if (detail::holds_cpp_type<int64_t>(right_type)) {
+		if (detail::is_cpp_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
@@ -113,7 +113,7 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 			return detail::adapt_type(res);
 		}
 
-		if (detail::holds_cpp_type<double>(right_type)) {
+		if (detail::is_cpp_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is double: {}.", right
@@ -129,11 +129,11 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 		);
 	}
 
-	if (detail::holds_cpp_type<double>(left_type)) {
+	if (detail::is_cpp_type<double>(left_type)) {
 		const auto left = std::any_cast<double>(left_w);
 		INTERPRETER_PRINT(aleprln, "First component is double: {}.", left);
 
-		if (detail::holds_cpp_type<uint64_t>(right_type)) {
+		if (detail::is_cpp_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
@@ -142,7 +142,7 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 			return left / detail::to_double(right);
 		}
 
-		if (detail::holds_cpp_type<int64_t>(right_type)) {
+		if (detail::is_cpp_type<int64_t>(right_type)) {
 			const auto right = std::any_cast<int64_t>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
@@ -151,7 +151,7 @@ arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept
 			return left / detail::to_double(right);
 		}
 
-		if (detail::holds_cpp_type<double>(right_type)) {
+		if (detail::is_cpp_type<double>(right_type)) {
 			const auto right = std::any_cast<double>(right_w);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is double: {}.", right
