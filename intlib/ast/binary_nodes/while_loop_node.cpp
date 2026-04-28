@@ -62,7 +62,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Node_Is_Malformed},
 			Vec{evaluation_function_e::While_Loop},
-			Vec{"Condition in while loop is missing."s}
+			Vec{"Condition in while loop is missing"s}
 		);
 	}
 
@@ -91,7 +91,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 				evaluation_error_e::Conversion_To_Bool_Failed,
 				evaluation_function_e::While_Loop,
 				"Could not convert value in while loop condition to a Boolean "
-				"value."
+				"value"
 			);
 		}
 

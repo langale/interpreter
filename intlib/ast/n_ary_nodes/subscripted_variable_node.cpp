@@ -66,7 +66,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 			evaluation_function_e::Subscripted_Variable,
 			std::format(
 				"Full variable name of subscripted variable {} could not be "
-				"retrieved.",
+				"retrieved",
 				v.get_variable_name()
 			)
 		);
@@ -83,7 +83,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 			Vec{evaluation_error_e::Undefined_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},
 			Vec{std::format(
-				"Variable '{}' is not defined in this scope.", var_name
+				"Variable '{}' is not defined in this scope", var_name
 			)}
 		);
 	}
@@ -95,7 +95,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		return make_bad_evaluation_result(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},
-			Vec{std::format("Variable '{}' has no value.", var_name)}
+			Vec{std::format("Variable '{}' has no value", var_name)}
 		);
 	}
 

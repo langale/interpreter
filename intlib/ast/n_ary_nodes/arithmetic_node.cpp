@@ -135,7 +135,7 @@ EvaluationResult evaluate(
 				Vec{evaluation_error_e::Arithmetic_Operation_Failed},
 				Vec{evaluation_function_e::Arithmetic},
 				Vec{std::format(
-					"Could not operate two std::any values: '{}' and '{}'.",
+					"Could not operate two std::any values: '{}' and '{}'",
 					detail::AnyView{expr_res_w},
 					detail::AnyView{res}
 				)}

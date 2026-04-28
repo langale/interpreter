@@ -138,7 +138,7 @@ EvaluationResult evaluate_logical_node(
 			std::move(res_int.error()),
 			evaluation_error_e::Conversion_To_Bool_Failed,
 			evaluation_function_e::Logical,
-			"Evaluation of node could not be converted to a Boolean value."
+			"Evaluation of node could not be converted to a Boolean value"
 		);
 	}
 

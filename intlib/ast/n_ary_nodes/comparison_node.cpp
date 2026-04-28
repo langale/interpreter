@@ -115,7 +115,7 @@ EvaluationResult evaluate(
 				Vec{evaluation_error_e::Comparison_Operation_Failed},
 				Vec{evaluation_function_e::Comparison},
 				Vec{std::format(
-					"Could not compare two std::any values: '{}' and '{}'.",
+					"Could not compare two std::any values: '{}' and '{}'",
 					detail::AnyView{previous_w},
 					detail::AnyView{current_w}
 				)}

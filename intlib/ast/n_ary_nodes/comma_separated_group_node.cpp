@@ -60,7 +60,7 @@ evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 		Vec{evaluation_error_e::Evaluation_Of_Node_Is_Forbidden},
 		Vec{evaluation_function_e::Comma_Separated_Group},
 		Vec{std::format(
-			"Cannot evaluate nodes of type '{}'.", v.get_node_type()
+			"Cannot evaluate nodes of type '{}'", v.get_node_type()
 		)}
 	);
 }

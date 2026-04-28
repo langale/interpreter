@@ -117,7 +117,7 @@ namespace ast {
 				Vec{evaluation_error_e::
 						Evaluation_Of_Node_Is_Not_A_Numeric_Value},
 				Vec{evaluation_function_e::Variable_Names},
-				Vec{"Evaluation of node is not a numeric value."s}
+				Vec{"Evaluation of node is not a numeric value"s}
 			);
 		}
 

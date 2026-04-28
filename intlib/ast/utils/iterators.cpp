@@ -102,7 +102,7 @@ make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var)
 		co_yield make_bad_evaluation_result(
 			Vec{evaluation_error_e::Memory_Variable_Does_Not_Exist},
 			Vec{evaluation_function_e::Iterator_Value_Subscripted_Variable},
-			Vec{std::format("Variable '{}' does not exist.", var_name)}
+			Vec{std::format("Variable '{}' does not exist", var_name)}
 		);
 		co_return;
 	}
@@ -136,7 +136,7 @@ std::generator<EvaluationResult> make_value_iterator(
 		co_yield make_bad_evaluation_result(
 			Vec{evaluation_error_e::Memory_Variable_Does_Not_Exist},
 			Vec{evaluation_function_e::Iterator_Value_Subscripted_Variable},
-			Vec{std::format("Variable '{}' does not exist.", var_name)}
+			Vec{std::format("Variable '{}' does not exist", var_name)}
 		);
 		co_return;
 	}
@@ -187,7 +187,7 @@ std::generator<EvaluationResult> make_value_iterator(
 			Vec{evaluation_error_e::Conversion_To_Numeric_Failed},
 			Vec{evaluation_function_e::Iterator_Value_Sequence},
 			Vec{"Evaluation of first value of sequence could not be converted "
-				"to a numeric value."s}
+				"to a numeric value"s}
 		);
 		co_return;
 	}
@@ -202,7 +202,7 @@ std::generator<EvaluationResult> make_value_iterator(
 			Vec{evaluation_error_e::Conversion_To_Numeric_Failed},
 			Vec{evaluation_function_e::Iterator_Value_Sequence},
 			Vec{"Evaluation of second value of sequence could not be converted "
-				"to a numeric value."s}
+				"to a numeric value"s}
 		);
 		co_return;
 	}
@@ -279,7 +279,7 @@ std::generator<EvaluationResult> make_value_iterator(
 					Vec{evaluation_error_e::
 							Sequence_Environment_Enumeration_Step_Failed},
 					Vec{evaluation_function_e::Iterator_Value_Sequence},
-					Vec{"Evaluation of node failed."s}
+					Vec{"Evaluation of node failed"s}
 				);
 				co_return;
 			}
@@ -299,7 +299,7 @@ std::generator<EvaluationResult> make_value_iterator(
 				Vec{evaluation_error_e::
 						Sequence_Environment_Enumeration_Step_Failed},
 				Vec{evaluation_function_e::Iterator_Value_Sequence},
-				Vec{"Evaluation of node failed."s}
+				Vec{"Evaluation of node failed"s}
 			);
 			co_return;
 		}
@@ -328,7 +328,7 @@ std::generator<EvaluationResult> make_value_iterator(
 					std::move(res.error()),
 					evaluation_error_e::Evaluation_Of_Node_Failed,
 					evaluation_function_e::Iterator_Value_Comma_Separated_Group,
-					"Evaluation of node failed."s
+					"Evaluation of node failed"s
 				);
 				co_return;
 			}
@@ -349,7 +349,7 @@ std::generator<EvaluationResult> make_value_iterator(
 						Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
 						Vec{evaluation_function_e::
 								Iterator_Value_Comma_Separated_Group},
-						Vec{"Evaluation of node failed."s}
+						Vec{"Evaluation of node failed"s}
 					);
 					co_return;
 				}
@@ -510,7 +510,7 @@ std::generator<EvaluationResult> make_name_iterator(
 				Vec{evaluation_error_e::
 						Sequence_Environment_Enumeration_Step_Failed},
 				Vec{evaluation_function_e::Iterator_Value_Sequence},
-				Vec{"Evaluation of node failed."s}
+				Vec{"Evaluation of node failed"s}
 			);
 			co_return;
 		}
