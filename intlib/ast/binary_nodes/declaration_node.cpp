@@ -232,7 +232,7 @@ namespace ast {
 
 		std::any var_name_w = std::move(*var_res);
 		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-		const std::string& var_type = decl.get_variable_type();
+		const std::string_view var_type = decl.get_variable_type();
 
 		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
@@ -337,7 +337,7 @@ namespace ast {
 
 		std::any var_name_w = std::move(*var_res);
 		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-		const std::string& var_type = decl.get_variable_type();
+		const std::string_view var_type = decl.get_variable_type();
 
 		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
@@ -391,7 +391,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 
 			std::any var_name_w = std::move(*res);
 			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-			const std::string& var_type = decl.get_variable_type();
+			const std::string_view var_type = decl.get_variable_type();
 
 			auto declaration_res =
 				declare_variable(ctx, std::move(var_name), var_type);
