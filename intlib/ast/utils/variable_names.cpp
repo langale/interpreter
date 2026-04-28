@@ -154,15 +154,6 @@ std::string make_indexed_variable_name(
 	return n;
 }
 
-const std::string& get_variable_name(const ale::ast::SequenceNode& sequence
-) noexcept
-{
-	return static_cast<ale::ast::SubscriptedVariableNode *>(
-			   sequence.get_left_child().get()
-	)
-		->get_variable_name();
-}
-
 EvaluationResult make_subscripted_variable_name(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
@@ -222,7 +213,8 @@ EvaluationResult make_shallow_sequence_indices(
 
 	// left indices
 	const auto& left_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(left_child.get()
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(
+			left_child.get()
 		);
 	auto res_left_indices_w = get_indices(ctx, left_subscripted_variable);
 	if (not res_left_indices_w.has_value()) {
@@ -231,8 +223,9 @@ EvaluationResult make_shallow_sequence_indices(
 
 	// right indices
 	const auto& right_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(right_child.get(
-		));
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(
+			right_child.get()
+		);
 	auto res_right_indices_w = get_indices(ctx, right_subscripted_variable);
 	if (not res_right_indices_w.has_value()) {
 		return std::move(res_right_indices_w.error());

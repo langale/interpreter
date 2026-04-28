@@ -56,9 +56,6 @@ void append_variable_name(
 	const std::optional<std::span<int64_t>>& distances
 );
 
-[[nodiscard]] const std::string&
-get_variable_name(const ale::ast::SequenceNode& sequence) noexcept;
-
 [[nodiscard]] EvaluationResult make_subscripted_variable_name(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
