@@ -53,7 +53,7 @@
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_conversion.hpp>
+#include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/any_output.hpp>
 
 namespace intlib {
@@ -64,10 +64,10 @@ namespace ast {
 [[nodiscard]] static bool
 check_equal_anys(const std::any& l, const std::any& r) noexcept
 {
-	const bool is_l_uint64 = detail::is_type<uint64_t>(l);
-	const bool is_l_int64 = detail::is_type<int64_t>(l);
-	const bool is_r_uint64 = detail::is_type<uint64_t>(r);
-	const bool is_r_int64 = detail::is_type<int64_t>(r);
+	const bool is_l_uint64 = detail::holds_cpp_type<uint64_t>(l);
+	const bool is_l_int64 = detail::holds_cpp_type<int64_t>(l);
+	const bool is_r_uint64 = detail::holds_cpp_type<uint64_t>(r);
+	const bool is_r_int64 = detail::holds_cpp_type<int64_t>(r);
 	if (is_l_uint64 and is_r_uint64) {
 		return std::any_cast<uint64_t>(l) == std::any_cast<uint64_t>(r);
 	}
@@ -101,7 +101,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 
 		auto new_index_w = std::move(*res);
 		if (not has_index) {
-			if (detail::is_type<int64_t>(new_index_w)) {
+			if (detail::holds_cpp_type<int64_t>(new_index_w)) {
 				const int64_t idx = std::any_cast<int64_t>(new_index_w);
 				INTERPRETER_PRINT(
 					aleprln,
@@ -112,7 +112,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 				);
 				indices.set_index(d, name, idx);
 			}
-			else if (detail::is_type<uint64_t>(new_index_w)) {
+			else if (detail::holds_cpp_type<uint64_t>(new_index_w)) {
 				const uint64_t idx = std::any_cast<uint64_t>(new_index_w);
 				INTERPRETER_PRINT(
 					aleprln,
@@ -125,7 +125,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 			}
 			else {
 				const std::any idx_w =
-					detail::any_convert_to_type(new_index_w, "int64_t");
+					detail::any_to_numeric<int64_t>(new_index_w);
 				const int64_t idx = std::any_cast<int64_t>(idx_w);
 				INTERPRETER_PRINT(
 					aleprln,
@@ -144,21 +144,22 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 					aleprln,
 					"Mismatch between known index value '{}' and new "
 					"computed index value '{}', for variable '{}'",
-					any_view{known_index_w},
-					any_view{new_index_w},
+					detail::AnyView{known_index_w},
+					detail::AnyView{new_index_w},
 					name
 				);
 
 				return make_bad_evaluation_result(
-					Vec{evaluation_error_e::Sequence_Environment_Index_Mismatch
+					Vec{
+						evaluation_error_e::Sequence_Environment_Index_Mismatch
 					},
 					Vec{evaluation_function_e::
 							Sequence_Execution_Environment_Construction},
 					Vec{std::format(
 						"Mismatch between known index value '{}' and new "
 						"computed index value '{}', for variable '{}'",
-						any_view{known_index_w},
-						any_view{new_index_w},
+						detail::AnyView{known_index_w},
+						detail::AnyView{new_index_w},
 						name
 					)}
 				);
@@ -312,7 +313,8 @@ EvaluationResult make_sequence_execution_environment(
 	const auto depth_end = env.get_first_indices().depth();
 	if (depth_start != depth_end) {
 		return make_bad_evaluation_result(
-			std::vector{evaluation_error_e::Sequence_Environment_Mismatch_Depth
+			std::vector{
+				evaluation_error_e::Sequence_Environment_Mismatch_Depth
 			},
 			std::vector{evaluation_function_e::
 							Sequence_Execution_Environment_Construction},

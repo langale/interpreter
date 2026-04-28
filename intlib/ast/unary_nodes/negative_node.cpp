@@ -63,19 +63,19 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	}
 
 	const std::any& res_w = *res_int_w;
-	if (detail::is_type<uint64_t>(res_w)) {
+	if (detail::holds_cpp_type<uint64_t>(res_w)) {
 		const auto ri = std::any_cast<uint64_t>(res_w);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is uint64_t: {}.", ri);
 		return make_good_evaluation_result<int64_t>(-detail::to_int64(ri));
 	}
 
-	if (detail::is_type<int64_t>(res_w)) {
+	if (detail::holds_cpp_type<int64_t>(res_w)) {
 		const auto ri = std::any_cast<int64_t>(res_w);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is int64_t: {}.", ri);
 		return make_good_evaluation_result<std::any>(detail::adapt_type(-ri));
 	}
 
-	if (detail::is_type<double>(res_w)) {
+	if (detail::holds_cpp_type<double>(res_w)) {
 		const auto ri = std::any_cast<double>(res_w);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is double: {}.", ri);
 		return make_good_evaluation_result<double>(-ri);

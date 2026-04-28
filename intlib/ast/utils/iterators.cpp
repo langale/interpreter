@@ -177,7 +177,7 @@ std::generator<EvaluationResult> make_value_iterator(
 	std::any second_value_w = std::move(*second_res);
 
 	INTERPRETER_PRINT(
-		aleprln, "Converting left value '{}'.", any_view{first_value_w}
+		aleprln, "Converting left value '{}'.", detail::AnyView{first_value_w}
 	);
 	const std::optional<int64_t> first_val_w =
 		detail::any_to_numeric<int64_t>(first_value_w);
@@ -193,7 +193,7 @@ std::generator<EvaluationResult> make_value_iterator(
 	}
 
 	INTERPRETER_PRINT(
-		aleprln, "Converting right value '{}'.", any_view{second_value_w}
+		aleprln, "Converting right value '{}'.", detail::AnyView{second_value_w}
 	);
 	const std::optional<int64_t> second_val_w =
 		detail::any_to_numeric<int64_t>(second_value_w);

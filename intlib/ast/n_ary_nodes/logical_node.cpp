@@ -113,9 +113,9 @@ EvaluationResult evaluate_logical_node(
 	}
 
 	const std::any& res_w = *res_int;
-	INTERPRETER_PRINT(aleprln, "Evaluation of node '{}'", any_view{res_w});
+	INTERPRETER_PRINT(aleprln, "Evaluation of node '{}'", detail::AnyView{res_w});
 
-	if (detail::is_type<void>(res_w)) {
+	if (detail::holds_cpp_type<void>(res_w)) {
 		INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 		return append_error(
 			std::move(res_int.error()),
@@ -131,8 +131,8 @@ EvaluationResult evaluate_logical_node(
 			aleprln,
 			"Evaluation of node '{}' could not be converted to a Boolean value "
 			"'{}'.",
-			any_view{res_w},
-			any_view{r_conv_w}
+			detail::AnyView{res_w},
+			detail::AnyView{r_conv_w}
 		);
 		return append_error(
 			std::move(res_int.error()),

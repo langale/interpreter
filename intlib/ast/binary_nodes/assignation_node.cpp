@@ -103,13 +103,13 @@ namespace ast {
 	}
 
 	std::any value_conv_w =
-		detail::any_convert_to_type(value_w, var_in_memory.type);
+		detail::any_to_ale_type(value_w, var_in_memory.type);
 
-	if (detail::is_type<void>(value_conv_w)) {
+	if (detail::holds_cpp_type<void>(value_conv_w)) {
 		INTERPRETER_PRINT(
 			aleprln,
 			"Could not convert value '{}' to a value of type '{}'.",
-			any_view{value_w},
+			detail::AnyView{value_w},
 			var_in_memory.type
 		);
 		return make_bad_evaluation_result(
@@ -117,7 +117,7 @@ namespace ast {
 			Vec{evaluation_function_e::Assignation},
 			Vec{std::format(
 				"Could not convert value '{}' to a value of type '{}'",
-				any_view{value_w},
+				detail::AnyView{value_w},
 				var_in_memory.type
 			)}
 		);
@@ -127,7 +127,7 @@ namespace ast {
 		aleprln,
 		"Value after conversion to '{}' is: '{}'.",
 		var_in_memory.type,
-		any_view{value_conv_w}
+		detail::AnyView{value_conv_w}
 	);
 
 	var_in_memory.value_w = std::move(value_conv_w);
@@ -189,11 +189,11 @@ namespace ast {
 
 		const std::any& value_w = *value_res;
 		const std::any *actual_value_w = nullptr;
-		if (detail::is_type<memory::RefMemVar>(value_w)) {
+		if (detail::holds_cpp_type<memory::RefMemVar>(value_w)) {
 			actual_value_w =
 				&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
 		}
-		else if (detail::is_type<memory::RefConstMemVar>(value_w)) {
+		else if (detail::holds_cpp_type<memory::RefConstMemVar>(value_w)) {
 			actual_value_w =
 				&std::any_cast<memory::RefConstMemVar>(value_w).get().value_w;
 		}
@@ -206,7 +206,7 @@ namespace ast {
 
 		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT(
-			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
+			aleprln, "Of value: '{}'.", detail::AnyView{*actual_value_w}
 		);
 
 		EvaluationResult assignation_res =
@@ -268,11 +268,11 @@ namespace ast {
 
 	const std::any& value_w = *compute_res;
 	const std::any *actual_value_w = nullptr;
-	if (detail::is_type<memory::RefMemVar>(value_w)) {
+	if (detail::holds_cpp_type<memory::RefMemVar>(value_w)) {
 		actual_value_w =
 			&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
 	}
-	else if (detail::is_type<const memory::RefMemVar>(value_w)) {
+	else if (detail::holds_cpp_type<const memory::RefMemVar>(value_w)) {
 		actual_value_w =
 			&std::any_cast<const memory::RefMemVar>(value_w).get().value_w;
 	}
@@ -309,7 +309,7 @@ namespace ast {
 
 		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT(
-			aleprln, "Of value: '{}'.", any_view{*actual_value_w}
+			aleprln, "Of value: '{}'.", detail::AnyView{*actual_value_w}
 		);
 
 		EvaluationResult assignation_res =

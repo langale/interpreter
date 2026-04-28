@@ -84,7 +84,7 @@ EvaluationResult evaluate(
 			);
 		}
 
-		if (detail::is_type<void>(*res)) {
+		if (detail::holds_cpp_type<void>(*res)) {
 			INTERPRETER_PRINT(
 				aleprln, "Evaluation of node returned a void value."
 			);
@@ -136,8 +136,8 @@ EvaluationResult evaluate(
 				Vec{evaluation_function_e::Arithmetic},
 				Vec{std::format(
 					"Could not operate two std::any values: '{}' and '{}'.",
-					any_view{expr_res_w},
-					any_view{res}
+					detail::AnyView{expr_res_w},
+					detail::AnyView{res}
 				)}
 			);
 		}

@@ -85,7 +85,7 @@ namespace ast {
 		const std::any& val_w = *val_int_w;
 		std::optional<int64_t> idx_w;
 
-		if (detail::is_type<memory::VariableValue>(val_w)) {
+		if (detail::holds_cpp_type<memory::VariableValue>(val_w)) {
 			const auto& memory_variable =
 				std::any_cast<const memory::VariableValue&>(val_w);
 			idx_w = detail::any_to_numeric<int64_t>(memory_variable.value_w);
@@ -95,7 +95,7 @@ namespace ast {
 					aleprln,
 					"Could not convert node evaluation '{}' into a numeric "
 					"int64_t.",
-					any_view{memory_variable.value_w}
+					detail::AnyView{memory_variable.value_w}
 				);
 			}
 		}
@@ -107,7 +107,7 @@ namespace ast {
 					aleprln,
 					"Could not convert node evaluation '{}' into a numeric "
 					"int64_t.",
-					any_view{val_w}
+					detail::AnyView{val_w}
 				);
 			}
 		}
@@ -255,8 +255,8 @@ EvaluationResult make_shallow_sequence_indices(
 	using Veci64 = Vec<int64_t>;
 
 #if defined DEBUG
-	assert(detail::is_type<Veci64>(left_idxs_w));
-	assert(detail::is_type<Veci64>(right_idxs_w));
+	assert(detail::holds_cpp_type<Veci64>(left_idxs_w));
+	assert(detail::holds_cpp_type<Veci64>(right_idxs_w));
 #endif
 
 	return make_good_evaluation_result<ShallowSequenceIndices>(

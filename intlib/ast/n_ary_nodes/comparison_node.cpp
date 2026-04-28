@@ -102,27 +102,27 @@ EvaluationResult evaluate(
 		std::any current_w = std::move(*res);
 
 		const std::optional<bool> comparison_result_w =
-			detail::any_comparison(t, previous_w, current_w);
+			comparison::any_comparison(t, previous_w, current_w);
 
 		if (not comparison_result_w.has_value()) {
 			INTERPRETER_PRINT(
 				aleprln,
 				"Could not compare two std::any values: '{}' and '{}'.",
-				any_view{previous_w},
-				any_view{current_w}
+				detail::AnyView{previous_w},
+				detail::AnyView{current_w}
 			);
 			return make_bad_evaluation_result(
 				Vec{evaluation_error_e::Comparison_Operation_Failed},
 				Vec{evaluation_function_e::Comparison},
 				Vec{std::format(
 					"Could not compare two std::any values: '{}' and '{}'.",
-					any_view{previous_w},
-					any_view{current_w}
+					detail::AnyView{previous_w},
+					detail::AnyView{current_w}
 				)}
 			);
 		}
 
-		if (not*comparison_result_w) {
+		if (not *comparison_result_w) {
 			return false;
 		}
 		previous_w = std::move(current_w);
