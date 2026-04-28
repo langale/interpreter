@@ -42,7 +42,7 @@
 #include <intlib/comparison/comparison.hpp>
 
 namespace intlib {
-namespace detail {
+namespace comparison {
 
 #define aleprln ale::logger::println
 
@@ -57,21 +57,27 @@ std::optional<bool> any_comparison(
 	switch (t) {
 	case ale::ast::node_type_e::Comparison_Equal:
 		return any_comparison_equal(left_w, right_w);
+
 	case ale::ast::node_type_e::Comparison_Not_Equal:
 		return any_comparison_not_equal(left_w, right_w);
+
 	case ale::ast::node_type_e::Comparison_Less_Than:
 		return any_comparison_less_than(left_w, right_w);
+
 	case ale::ast::node_type_e::Comparison_Less_Equal:
-		return any_comparison_less_than_equal_to(left_w, right_w);
+		return any_comparison_less_equal(left_w, right_w);
+
 	case ale::ast::node_type_e::Comparison_Greater_Than:
 		return any_comparison_greater_than(left_w, right_w);
+
 	case ale::ast::node_type_e::Comparison_Greater_Equal:
-		return any_comparison_greater_than_equal_to(left_w, right_w);
+		return any_comparison_greater_equal(left_w, right_w);
+
 	default:
 		INTERPRETER_PRINT(aleprln, "Wrong node type '{}' for comparison.", t);
 		return {};
 	}
 }
 
-} // namespace detail
+} // namespace comparison
 } // namespace intlib

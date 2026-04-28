@@ -39,20 +39,19 @@
 #include <intlib/detail/any_type.hpp>
 
 namespace intlib {
-namespace detail {
+namespace comparison {
 
 #define aleprln ale::logger::println
 
 template <typename left_t, typename right_t>
-[[nodiscard]] static std::optional<bool> any_comparison_greater_than_equal_to(
-	const std::any& left_w, const std::any& right_w
-)
+[[nodiscard]] static std::optional<bool>
+any_comparison_greater_equal(const std::any& left_w, const std::any& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
-		if (detail::is_type<left_t>(left_w) and
-			detail::is_type<right_t>(right_w)) {
+		if (detail::holds_cpp_type<left_t>(left_w) and
+			detail::holds_cpp_type<right_t>(right_w)) {
 
 			const auto left = std::any_cast<left_t>(left_w);
 			const auto right = std::any_cast<right_t>(right_w);
@@ -95,34 +94,30 @@ any_comparison_greater_than_equal_to_right_numeric(
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
 	if (const auto r =
-			any_comparison_greater_than_equal_to<left_t, bool>(left_w, right_w);
+			any_comparison_greater_equal<left_t, bool>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_greater_than_equal_to<left_t, int64_t>(
-			left_w, right_w
-		);
+	if (const auto r =
+			any_comparison_greater_equal<left_t, int64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_greater_than_equal_to<left_t, uint64_t>(
-			left_w, right_w
-		);
+	if (const auto r =
+			any_comparison_greater_equal<left_t, uint64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_greater_than_equal_to<left_t, double>(
-			left_w, right_w
-		);
+	if (const auto r =
+			any_comparison_greater_equal<left_t, double>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
 	return {};
 }
 
-std::optional<bool> any_comparison_greater_than_equal_to(
-	const std::any& left_w, const std::any& right_w
-)
+std::optional<bool>
+any_comparison_greater_equal(const std::any& left_w, const std::any& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
@@ -154,15 +149,14 @@ std::optional<bool> any_comparison_greater_than_equal_to(
 		return r;
 	}
 
-	if (const auto r =
-			any_comparison_greater_than_equal_to<std::string, std::string>(
-				left_w, right_w
-			);
+	if (const auto r = any_comparison_greater_equal<std::string, std::string>(
+			left_w, right_w
+		);
 		r.has_value()) {
 		return r;
 	}
 	return {};
 }
 
-} // namespace detail
+} // namespace comparison
 } // namespace intlib

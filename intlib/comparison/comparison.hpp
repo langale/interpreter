@@ -39,31 +39,50 @@
 #include <ale/ast/utils/node_type_enum.hpp>
 
 namespace intlib {
-namespace detail {
+namespace comparison {
+
+/**
+ * @brief Equal comparison between two std::any objects.
+ * @param left_w Value.
+ * @param right_w Value.
+ * @returns If any of the two input values is a double, returns a std::any object
+ * that contains a double. Otherwise: if the result is positive, a std::any that
+ * contains a uint64_t; if the result is negative, a std::any that contains an
+ * int64_t.
+ */
+[[nodiscard]] std::optional<bool>
+any_comparison_equal(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_equal(const std::any& a, const std::any& b);
+any_comparison_not_equal(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_not_equal(const std::any& a, const std::any& b);
+any_comparison_less_than(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_less_than(const std::any& a, const std::any& b);
+any_comparison_less_equal(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_less_than_equal_to(const std::any& a, const std::any& b);
+any_comparison_greater_than(const std::any& left_w, const std::any& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_greater_than(const std::any& a, const std::any& b);
+any_comparison_greater_equal(const std::any& left_w, const std::any& right_w);
 
-[[nodiscard]] std::optional<bool>
-any_comparison_greater_than_equal_to(const std::any& a, const std::any& b);
-
+/**
+ * @brief Comparison operation determined by @e t between two std::any objects.
+ *
+ * These two objects need to be of the same type. To ensure correctness, values
+ * are cast-ed to the same type and then compared.
+ * @param t Type of comparison.
+ * @param left_w First value.
+ * @param right_w Second value.
+ * @returns The result of the comparison.
+ */
 [[nodiscard]] std::optional<bool> any_comparison(
 	const ale::ast::node_type_e t,
 	const std::any& left_w,
 	const std::any& right_w
 );
 
-} // namespace detail
+} // namespace comparison
 } // namespace intlib

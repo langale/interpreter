@@ -39,7 +39,7 @@
 #include <intlib/detail/any_type.hpp>
 
 namespace intlib {
-namespace detail {
+namespace comparison {
 
 #define aleprln ale::logger::println
 
@@ -50,7 +50,9 @@ any_comparison_equal(const std::any& left_w, const std::any& right_w)
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
-		if (is_type<left_t>(left_w) and is_type<right_t>(right_w)) {
+		if (detail::holds_cpp_type<left_t>(left_w) and
+			detail::holds_cpp_type<right_t>(right_w)) {
+
 			const auto left = std::any_cast<left_t>(left_w);
 			const auto right = std::any_cast<right_t>(right_w);
 			if constexpr (std::is_floating_point_v<left_t> or
@@ -143,5 +145,5 @@ any_comparison_equal(const std::any& left_w, const std::any& right_w)
 	return {};
 }
 
-} // namespace detail
+} // namespace comparison
 } // namespace intlib
