@@ -32,37 +32,14 @@
  ********************************************************************/
 
 #include <string>
-#include <array>
 #include <any>
 
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/any_to_bool.hpp>
+#include <intlib/detail/ale_type.hpp>
 
 namespace intlib {
 namespace detail {
-
-static constexpr std::array numeric_types{
-	"bool",
-	"char",
-	"unsigned char",
-	"signed char",
-	"u8",
-	"i8",
-	"u16",
-	"i16",
-	"u32",
-	"i32",
-	"u64",
-	"i64",
-	"f16",
-	"f32",
-	"f64"
-};
-
-bool is_type_numeric(const std::string& type) noexcept
-{
-	return std::ranges::find(numeric_types, type) != numeric_types.end();
-}
 
 #define OPTIONAL_TO_ANY(func, value)                                           \
 	const auto o = func(value);                                                \
@@ -71,23 +48,14 @@ bool is_type_numeric(const std::string& type) noexcept
 	}                                                                          \
 	return {};
 
-std::any any_convert_to_type(const std::any& value_w, const std::string& type)
+std::any
+any_to_ale_type(const std::any& value_w, const std::string_view type)
 {
 	if (type == "bool") {
 		OPTIONAL_TO_ANY(any_to_bool, value_w);
 	}
 
-	if (is_type_numeric(type)) {
-		if (type == "char") {
-			OPTIONAL_TO_ANY(any_to_numeric<char>, value_w);
-		}
-		if (type == "unsigned char") {
-			OPTIONAL_TO_ANY(any_to_numeric<unsigned char>, value_w);
-		}
-		if (type == "signed char") {
-			OPTIONAL_TO_ANY(any_to_numeric<signed char>, value_w);
-		}
-
+	if (is_ale_type_numeric(type)) {
 		if (type == "u8") {
 			OPTIONAL_TO_ANY(any_to_numeric<uint8_t>, value_w);
 		}

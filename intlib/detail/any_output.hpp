@@ -34,13 +34,21 @@
 #include <format>
 #include <any>
 
-struct any_view {
+namespace intlib {
+namespace detail {
+
+/// A view to a std::any object
+struct AnyView {
 	const std::any& value;
 };
 
+} // namespace detail
+} // namespace intlib
+
 template <>
-struct std::formatter<any_view> : std::formatter<std::string> {
+struct std::formatter<intlib::detail::AnyView> : std::formatter<std::string> {
 	using OutT = std::format_context::iterator;
 
-	OutT format(const any_view view, std::format_context& ctx) const;
+	OutT
+	format(const intlib::detail::AnyView& view, std::format_context& ctx) const;
 };

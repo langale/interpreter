@@ -38,8 +38,9 @@
 namespace intlib {
 namespace detail {
 
+/// Concept for a numeric type.
 template <typename type_t>
-concept numeric_c = std::integral<type_t> or std::floating_point<type_t>;
+concept Numeric_c = std::integral<type_t> or std::floating_point<type_t>;
 
-}
+} // namespace detail
 } // namespace intlib

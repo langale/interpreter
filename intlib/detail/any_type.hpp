@@ -33,7 +33,6 @@
 
 #include <stdfloat>
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <any>
 
@@ -41,7 +40,7 @@ namespace intlib {
 namespace detail {
 
 /**
- * @brief Demangles the type name of a std::any value.
+ * @brief De-mangles the type name of a std::any value.
  *
  * @param name Input name from type().name()
  * @returns A more human-readable string for the name of a std::any.
@@ -51,77 +50,32 @@ namespace detail {
 /// Returns a 'standardized' name for 'a'.
 [[nodiscard]] std::string get_type_name(const std::any& value_w);
 
+/// Constant expression to check whether a given type is a built-in type or not.
 template <typename type_t>
-[[nodiscard]] constexpr bool check_is_builtint_type() noexcept
-{
-	if constexpr (std::is_same_v<type_t, bool>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, char>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, unsigned char>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, signed char>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, int8_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, uint8_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, int16_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, uint16_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, int32_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, uint32_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, int64_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, uint64_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, std::float16_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, std::float32_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, float>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, std::float64_t>) {
-		return true;
-	}
-	if constexpr (std::is_same_v<type_t, double>) {
-		return true;
-	}
-	if constexpr (std::is_void_v<type_t>) {
-		return true;
-	}
-	return false;
-}
+static constexpr bool is_cpp_builtin_type_v =
+	std::is_same_v<type_t, bool> or std::is_same_v<type_t, char> or
+	std::is_same_v<type_t, unsigned char> or
+	std::is_same_v<type_t, signed char> or std::is_same_v<type_t, int8_t> or
+	std::is_same_v<type_t, uint8_t> or std::is_same_v<type_t, int16_t> or
+	std::is_same_v<type_t, uint16_t> or std::is_same_v<type_t, int32_t> or
+	std::is_same_v<type_t, uint32_t> or std::is_same_v<type_t, int64_t> or
+	std::is_same_v<type_t, uint64_t> or
+	std::is_same_v<type_t, std::float16_t> or
+	std::is_same_v<type_t, std::float32_t> or std::is_same_v<type_t, float> or
+	std::is_same_v<type_t, std::float64_t> or std::is_same_v<type_t, double> or
+	std::is_void_v<type_t>;
 
 /**
- * @brief Checks whether an input string corresponds to a given type.
+ * @brief Checks whether an input string corresponds to a given built-in type.
  * @tparam type_t Given type.
  * @param name Name of the type.
- * @returns True or false depending on whether the input string corresponds to
- * type @e T.
+ * @returns Whether the input string corresponds to type @e T.
  */
 template <typename type_t>
-[[nodiscard]] bool is_builtin_type(const std::string& name)
+[[nodiscard]] constexpr bool
+holds_cpp_basic_type(const std::string_view name) noexcept
 {
-	static_assert(check_is_builtint_type<type_t>());
+	static_assert(is_cpp_builtin_type_v<type_t>);
 
 	if constexpr (std::is_same_v<type_t, bool>) {
 		return name == "bool";
@@ -172,11 +126,17 @@ template <typename type_t>
 	return false;
 }
 
+/**
+ * @brief Does the given string represent a C++ built-in type?
+ * @tparam type_t Given type.
+ * @param name String to be checked.
+ * @returns Whether the input string contains a C++ built-in type.
+ */
 template <typename type_t>
-[[nodiscard]] bool is_type(const std::string& name)
+[[nodiscard]] bool is_cpp_type(const std::string_view name)
 {
-	if constexpr (check_is_builtint_type<type_t>()) {
-		return is_builtin_type<type_t>(name);
+	if constexpr (is_cpp_builtin_type_v<type_t>) {
+		return holds_cpp_basic_type<type_t>(name);
 	}
 
 	return name == demangle_name_type(typeid(type_t).name());
@@ -186,14 +146,14 @@ template <typename type_t>
  * @brief Checks whether the input std::any holds a specific given type.
  * @tparam type_t Given type.
  * @param value_w Input std::any.
- * @returns True or false depending on whether the input std::any holds the a value
+ * @returns True or false depending on whether the input std::any holds a value
  * of the given type @e T.
  */
 template <typename type_t>
-[[nodiscard]] bool is_type(const std::any& value_w)
+[[nodiscard]] bool holds_cpp_type(const std::any& value_w)
 {
 	const std::string name = get_type_name(value_w);
-	return is_type<type_t>(name);
+	return is_cpp_type<type_t>(name);
 }
 
 } // namespace detail
