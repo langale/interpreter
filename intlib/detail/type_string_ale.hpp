@@ -37,23 +37,65 @@
 #include <ranges>
 #include <array>
 
+#include <intlib/detail/compile_time_strings.hpp>
+
 namespace intlib {
 namespace detail {
 
+static constexpr auto bool_ale = as_c_str("bool"_lr);
+static constexpr auto i8_ale = as_c_str("i8"_lr);
+static constexpr auto u8_ale = as_c_str("u8"_lr);
+static constexpr auto i16_ale = as_c_str("i16"_lr);
+static constexpr auto u16_ale = as_c_str("u16"_lr);
+static constexpr auto i32_ale = as_c_str("i32"_lr);
+static constexpr auto u32_ale = as_c_str("u32"_lr);
+static constexpr auto i64_ale = as_c_str("i64"_lr);
+static constexpr auto u64_ale = as_c_str("u64"_lr);
+static constexpr auto f16_ale = as_c_str("f16"_lr);
+static constexpr auto f32_ale = as_c_str("f32"_lr);
+static constexpr auto f64_ale = as_c_str("f64"_lr);
+
 static constexpr std::array numeric_types{
-	"bool",
-	"u8",
-	"i8",
-	"u16",
-	"i16",
-	"u32",
-	"i32",
-	"u64",
-	"i64",
-	"f16",
-	"f32",
-	"f64"
+	bool_ale,
+	u8_ale,
+	i8_ale,
+	u16_ale,
+	i16_ale,
+	u32_ale,
+	i32_ale,
+	u64_ale,
+	i64_ale,
+	f16_ale,
+	f32_ale,
+	f64_ale
 };
+
+template <auto>
+struct AleToCpp {
+	using type = void;
+};
+
+template <auto identifier>
+using AleToCpp_t = AleToCpp<identifier>::type;
+
+#define MAKE_ALE_TO_CPP(ale, cpp)                                              \
+	template <>                                                                \
+	struct AleToCpp<ale> {                                                     \
+		using type = cpp;                                                      \
+	}
+
+MAKE_ALE_TO_CPP(bool_ale, int8_t);
+MAKE_ALE_TO_CPP(i8_ale, int8_t);
+MAKE_ALE_TO_CPP(u8_ale, uint8_t);
+MAKE_ALE_TO_CPP(i16_ale, int16_t);
+MAKE_ALE_TO_CPP(u16_ale, uint16_t);
+MAKE_ALE_TO_CPP(i32_ale, int32_t);
+MAKE_ALE_TO_CPP(u32_ale, uint32_t);
+MAKE_ALE_TO_CPP(i64_ale, int64_t);
+MAKE_ALE_TO_CPP(u64_ale, uint64_t);
+MAKE_ALE_TO_CPP(f16_ale, std::float16_t);
+MAKE_ALE_TO_CPP(f32_ale, std::float32_t);
+MAKE_ALE_TO_CPP(f64_ale, std::float64_t);
 
 [[nodiscard]] static constexpr bool
 is_ale_type_numeric(const std::string_view type) noexcept
