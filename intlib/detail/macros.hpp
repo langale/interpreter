@@ -1,12 +1,14 @@
 /*********************************************************************
  *
- * ALE interpreter -- a command line utility to run programs written in ALE
- * Copyright (C) 2024 - 2026 Lluís Alemany Puig
+ * ALE interpreter library -- the base utilities for a command line utility
+ * to run programs written in ALE
+ *
+ *     Copyright (C) 2024 - 2026 Lluís Alemany Puig
  *
  * This file is part of the implementation of an interpreter for ALE.
  * The full code is available at:
  *
- *     https://github.com/langale/ale
+ *     https://github.com/langale/interpreter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
