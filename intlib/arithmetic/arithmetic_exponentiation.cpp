@@ -62,7 +62,7 @@ std::any arithmetic_exponentiation(
 				aleprln, "Second component is uint64_t: {}.", right
 			);
 
-			return std::pow(left, right);
+			return detail::to_float64(std::pow(left, right));
 		}
 
 		if (detail::is_cpp_type<int64_t>(right_type)) {
@@ -71,14 +71,16 @@ std::any arithmetic_exponentiation(
 				aleprln, "Second component is int64_t: {}.", right
 			);
 
-			return std::pow(detail::to_int64(left), right);
+			return detail::to_float64(std::pow(detail::to_int64(left), right));
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto bd = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT(aleprln, "Second component is double: {}.", bd);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto bd = std::any_cast<std::float64_t>(right_w);
+			INTERPRETER_PRINT(
+				aleprln, "Second component is std::float64_t: {}.", bd
+			);
 
-			return std::pow(detail::to_double(left), bd);
+			return detail::to_float64(std::pow(detail::to_float64(left), bd));
 		}
 
 		INTERPRETER_PRINT(
@@ -98,7 +100,7 @@ std::any arithmetic_exponentiation(
 				aleprln, "Second component is uint64_t: {}.", right
 			);
 
-			return std::pow(left, detail::to_int64(right));
+			return detail::to_float64(std::pow(left, detail::to_int64(right)));
 		}
 
 		if (detail::is_cpp_type<int64_t>(right_type)) {
@@ -107,14 +109,16 @@ std::any arithmetic_exponentiation(
 				aleprln, "Second component is int64_t: {}.", right
 			);
 
-			return std::pow(left, right);
+			return detail::to_float64(std::pow(left, right));
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto bd = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT(aleprln, "Second component is double: {}.", bd);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto bd = std::any_cast<std::float64_t>(right_w);
+			INTERPRETER_PRINT(
+				aleprln, "Second component is std::float64_t: {}.", bd
+			);
 
-			return std::pow(detail::to_double(left), bd);
+			return detail::to_float64(std::pow(detail::to_float64(left), bd));
 		}
 
 		INTERPRETER_PRINT(
@@ -124,9 +128,11 @@ std::any arithmetic_exponentiation(
 		);
 	}
 
-	if (detail::is_cpp_type<double>(left_type)) {
-		const auto left = std::any_cast<double>(left_w);
-		INTERPRETER_PRINT(aleprln, "First component is double: {}.", left);
+	if (detail::is_cpp_type<std::float64_t>(left_type)) {
+		const auto left = std::any_cast<std::float64_t>(left_w);
+		INTERPRETER_PRINT(
+			aleprln, "First component is std::float64_t: {}.", left
+		);
 
 		if (detail::is_cpp_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
@@ -134,7 +140,8 @@ std::any arithmetic_exponentiation(
 				aleprln, "Second component is uint64_t: {}.", right
 			);
 
-			return std::pow(left, detail::to_double(right));
+			return detail::to_float64(std::pow(left, detail::to_float64(right))
+			);
 		}
 
 		if (detail::is_cpp_type<int64_t>(right_type)) {
@@ -143,14 +150,17 @@ std::any arithmetic_exponentiation(
 				aleprln, "Second component is int64_t: {}.", right
 			);
 
-			return std::pow(left, detail::to_double(right));
+			return detail::to_float64(std::pow(left, detail::to_float64(right))
+			);
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto bd = std::any_cast<double>(right_w);
-			INTERPRETER_PRINT(aleprln, "Second component is double: {}.", bd);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto bd = std::any_cast<std::float64_t>(right_w);
+			INTERPRETER_PRINT(
+				aleprln, "Second component is std::float64_t: {}.", bd
+			);
 
-			return std::pow(left, bd);
+			return detail::to_float64(std::pow(left, bd));
 		}
 
 		INTERPRETER_PRINT(

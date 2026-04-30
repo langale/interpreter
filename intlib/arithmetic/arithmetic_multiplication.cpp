@@ -75,13 +75,13 @@ std::any arithmetic_multiplication(
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto right = std::any_cast<double>(right_w);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto right = std::any_cast<std::float64_t>(right_w);
 			INTERPRETER_PRINT(
-				aleprln, "Second component is double: {}.", right
+				aleprln, "Second component is std::float64_t: {}.", right
 			);
 
-			return detail::to_double(left) * right;
+			return detail::to_float64(left) * right;
 		}
 
 		INTERPRETER_PRINT(
@@ -115,13 +115,13 @@ std::any arithmetic_multiplication(
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto right = std::any_cast<double>(right_w);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto right = std::any_cast<std::float64_t>(right_w);
 			INTERPRETER_PRINT(
-				aleprln, "Second component is double: {}.", right
+				aleprln, "Second component is std::float64_t: {}.", right
 			);
 
-			return detail::to_double(left) * right;
+			return detail::to_float64(left) * right;
 		}
 
 		INTERPRETER_PRINT(
@@ -131,9 +131,11 @@ std::any arithmetic_multiplication(
 		);
 	}
 
-	if (detail::is_cpp_type<double>(left_type)) {
-		const auto left = std::any_cast<double>(left_w);
-		INTERPRETER_PRINT(aleprln, "First component is double: {}.", left);
+	if (detail::is_cpp_type<std::float64_t>(left_type)) {
+		const auto left = std::any_cast<std::float64_t>(left_w);
+		INTERPRETER_PRINT(
+			aleprln, "First component is std::float64_t: {}.", left
+		);
 
 		if (detail::is_cpp_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
@@ -141,7 +143,7 @@ std::any arithmetic_multiplication(
 				aleprln, "Second component is uint64_t: {}.", right
 			);
 
-			return left * detail::to_double(right);
+			return left * detail::to_float64(right);
 		}
 
 		if (detail::is_cpp_type<int64_t>(right_type)) {
@@ -150,13 +152,13 @@ std::any arithmetic_multiplication(
 				aleprln, "Second component is int64_t: {}.", right
 			);
 
-			return left * detail::to_double(right);
+			return left * detail::to_float64(right);
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto right = std::any_cast<double>(right_w);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto right = std::any_cast<std::float64_t>(right_w);
 			INTERPRETER_PRINT(
-				aleprln, "Second component is double: {}.", right
+				aleprln, "Second component is std::float64_t: {}.", right
 			);
 
 			return left * right;

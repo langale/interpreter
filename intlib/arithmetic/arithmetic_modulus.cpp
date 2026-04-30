@@ -73,10 +73,10 @@ arithmetic_modulus(const std::any& left_w, const std::any& right_w) noexcept
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto right = std::any_cast<double>(right_w);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto right = std::any_cast<std::float64_t>(right_w);
 			INTERPRETER_PRINT(
-				aleprln, "Second component is double: {}.", right
+				aleprln, "Second component is std::float64_t: {}.", right
 			);
 
 			if (right < 0) {
@@ -120,10 +120,10 @@ arithmetic_modulus(const std::any& left_w, const std::any& right_w) noexcept
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto right = std::any_cast<double>(right_w);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto right = std::any_cast<std::float64_t>(right_w);
 			INTERPRETER_PRINT(
-				aleprln, "Second component is double: {}.", right
+				aleprln, "Second component is std::float64_t: {}.", right
 			);
 
 			if (right < 0) {
@@ -141,9 +141,11 @@ arithmetic_modulus(const std::any& left_w, const std::any& right_w) noexcept
 		);
 	}
 
-	if (detail::is_cpp_type<double>(left_type)) {
-		const auto left = std::any_cast<double>(left_w);
-		INTERPRETER_PRINT(aleprln, "First component is double: {}.", left);
+	if (detail::is_cpp_type<std::float64_t>(left_type)) {
+		const auto left = std::any_cast<std::float64_t>(left_w);
+		INTERPRETER_PRINT(
+			aleprln, "First component is std::float64_t: {}.", left
+		);
 
 		if (detail::is_cpp_type<uint64_t>(right_type)) {
 			const auto right = std::any_cast<uint64_t>(right_w);
@@ -170,10 +172,10 @@ arithmetic_modulus(const std::any& left_w, const std::any& right_w) noexcept
 			return detail::adapt_type(res);
 		}
 
-		if (detail::is_cpp_type<double>(right_type)) {
-			const auto right = std::any_cast<double>(right_w);
+		if (detail::is_cpp_type<std::float64_t>(right_type)) {
+			const auto right = std::any_cast<std::float64_t>(right_w);
 			INTERPRETER_PRINT(
-				aleprln, "Second component is double: {}.", right
+				aleprln, "Second component is std::float64_t: {}.", right
 			);
 
 			if (right < 0 or left < 0) {
