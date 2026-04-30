@@ -31,10 +31,10 @@
 
 #pragma once
 
-#include <stdfloat>
-#include <cstdint>
 #include <string>
 #include <any>
+
+#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace detail {
@@ -73,57 +73,10 @@ static constexpr bool is_cpp_builtin_type_v =
  */
 template <typename type_t>
 [[nodiscard]] constexpr bool
-holds_cpp_basic_type(const std::string_view name) noexcept
+is_cpp_basic_type(const std::string_view name) noexcept
 {
 	static_assert(is_cpp_builtin_type_v<type_t>);
-
-	if constexpr (std::is_same_v<type_t, bool>) {
-		return name == "bool";
-	}
-	else if constexpr (std::is_same_v<type_t, int8_t>) {
-		return name == "signed char";
-	}
-	else if constexpr (std::is_same_v<type_t, uint8_t>) {
-		return name == "unsigned char";
-	}
-	else if constexpr (std::is_same_v<type_t, int16_t>) {
-		return name == "short";
-	}
-	else if constexpr (std::is_same_v<type_t, uint16_t>) {
-		return name == "unsigned short";
-	}
-	else if constexpr (std::is_same_v<type_t, int32_t>) {
-		return name == "int";
-	}
-	else if constexpr (std::is_same_v<type_t, uint32_t>) {
-		return name == "unsigned int";
-	}
-	else if constexpr (std::is_same_v<type_t, int64_t>) {
-		return name == "long";
-	}
-	else if constexpr (std::is_same_v<type_t, uint64_t>) {
-		return name == "unsigned long";
-	}
-	else if constexpr (std::is_same_v<type_t, std::float16_t>) {
-		return name == "float16";
-	}
-	else if constexpr (std::is_same_v<type_t, std::float32_t>) {
-		return name == "float32";
-	}
-	else if constexpr (std::is_same_v<type_t, float>) {
-		return name == "float";
-	}
-	else if constexpr (std::is_same_v<type_t, std::float64_t>) {
-		return name == "float64";
-	}
-	else if constexpr (std::is_same_v<type_t, double>) {
-		return name == "double";
-	}
-	else if constexpr (std::is_void_v<type_t>) {
-		return name == "void";
-	}
-
-	return false;
+	return name == cpp_type_string<type_t>;
 }
 
 /**
@@ -136,7 +89,7 @@ template <typename type_t>
 [[nodiscard]] bool is_cpp_type(const std::string_view name)
 {
 	if constexpr (is_cpp_builtin_type_v<type_t>) {
-		return holds_cpp_basic_type<type_t>(name);
+		return is_cpp_basic_type<type_t>(name);
 	}
 
 	return name == demangle_name_type(typeid(type_t).name());

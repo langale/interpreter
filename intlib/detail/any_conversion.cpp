@@ -38,7 +38,7 @@
 
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/any_to_bool.hpp>
-#include <intlib/detail/ale_type.hpp>
+#include <intlib/detail/type_string_ale.hpp>
 #include <intlib/logger/macros.hpp>
 
 namespace intlib {

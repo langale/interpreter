@@ -32,6 +32,7 @@
 #pragma once
 
 #include <concepts>
+#include <stdfloat>
 #include <cstdint>
 #include <any>
 
@@ -42,6 +43,12 @@ template <typename type_t>
 [[nodiscard]] double to_double(const type_t& x) noexcept
 {
 	return static_cast<double>(x);
+}
+
+template <typename type_t>
+[[nodiscard]] std::float64_t to_float64(const type_t& x) noexcept
+{
+	return static_cast<std::float64_t>(x);
 }
 
 template <typename type_t>

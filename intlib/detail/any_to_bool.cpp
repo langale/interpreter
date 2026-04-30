@@ -43,16 +43,16 @@ std::optional<bool> any_to_bool(const std::any& value_w) noexcept
 {
 	const std::string type = get_type_name(value_w);
 
-	if (detail::holds_cpp_basic_type<bool>(type)) {
+	if (detail::is_cpp_basic_type<bool>(type)) {
 		return std::any_cast<bool>(value_w);
 	}
-	if (detail::holds_cpp_basic_type<int64_t>(type)) {
+	if (detail::is_cpp_basic_type<int64_t>(type)) {
 		return std::any_cast<int64_t>(value_w);
 	}
-	if (detail::holds_cpp_basic_type<uint64_t>(type)) {
+	if (detail::is_cpp_basic_type<uint64_t>(type)) {
 		return std::any_cast<uint64_t>(value_w);
 	}
-	if (detail::holds_cpp_basic_type<double>(type)) {
+	if (detail::is_cpp_basic_type<double>(type)) {
 		return to_int64(std::any_cast<double>(value_w));
 	}
 	return {};

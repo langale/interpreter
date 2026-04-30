@@ -102,13 +102,6 @@ std::formatter<intlib::detail::AnyView>::format(
 		);
 	}
 
-	if (intlib::detail::is_cpp_type<float>(name)) {
-		return std::format_to(ctx.out(), "{}", std::any_cast<float>(value_w));
-	}
-	if (intlib::detail::is_cpp_type<double>(name)) {
-		return std::format_to(ctx.out(), "{}", std::any_cast<double>(value_w));
-	}
-
 	if (intlib::detail::is_cpp_type<std::string>(name)) {
 		return std::format_to(
 			ctx.out(), "{}", std::any_cast<std::string>(value_w)
