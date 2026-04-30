@@ -55,6 +55,7 @@
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/any_output.hpp>
+#include <intlib/detail/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -62,17 +63,15 @@ namespace ast {
 #define aleprln ale::logger::println
 
 [[nodiscard]] static bool
-check_equal_anys(const std::any& l, const std::any& r) noexcept
+check_equal_anys(const std::any& l, const int64_t r) noexcept
 {
 	const bool is_l_uint64 = detail::holds_cpp_type<uint64_t>(l);
 	const bool is_l_int64 = detail::holds_cpp_type<int64_t>(l);
-	const bool is_r_uint64 = detail::holds_cpp_type<uint64_t>(r);
-	const bool is_r_int64 = detail::holds_cpp_type<int64_t>(r);
-	if (is_l_uint64 and is_r_uint64) {
-		return std::any_cast<uint64_t>(l) == std::any_cast<uint64_t>(r);
+	if (is_l_uint64) {
+		return std::any_cast<uint64_t>(l) == detail::to_uint64(r);
 	}
-	if (is_l_int64 and is_r_int64) {
-		return std::any_cast<int64_t>(l) == std::any_cast<int64_t>(r);
+	if (is_l_int64) {
+		return std::any_cast<int64_t>(l) == r;
 	}
 	return false;
 }
@@ -121,7 +120,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 					name,
 					idx
 				);
-				indices.set_index(d, name, static_cast<int64_t>(idx));
+				indices.set_index(d, name, detail::to_int64(idx));
 			}
 			else {
 				const std::any idx_w =
@@ -138,13 +137,13 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 			}
 		}
 		else {
-			const std::any& known_index_w = indices.get_index(d, name);
-			if (not check_equal_anys(new_index_w, known_index_w)) {
+			const int64_t known_index = indices.get_index(d, name);
+			if (not check_equal_anys(new_index_w, known_index)) {
 				INTERPRETER_PRINT(
 					aleprln,
 					"Mismatch between known index value '{}' and new "
 					"computed index value '{}', for variable '{}'",
-					detail::AnyView{known_index_w},
+					known_index,
 					detail::AnyView{new_index_w},
 					name
 				);
@@ -157,7 +156,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 					Vec{std::format(
 						"Mismatch between known index value '{}' and new "
 						"computed index value '{}', for variable '{}'",
-						detail::AnyView{known_index_w},
+						known_index,
 						detail::AnyView{new_index_w},
 						name
 					)}
