@@ -31,6 +31,8 @@
  *
  ********************************************************************/
 
+#include <stdfloat>
+
 #include <ale/ast/zero_ary_nodes/literal_nodes/LiteralStringNode.hpp>
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralDecimalNode.hpp>
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralIntegerNode.hpp>
@@ -59,7 +61,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<double>(v.get_value());
+	return make_good_evaluation_result<std::float64_t>(v.get_value());
 }
 
 EvaluationResult evaluate(

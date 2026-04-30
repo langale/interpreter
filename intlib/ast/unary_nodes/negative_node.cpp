@@ -75,10 +75,10 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 		return make_good_evaluation_result<std::any>(detail::adapt_type(-ri));
 	}
 
-	if (detail::holds_cpp_type<double>(res_w)) {
-		const auto ri = std::any_cast<double>(res_w);
+	if (detail::holds_cpp_type<std::float64_t>(res_w)) {
+		const auto ri = std::any_cast<std::float64_t>(res_w);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is double: {}.", ri);
-		return make_good_evaluation_result<double>(-ri);
+		return make_good_evaluation_result<std::float64_t>(-ri);
 	}
 
 	INTERPRETER_PRINT(
