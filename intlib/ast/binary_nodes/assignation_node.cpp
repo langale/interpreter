@@ -103,7 +103,7 @@ namespace ast {
 	}
 
 	std::any value_conv_w =
-		detail::any_to_ale_type(value_w, var_in_memory.type);
+		detail::convert_to_ale_type(value_w, var_in_memory.type);
 
 	if (detail::holds_cpp_type<void>(value_conv_w)) {
 		INTERPRETER_PRINT(
