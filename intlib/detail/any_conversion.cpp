@@ -53,58 +53,49 @@ namespace detail {
 	}                                                                          \
 	return {};
 
-std::any any_to_ale_type(const std::any& value_w, const std::string_view type)
+#define TEST(test_ale_type)                                                    \
+	if (to_ale_type == (test_ale_type)) {                                      \
+		using CppType = AleToCpp_t<test_ale_type>;                             \
+		OPTIONAL_TO_ANY(any_to_numeric<CppType>, value_w);                     \
+	}
+
+std::any
+convert_to_ale_type(const std::any& value_w, const std::string_view to_ale_type)
 {
 	INTERPRETER_ENTER_DETAIL_FUNCTION(aleprln);
 
 	INTERPRETER_PRINT(
-		aleprln, "Convert std::any object to a value of ALE type '{}'.", type
+		aleprln,
+		"Convert std::any object to a value of ALE type '{}'.",
+		to_ale_type
 	);
 
-	if (type == "bool") {
+	if (to_ale_type == bool_ale) {
 		OPTIONAL_TO_ANY(any_to_bool, value_w);
 	}
 
-	if (is_ale_type_numeric(type)) {
+	if (is_ale_type_numeric(to_ale_type)) {
+		TEST(i8_ale);
+		TEST(u8_ale);
 
-		if (type == "u8") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint8_t>, value_w);
-		}
-		if (type == "i8") {
-			OPTIONAL_TO_ANY(any_to_numeric<int8_t>, value_w);
-		}
+		TEST(i16_ale);
+		TEST(u16_ale);
 
-		if (type == "u16") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint16_t>, value_w);
-		}
-		if (type == "i16") {
-			OPTIONAL_TO_ANY(any_to_numeric<int16_t>, value_w);
-		}
+		TEST(i32_ale);
+		TEST(u32_ale);
 
-		if (type == "u32") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint32_t>, value_w);
-		}
-		if (type == "i32") {
-			OPTIONAL_TO_ANY(any_to_numeric<int32_t>, value_w);
-		}
+		TEST(i64_ale);
+		TEST(u64_ale);
 
-		if (type == "u64") {
-			OPTIONAL_TO_ANY(any_to_numeric<uint64_t>, value_w);
-		}
-		if (type == "i64") {
-			OPTIONAL_TO_ANY(any_to_numeric<int64_t>, value_w);
-		}
-
-		if (type == "f16") {
-			OPTIONAL_TO_ANY(any_to_numeric<std::float16_t>, value_w);
-		}
-		if (type == "f32") {
-			OPTIONAL_TO_ANY(any_to_numeric<std::float32_t>, value_w);
-		}
-		if (type == "f64") {
-			OPTIONAL_TO_ANY(any_to_numeric<std::float64_t>, value_w);
-		}
+		TEST(f16_ale);
+		TEST(f32_ale);
+		TEST(f64_ale);
 	}
+
+	INTERPRETER_PRINT(
+		aleprln, "Unhandled conversion to type '{}'.", to_ale_type
+	);
+
 	return {};
 }
 

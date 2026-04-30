@@ -40,7 +40,7 @@ namespace intlib {
 namespace detail {
 
 [[nodiscard]] std::any
-any_to_ale_type(const std::any& value_w, const std::string_view type);
+convert_to_ale_type(const std::any& value_w, std::string_view to_ale_type);
 
 } // namespace detail
 } // namespace intlib
