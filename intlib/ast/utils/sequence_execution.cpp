@@ -150,8 +150,7 @@ check_equal_anys(const std::any& l, const std::any& r) noexcept
 				);
 
 				return make_bad_evaluation_result(
-					Vec{
-						evaluation_error_e::Sequence_Environment_Index_Mismatch
+					Vec{evaluation_error_e::Sequence_Environment_Index_Mismatch
 					},
 					Vec{evaluation_function_e::
 							Sequence_Execution_Environment_Construction},
@@ -313,12 +312,10 @@ EvaluationResult make_sequence_execution_environment(
 	const auto depth_end = env.get_first_indices().depth();
 	if (depth_start != depth_end) {
 		return make_bad_evaluation_result(
-			std::vector{
-				evaluation_error_e::Sequence_Environment_Mismatch_Depth
-			},
-			std::vector{evaluation_function_e::
-							Sequence_Execution_Environment_Construction},
-			std::vector{std::format(
+			Vec{evaluation_error_e::Sequence_Environment_Mismatch_Depth},
+			Vec{evaluation_function_e::
+					Sequence_Execution_Environment_Construction},
+			Vec{std::format(
 				"Mismatch in depth. Left indices: '{}'. Right indices: '{}'",
 				depth_start,
 				depth_end
