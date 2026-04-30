@@ -1,20 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
 project(INTERPRETER LANGUAGES CXX)
 
-# Turn on export of compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# project's version
 set(INTERPRETER_MAJOR 99)
 set(INTERPRETER_MINOR 99)
 set(INTERPRETER_PATCH 99)
 set(INTERPRETER_VERSION "${INTERPRETER_MAJOR}.${INTERPRETER_MINOR}.${INTERPRETER_PATCH}")
+
+set(INTERPRETER_DIR ${CMAKE_SOURCE_DIR})
+message(STATUS "INTERPRETER_DIR: ${INTERPRETER_DIR}")
 
 # ******************************************************************************
 # Custom functions
 
 include(CheckCXXCompilerFlag)
 include(GNUInstallDirs)
+
 
 function(add_compile_flag thing flag)
 	check_cxx_compiler_flag(${flag} CXX_HAS_FLAG_${flag})
@@ -69,6 +71,7 @@ function(configure_object thing)
 	add_compile_flag(${thing} -Wlogical-op)
 	add_compile_flag(${thing} -Wuseless-cast)
 	add_compile_flag(${thing} -Wrestrict)
+	add_compile_flag(${thing} -Wswitch-unreachable)
 
 	# Compile-mode dependent flags
 
@@ -112,7 +115,22 @@ function(configure_object thing)
 	target_include_directories(${thing} PRIVATE ${ALE_DIR})
 	target_include_directories(${thing} PRIVATE ${INTERPRETER_DIR})
 
+
+	target_link_libraries(${thing} ${ALE_LIB_DIR}/lib${ALE_LIB_NAME}.so)
+
+
 endfunction(configure_object)
+
+
+
+
+
+
+
+
+
+
+
 
 # ******************************************************************************
 # Set default build type
@@ -141,12 +159,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ******************************************************************************
-# Path to the current CMakeFile
-
-set(INTERPRETER_DIR ${CMAKE_SOURCE_DIR})
-message(STATUS "INTERPRETER_DIR: ${INTERPRETER_DIR}")
-
-# ******************************************************************************
 # Path to ALE's directory
 
 if (NOT DEFINED ALE_DIR)
@@ -157,8 +169,19 @@ if (NOT DEFINED ALE_DIR)
 	message(FATAL_ERROR "Please, read the last few lines above and follow the instructions given.")
 endif()
 
+
+
+
+
+
+
+
+
+
+
+
 # ******************************************************************************
-# Set external libraries names
+# Set libraries names
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 get_filename_component(BUILD_TYPE_DIR "${CMAKE_BINARY_DIR}" NAME)
@@ -185,22 +208,24 @@ else()
 	set(TESTS_LIB_NAME testsliboptimized)
 endif()
 
-set(ALE_LIB_DIR ${ALE_DIR}/${BUILD_TYPE_DIR}/ale)
 message(STATUS "Compile against ALE:")
+set(ALE_LIB_DIR ${ALE_DIR}/${BUILD_TYPE_DIR}/ale)
 message(STATUS "    ALE_DIR:      ${ALE_DIR}")
 message(STATUS "    ALE_LIB_DIR:  ${ALE_LIB_DIR}")
 message(STATUS "    ALE_LIB_NAME: ${ALE_LIB_NAME}")
 
+
+
+
+
+
+
 set(INTERPRETER_LIB_DIR ${INTERPRETER_DIR}/${BUILD_TYPE_DIR}/intlib)
-message(STATUS "    INTERPRETER_LIB_DIR:  ${INTERPRETER_LIB_DIR}")
-message(STATUS "    INTERPRETER_LIB_NAME: ${INTERPRETER_LIB_NAME}")
 
-set(TESTS_LIB_DIR ${INTERPRETER_DIR}/${BUILD_TYPE_DIR}/tests/lib)
-message(STATUS "    TESTS_LIB_DIR:  ${TESTS_LIB_DIR}")
-message(STATUS "    TESTS_LIB_NAME: ${TESTS_LIB_NAME}")
-
-# *******************************************************************************
+# ******************************************************************************
 # Build-dependent options
+
+message(STATUS "Build-depdendent options:")
 
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -211,7 +236,7 @@ else()
 	# IPO: Inter-Procedural Optimization
 	include(CheckIPOSupported)
 	check_ipo_supported(RESULT IPO_IS_SUPPORTED OUTPUT IPO_CHECK_ERROR)
-	message(STATUS "IPO_IS_SUPPORTED='${IPO_IS_SUPPORTED}'")
+	message(STATUS "    IPO_IS_SUPPORTED='${IPO_IS_SUPPORTED}'")
 	if("${IPO_IS_SUPPORTED}" STREQUAL "YES")
 		message(STATUS "    IPO is supported.")
 	else()
@@ -222,7 +247,7 @@ endif()
 
 message(STATUS "    Enable ASAN (-DENABLE_ASAN=ON/OFF)? ${ENABLE_ASAN}")
 
-# *******************************************************************************
+# ******************************************************************************
 # Add subdirectories
 
 add_subdirectory(intlib)
