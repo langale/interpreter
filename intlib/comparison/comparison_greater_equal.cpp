@@ -31,6 +31,7 @@
  *
  ********************************************************************/
 
+#include <stdfloat>
 #include <optional>
 #include <string>
 #include <any>
@@ -109,7 +110,7 @@ any_comparison_greater_than_equal_to_right_numeric(
 		return r;
 	}
 	if (const auto r =
-			any_comparison_greater_equal<left_t, double>(left_w, right_w);
+			any_comparison_greater_equal<left_t, std::float64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
@@ -142,7 +143,7 @@ any_comparison_greater_equal(const std::any& left_w, const std::any& right_w)
 		return r;
 	}
 	if (const auto r =
-			any_comparison_greater_than_equal_to_right_numeric<double>(
+			any_comparison_greater_than_equal_to_right_numeric<std::float64_t>(
 				left_w, right_w
 			);
 		r.has_value()) {

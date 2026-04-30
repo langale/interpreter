@@ -31,6 +31,7 @@
  *
  ********************************************************************/
 
+#include <stdfloat>
 #include <optional>
 #include <string>
 #include <any>
@@ -104,7 +105,8 @@ template <typename left_t>
 		r.has_value()) {
 		return r;
 	}
-	if (const auto r = any_comparison_equal<left_t, double>(left_w, right_w);
+	if (const auto r =
+			any_comparison_equal<left_t, std::float64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
@@ -132,7 +134,7 @@ any_comparison_equal(const std::any& left_w, const std::any& right_w)
 		return r;
 	}
 	if (const auto r =
-			any_comparison_equal_right_numeric<double>(left_w, right_w);
+			any_comparison_equal_right_numeric<std::float64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
 	}
