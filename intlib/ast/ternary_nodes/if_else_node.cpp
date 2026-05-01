@@ -49,7 +49,7 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
+Evaluation evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
@@ -59,14 +59,14 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	if (first_child == nullptr) {
 		INTERPRETER_PRINT(aleprln, "Condition of if statement is null.");
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::If_Statement_Condition_Empty},
 			Vec{evaluation_function_e::If_Else},
 			Vec{"Condition of if statement is null"s}
 		);
 	}
 
-	EvaluationResult cond_res = interpret_node(ctx, first_child);
+	Evaluation cond_res = interpret_node(ctx, first_child);
 	if (not cond_res.has_value()) {
 		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
@@ -77,14 +77,15 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 		);
 	}
 
-	const std::optional cond_bool_w = detail::any_to_bool(*cond_res);
+	const EvaluationResult& cond = *cond_res;
+	const std::optional cond_bool_w = detail::any_to_bool(cond);
 	if (not cond_bool_w) {
 		INTERPRETER_PRINT(
 			aleprln,
 			"Unhandled variable type '{}'.",
 			detail::get_type_name(*cond_bool_w)
 		);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Conversion_To_Bool_Failed},
 			Vec{evaluation_function_e::If_Else},
 			Vec{std::format(
@@ -99,7 +100,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 			INTERPRETER_PRINT(
 				aleprln, "Condition is true but first branch of 'if' is empty."
 			);
-			return make_bad_evaluation_result(
+			return make_bad_evaluation(
 				Vec{evaluation_error_e::Node_Is_Malformed},
 				Vec{evaluation_function_e::If_Else},
 				Vec{"Condition is true but first branch of 'if' is empty"s}
@@ -114,7 +115,7 @@ EvaluationResult evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 			aleprln,
 			"Condition is true but the second branch of if statement is empty."
 		);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Node_Is_Malformed},
 			Vec{evaluation_function_e::If_Else},
 			Vec{"Condition is true but second branch of 'if' is empty"s}
