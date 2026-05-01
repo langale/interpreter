@@ -36,7 +36,7 @@
 #include <vector>
 
 #include <intlib/memory/LocalScope.hpp>
-#include <intlib/memory/VariableValue.hpp>
+#include <intlib/memory/Variable.hpp>
 #include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
@@ -108,7 +108,7 @@ public:
 	 * @param name The name of the variable to look for.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] const VariableValue&
+	[[nodiscard]] const Variable&
 	get_variable(const std::string& name) const noexcept;
 
 	/**
@@ -118,7 +118,7 @@ public:
 	 * @param name The name of the variable to look for.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] VariableValue& get_variable(const std::string& name) noexcept;
+	[[nodiscard]] Variable& get_variable(const std::string& name) noexcept;
 
 	/// Does a variable exist?
 	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept;

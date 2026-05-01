@@ -31,22 +31,18 @@
  *
  ********************************************************************/
 
+#pragma once
+
 #include <format>
 
-#include <intlib/detail/any_output.hpp>
-#include <intlib/memory/VariableValue.hpp>
-#include <intlib/memory/utils/variable_value_to_string.hpp>
+#include <intlib/memory/Variable.hpp>
 
-std::formatter<intlib::memory::VariableValue>::OutT
-std::formatter<intlib::memory::VariableValue>::format(
-	const intlib::memory::VariableValue& var, std::format_context& ctx
-) const
-{
-	return std::format_to(
-		ctx.out(),
-		"Variable: (ale: {}) (c++: {}) = {}",
-		var.ale_type,
-		var.wrap.type,
-		intlib::detail::AnyView{var.wrap.value}
-	);
-}
+template <>
+struct std::formatter<intlib::memory::Variable>
+	: std::formatter<std::string> {
+	using OutT = std::format_context::iterator;
+
+	OutT format(
+		const intlib::memory::Variable& var, std::format_context& ctx
+	) const;
+};

@@ -39,7 +39,7 @@
 #include <intlib/memory/WrappedAny.hpp>
 #include <intlib/detail/any_output.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
-#include <intlib/memory/utils/variable_value_to_string.hpp>
+#include <intlib/memory/utils/variable_to_string.hpp>
 
 std::formatter<intlib::memory::WrappedAny>::OutT
 std::formatter<intlib::memory::WrappedAny>::format(

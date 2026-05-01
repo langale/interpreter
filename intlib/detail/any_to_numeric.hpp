@@ -39,7 +39,7 @@
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/concepts.hpp>
 #include <intlib/detail/type_string_ale.hpp>
-#include <intlib/memory/VariableValue.hpp>
+#include <intlib/memory/Variable.hpp>
 
 namespace intlib {
 namespace detail {
@@ -48,14 +48,14 @@ template <Numeric_c cpp_t>
 [[nodiscard]] std::optional<cpp_t> any_to_numeric(const memory::WrappedAny& wrap
 ) noexcept
 {
-	if (wrap.type == type_string_cpp<memory::RefMemVar>) {
+	if (wrap.type == type_string_cpp<memory::RefVar>) {
 		return any_to_numeric<cpp_t>(
-			std::any_cast<memory::RefMemVar>(wrap.value).get().wrap
+			std::any_cast<memory::RefVar>(wrap.value).get().wrap
 		);
 	}
-	if (wrap.type == type_string_cpp<memory::RefConstMemVar>) {
+	if (wrap.type == type_string_cpp<memory::RefConstVar>) {
 		return any_to_numeric<cpp_t>(
-			std::any_cast<memory::RefConstMemVar>(wrap.value).get().wrap
+			std::any_cast<memory::RefConstVar>(wrap.value).get().wrap
 		);
 	}
 
@@ -115,7 +115,7 @@ template <Numeric_c cpp_t>
 }
 
 template <Numeric_c cpp_t>
-[[nodiscard]] std::optional<cpp_t> any_to_numeric(const memory::RefMemVar& value
+[[nodiscard]] std::optional<cpp_t> any_to_numeric(const memory::RefVar& value
 ) noexcept
 {
 	return any_to_numeric<cpp_t>(value.get().wrap);
@@ -123,7 +123,7 @@ template <Numeric_c cpp_t>
 
 template <Numeric_c cpp_t>
 [[nodiscard]] std::optional<cpp_t>
-any_to_numeric(const memory::RefConstMemVar& value) noexcept
+any_to_numeric(const memory::RefConstVar& value) noexcept
 {
 	return any_to_numeric<cpp_t>(value.get().wrap);
 }

@@ -76,7 +76,7 @@ void FunctionScope::declare_constant_variable(
 
 /* GETTERS */
 
-const VariableValue& FunctionScope::get_variable(const std::string& name
+const Variable& FunctionScope::get_variable(const std::string& name
 ) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
@@ -95,7 +95,7 @@ const VariableValue& FunctionScope::get_variable(const std::string& name
 	return empty_variable;
 }
 
-VariableValue& FunctionScope::get_variable(const std::string& name) noexcept
+Variable& FunctionScope::get_variable(const std::string& name) noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 

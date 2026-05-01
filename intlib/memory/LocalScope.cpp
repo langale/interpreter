@@ -59,7 +59,7 @@ void LocalScope::declare_variable(
 
 	m_variables.emplace(
 		std::move(name),
-		VariableValue{
+		Variable{
 			.wrap = std::move(value), .ale_type = type, .is_constant = false
 		}
 	);
@@ -79,7 +79,7 @@ void LocalScope::declare_constant_variable(
 
 	m_variables.emplace(
 		std::move(name),
-		VariableValue{
+		Variable{
 			.wrap = std::move(value), .ale_type = type, .is_constant = true
 		}
 	);
@@ -87,7 +87,7 @@ void LocalScope::declare_constant_variable(
 
 /* GETTERS */
 
-const VariableValue&
+const Variable&
 LocalScope::get_variable(const std::string& name) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
@@ -99,7 +99,7 @@ LocalScope::get_variable(const std::string& name) const noexcept
 	return it->second;
 }
 
-VariableValue& LocalScope::get_variable(const std::string& name) noexcept
+Variable& LocalScope::get_variable(const std::string& name) noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 

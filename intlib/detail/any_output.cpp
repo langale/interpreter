@@ -37,8 +37,8 @@
 
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
-#include <intlib/memory/VariableValue.hpp>
-#include <intlib/memory/utils/variable_value_to_string.hpp>
+#include <intlib/memory/Variable.hpp>
+#include <intlib/memory/utils/variable_to_string.hpp>
 
 using namespace intlib::detail;
 
@@ -53,13 +53,13 @@ std::formatter<AnyView>::OutT std::formatter<AnyView>::format(
 		return std::format_to(ctx.out(), "<empty>");
 	}
 
-	if (holds_cpp_type<intlib::memory::RefMemVar>(value_w)) {
-		const auto& var = std::any_cast<intlib::memory::RefMemVar>(value_w);
+	if (holds_cpp_type<intlib::memory::RefVar>(value_w)) {
+		const auto& var = std::any_cast<intlib::memory::RefVar>(value_w);
 		return std::format_to(ctx.out(), "{}", var.get());
 	}
-	if (holds_cpp_type<intlib::memory::RefConstMemVar>(value_w)) {
+	if (holds_cpp_type<intlib::memory::RefConstVar>(value_w)) {
 		const auto& var =
-			std::any_cast<intlib::memory::RefConstMemVar>(value_w);
+			std::any_cast<intlib::memory::RefConstVar>(value_w);
 		return std::format_to(ctx.out(), "{}", var.get());
 	}
 

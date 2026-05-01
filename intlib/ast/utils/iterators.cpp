@@ -108,14 +108,14 @@ make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var)
 		co_return;
 	}
 
-	const memory::VariableValue& variable = ctx.memory.get_variable(var_name);
+	const memory::Variable& variable = ctx.memory.get_variable(var_name);
 	if (variable.is_constant) {
 		co_yield make_good_evaluation<
-			EvaluationResult>(std::cref(variable), detail::type_string_cpp<memory::RefConstMemVar>);
+			EvaluationResult>(std::cref(variable), detail::type_string_cpp<memory::RefConstVar>);
 		co_return;
 	}
 	co_yield make_good_evaluation<
-		EvaluationResult>(std::ref(variable), detail::type_string_cpp<memory::RefMemVar>);
+		EvaluationResult>(std::ref(variable), detail::type_string_cpp<memory::RefVar>);
 }
 
 std::generator<Evaluation> make_value_iterator(
@@ -148,14 +148,14 @@ std::generator<Evaluation> make_value_iterator(
 		co_return;
 	}
 
-	const memory::VariableValue& variable = ctx.memory.get_variable(var_name);
+	const memory::Variable& variable = ctx.memory.get_variable(var_name);
 	if (variable.is_constant) {
 		co_yield make_good_evaluation<
-			EvaluationResult>(std::cref(variable), detail::type_string_cpp<memory::RefConstMemVar>);
+			EvaluationResult>(std::cref(variable), detail::type_string_cpp<memory::RefConstVar>);
 		co_return;
 	}
 	co_yield make_good_evaluation<
-		EvaluationResult>(std::ref(variable), detail::type_string_cpp<memory::RefMemVar>);
+		EvaluationResult>(std::ref(variable), detail::type_string_cpp<memory::RefVar>);
 }
 
 [[nodiscard]] static std::generator<Evaluation> unidimensional_iterator(

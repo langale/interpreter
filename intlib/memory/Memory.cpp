@@ -88,7 +88,7 @@ void Memory::declare_constant_variable(
 
 /* GETTERS */
 
-const VariableValue& Memory::get_variable(const std::string& name
+const Variable& Memory::get_variable(const std::string& name
 ) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
@@ -99,7 +99,7 @@ const VariableValue& Memory::get_variable(const std::string& name
 	return m_global_scope.get_variable(name);
 }
 
-VariableValue& Memory::get_variable(const std::string& name) noexcept
+Variable& Memory::get_variable(const std::string& name) noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 

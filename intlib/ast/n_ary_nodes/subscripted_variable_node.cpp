@@ -92,7 +92,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		);
 	}
 
-	memory::VariableValue& variable = ctx.memory.get_variable(var_name);
+	memory::Variable& variable = ctx.memory.get_variable(var_name);
 
 	if (not variable.wrap.value.has_value()) {
 		INTERPRETER_PRINT(aleprln, "Variable '{}' has no value.", var_name);
@@ -106,11 +106,11 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	if (variable.is_constant) {
 		return make_good_evaluation<
 			memory::
-				WrappedAny>(std::cref(variable), detail::type_string_cpp<memory::RefConstMemVar>);
+				WrappedAny>(std::cref(variable), detail::type_string_cpp<memory::RefConstVar>);
 	}
 	return make_good_evaluation<
 		memory::
-			WrappedAny>(std::ref(variable), detail::type_string_cpp<memory::RefMemVar>);
+			WrappedAny>(std::ref(variable), detail::type_string_cpp<memory::RefVar>);
 }
 
 } // namespace ast

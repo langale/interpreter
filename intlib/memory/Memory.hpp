@@ -37,7 +37,7 @@
 #include <stack>
 
 #include <intlib/memory/FunctionScope.hpp>
-#include <intlib/memory/VariableValue.hpp>
+#include <intlib/memory/Variable.hpp>
 #include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
@@ -86,14 +86,14 @@ public:
 	 * @brief Returns the value of variable @e s.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] const VariableValue& get_variable(const std::string& name
+	[[nodiscard]] const Variable& get_variable(const std::string& name
 	) const noexcept;
 
 	/**
 	 * @brief Returns the value of variable @e s.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] VariableValue& get_variable(const std::string& name) noexcept;
+	[[nodiscard]] Variable& get_variable(const std::string& name) noexcept;
 
 	/// Returns the number of scopes.
 	[[nodiscard]] std::size_t num_local_scopes() const noexcept

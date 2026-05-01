@@ -49,7 +49,7 @@ namespace memory {
  * - its type (@ref type),
  * - and whether it is mutable or not (@ref is_constant).
  */
-struct VariableValue {
+struct Variable {
 	/// The actual value that the variable holds.
 	WrappedAny wrap;
 	/// The type of this variable. This is an ALE's type.
@@ -58,24 +58,23 @@ struct VariableValue {
 	const bool is_constant;
 };
 
-static constinit VariableValue empty_variable{
+static constinit Variable empty_variable{
 	.wrap = {}, .ale_type = "", .is_constant = true
 };
 
-using RefMemVar = std::reference_wrapper<VariableValue>;
-using RefConstMemVar = std::reference_wrapper<const VariableValue>;
+using RefVar = std::reference_wrapper<Variable>;
+using RefConstVar = std::reference_wrapper<const Variable>;
 
 } // namespace memory
 
 namespace detail {
 
 template <>
-constexpr inline std::string_view type_string_cpp<memory::RefMemVar> =
-	"VariableValue&";
+constexpr inline std::string_view type_string_cpp<memory::RefVar> = "Variable&";
 
 template <>
-constexpr inline std::string_view type_string_cpp<memory::RefConstMemVar> =
-	"const VariableValue&";
+constexpr inline std::string_view type_string_cpp<memory::RefConstVar> =
+	"const Variable&";
 
 } // namespace detail
 } // namespace intlib

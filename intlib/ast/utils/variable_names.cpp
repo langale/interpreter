@@ -50,7 +50,7 @@ using namespace std::string_literals;
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
-#include <intlib/memory/utils/variable_value_to_string.hpp>
+#include <intlib/memory/utils/variable_to_string.hpp>
 #include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 namespace intlib {
@@ -84,9 +84,9 @@ namespace ast {
 		const memory::WrappedAny& val = *res_w;
 		std::optional<int64_t> idx_w;
 
-		if (val.type == detail::type_string_cpp<memory::VariableValue>) {
+		if (val.type == detail::type_string_cpp<memory::Variable>) {
 			const auto& memory_variable =
-				std::any_cast<const memory::VariableValue&>(val.value);
+				std::any_cast<const memory::Variable&>(val.value);
 
 			idx_w = detail::any_to_numeric<int64_t>(memory_variable);
 
