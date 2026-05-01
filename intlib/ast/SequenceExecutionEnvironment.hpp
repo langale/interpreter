@@ -121,7 +121,7 @@ namespace detail {
 
 template <>
 constexpr inline std::string_view
-	cpp_type_string<ast::SequenceExecutionEnvironment> =
+	type_string_cpp<ast::SequenceExecutionEnvironment> =
 		"SequenceExecutionEnvironment";
 
 } // namespace detail

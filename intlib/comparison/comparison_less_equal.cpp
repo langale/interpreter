@@ -53,8 +53,8 @@ any_comparison_less_equal(const WrappedAny& left_w, const WrappedAny& right_w)
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
-		if (left_w.type == detail::cpp_type_string<left_t> and
-			right_w.type == detail::cpp_type_string<right_t>) {
+		if (left_w.type == detail::type_string_cpp<left_t> and
+			right_w.type == detail::type_string_cpp<right_t>) {
 
 			const auto left = std::any_cast<left_t>(left_w.value);
 			const auto right = std::any_cast<right_t>(right_w.value);

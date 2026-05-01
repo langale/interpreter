@@ -111,11 +111,11 @@ make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var)
 	const memory::VariableValue& variable = ctx.memory.get_variable(var_name);
 	if (variable.is_constant) {
 		co_yield make_good_evaluation<
-			EvaluationResult>(std::cref(variable), detail::cpp_type_string<memory::RefConstMemVar>);
+			EvaluationResult>(std::cref(variable), detail::type_string_cpp<memory::RefConstMemVar>);
 		co_return;
 	}
 	co_yield make_good_evaluation<
-		EvaluationResult>(std::ref(variable), detail::cpp_type_string<memory::RefMemVar>);
+		EvaluationResult>(std::ref(variable), detail::type_string_cpp<memory::RefMemVar>);
 }
 
 std::generator<Evaluation> make_value_iterator(
@@ -151,11 +151,11 @@ std::generator<Evaluation> make_value_iterator(
 	const memory::VariableValue& variable = ctx.memory.get_variable(var_name);
 	if (variable.is_constant) {
 		co_yield make_good_evaluation<
-			EvaluationResult>(std::cref(variable), detail::cpp_type_string<memory::RefConstMemVar>);
+			EvaluationResult>(std::cref(variable), detail::type_string_cpp<memory::RefConstMemVar>);
 		co_return;
 	}
 	co_yield make_good_evaluation<
-		EvaluationResult>(std::ref(variable), detail::cpp_type_string<memory::RefMemVar>);
+		EvaluationResult>(std::ref(variable), detail::type_string_cpp<memory::RefMemVar>);
 }
 
 [[nodiscard]] static std::generator<Evaluation> unidimensional_iterator(
@@ -223,7 +223,7 @@ std::generator<Evaluation> make_value_iterator(
 	for (int64_t i = *first_val_w; i <= *second_val_w; ++i) {
 		INTERPRETER_PRINT(aleprln, "Next value: '{}'.", i);
 		co_yield make_good_evaluation<
-			EvaluationResult>(i, detail::cpp_type_string<int64_t>);
+			EvaluationResult>(i, detail::type_string_cpp<int64_t>);
 	}
 }
 
@@ -276,7 +276,7 @@ std::generator<Evaluation> make_value_iterator(
 	memory::WrappedAny res = std::move(*res_w);
 #if defined DEBUG
 	INTERPRETER_PRINT(aleprln, "Type of result: '{}'.", res.type);
-	assert(res.type == detail::cpp_type_string<SequenceExecutionEnvironment>);
+	assert(res.type == detail::type_string_cpp<SequenceExecutionEnvironment>);
 #endif
 	SequenceExecutionEnvironment seq_env =
 		std::any_cast<SequenceExecutionEnvironment&&>(std::move(res.value));
@@ -454,7 +454,7 @@ make_name_iterator(EvaluationContext&, const ale::ast::VariableNode& var)
 
 	const std::string& var_name = var.get_variable_name();
 	co_yield make_good_evaluation<
-		EvaluationResult>(var_name, detail::cpp_type_string<std::string>);
+		EvaluationResult>(var_name, detail::type_string_cpp<std::string>);
 }
 
 std::generator<Evaluation> make_name_iterator(
@@ -481,7 +481,7 @@ std::generator<Evaluation> make_name_iterator(
 
 	EvaluationResult res = std::move(*res_w);
 #if defined DEBUG
-	assert(res.type == detail::cpp_type_string<std::string>);
+	assert(res.type == detail::type_string_cpp<std::string>);
 #endif
 
 	INTERPRETER_PRINT(aleprln, "Going to cast away from '{}'.", res);
@@ -489,7 +489,7 @@ std::generator<Evaluation> make_name_iterator(
 	INTERPRETER_PRINT(aleprln, "variable name '{}'.", var_name);
 
 	co_yield make_good_evaluation<
-		EvaluationResult>(std::move(var_name), detail::cpp_type_string<std::string>);
+		EvaluationResult>(std::move(var_name), detail::type_string_cpp<std::string>);
 }
 
 std::generator<Evaluation> make_name_iterator(

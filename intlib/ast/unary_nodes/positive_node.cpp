@@ -63,27 +63,27 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 	}
 
 	const EvaluationResult& res = *int_res_w;
-	if (res.type == detail::cpp_type_string<uint64_t>) {
+	if (res.type == detail::type_string_cpp<uint64_t>) {
 		const auto ri = std::any_cast<uint64_t>(res.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is uint64_t: {}.", ri);
 		return make_good_evaluation<
-			EvaluationResult>(detail::to_uint64(ri), detail::cpp_type_string<uint64_t>);
+			EvaluationResult>(detail::to_uint64(ri), detail::type_string_cpp<uint64_t>);
 	}
 
-	if (res.type == detail::cpp_type_string<int64_t>) {
+	if (res.type == detail::type_string_cpp<int64_t>) {
 		const auto ri = std::any_cast<int64_t>(res.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is int64_t: {}.", ri);
 		return make_good_evaluation<
-			EvaluationResult>(detail::to_int64(ri), detail::cpp_type_string<int64_t>);
+			EvaluationResult>(detail::to_int64(ri), detail::type_string_cpp<int64_t>);
 	}
 
-	if (res.type == detail::cpp_type_string<std::float64_t>) {
+	if (res.type == detail::type_string_cpp<std::float64_t>) {
 		const auto ri = std::any_cast<std::float64_t>(res.value);
 		INTERPRETER_PRINT(
 			aleprln, "Evaluation of node is std::float64_t: {}.", ri
 		);
 		return make_good_evaluation<
-			EvaluationResult>(ri, detail::cpp_type_string<std::float64_t>);
+			EvaluationResult>(ri, detail::type_string_cpp<std::float64_t>);
 	}
 
 	INTERPRETER_PRINT(aleprln, "Unhandled result '{}'.", res);

@@ -78,7 +78,7 @@ template <typename type_t>
 is_cpp_basic_type(const std::string_view name) noexcept
 {
 	static_assert(is_cpp_builtin_type_v<type_t>);
-	return name == cpp_type_string<type_t>;
+	return name == type_string_cpp<type_t>;
 }
 
 /**

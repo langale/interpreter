@@ -73,7 +73,7 @@ node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 	}
 
 	EvaluationResult res = std::move(*eval_res);
-	if (res.type == detail::cpp_type_string<void>) {
+	if (res.type == detail::type_string_cpp<void>) {
 		INTERPRETER_PRINT(aleprln, "Evaluation of node returned a void value.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},

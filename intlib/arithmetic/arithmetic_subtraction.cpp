@@ -51,11 +51,11 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 
 	INTERPRETER_PRINT(aleprln, "Operating {} - {}.", left_w, right_w);
 
-	if (left_w.type == detail::cpp_type_string<uint64_t>) {
+	if (left_w.type == detail::type_string_cpp<uint64_t>) {
 		const auto left = std::any_cast<uint64_t>(left_w.value);
 		INTERPRETER_PRINT(aleprln, "First component is uint64_t: {}.", left);
 
-		if (right_w.type == detail::cpp_type_string<uint64_t>) {
+		if (right_w.type == detail::type_string_cpp<uint64_t>) {
 			const auto right = std::any_cast<uint64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
@@ -65,7 +65,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_int64(res);
 		}
 
-		if (right_w.type == detail::cpp_type_string<int64_t>) {
+		if (right_w.type == detail::type_string_cpp<int64_t>) {
 			const auto right = std::any_cast<int64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
@@ -75,7 +75,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_int64(res);
 		}
 
-		if (right_w.type == detail::cpp_type_string<std::float64_t>) {
+		if (right_w.type == detail::type_string_cpp<std::float64_t>) {
 			const auto right = std::any_cast<std::float64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is std::float64_t: {}.", right
@@ -92,11 +92,11 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 		);
 	}
 
-	if (left_w.type == detail::cpp_type_string<int64_t>) {
+	if (left_w.type == detail::type_string_cpp<int64_t>) {
 		const auto left = std::any_cast<int64_t>(left_w.value);
 		INTERPRETER_PRINT(aleprln, "First component is int64_t: {}.", left);
 
-		if (right_w.type == detail::cpp_type_string<uint64_t>) {
+		if (right_w.type == detail::type_string_cpp<uint64_t>) {
 			const auto right = std::any_cast<uint64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
@@ -106,7 +106,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_int64(res);
 		}
 
-		if (right_w.type == detail::cpp_type_string<int64_t>) {
+		if (right_w.type == detail::type_string_cpp<int64_t>) {
 			const auto right = std::any_cast<int64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
@@ -116,7 +116,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_int64(res);
 		}
 
-		if (right_w.type == detail::cpp_type_string<std::float64_t>) {
+		if (right_w.type == detail::type_string_cpp<std::float64_t>) {
 			const auto right = std::any_cast<std::float64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is std::float64_t: {}.", right
@@ -133,13 +133,13 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 		);
 	}
 
-	if (left_w.type == detail::cpp_type_string<std::float64_t>) {
+	if (left_w.type == detail::type_string_cpp<std::float64_t>) {
 		const auto left = std::any_cast<std::float64_t>(left_w.value);
 		INTERPRETER_PRINT(
 			aleprln, "First component is std::float64_t: {}.", left
 		);
 
-		if (right_w.type == detail::cpp_type_string<uint64_t>) {
+		if (right_w.type == detail::type_string_cpp<uint64_t>) {
 			const auto right = std::any_cast<uint64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is uint64_t: {}.", right
@@ -149,7 +149,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_float64(res);
 		}
 
-		if (right_w.type == detail::cpp_type_string<int64_t>) {
+		if (right_w.type == detail::type_string_cpp<int64_t>) {
 			const auto right = std::any_cast<int64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is int64_t: {}.", right
@@ -159,7 +159,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_float64(res);
 		}
 
-		if (right_w.type == detail::cpp_type_string<std::float64_t>) {
+		if (right_w.type == detail::type_string_cpp<std::float64_t>) {
 			const auto right = std::any_cast<std::float64_t>(right_w.value);
 			INTERPRETER_PRINT(
 				aleprln, "Second component is std::float64_t: {}.", right

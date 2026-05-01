@@ -117,7 +117,7 @@ Evaluation evaluate_logical_node(
 	const EvaluationResult& res = *res_w;
 	INTERPRETER_PRINT(aleprln, "Evaluation of node '{}'", res);
 
-	if (res.type == detail::cpp_type_string<void>) {
+	if (res.type == detail::type_string_cpp<void>) {
 		INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 		return append_error(
 			std::move(res_w.error()),
@@ -143,7 +143,7 @@ Evaluation evaluate_logical_node(
 	}
 
 	return make_good_evaluation<
-		memory::WrappedAny>(*r_conv_w, detail::cpp_type_string<bool>);
+		memory::WrappedAny>(*r_conv_w, detail::type_string_cpp<bool>);
 }
 
 Evaluation evaluate(
@@ -166,7 +166,7 @@ Evaluation evaluate(
 
 	const EvaluationResult& res = *eval_w;
 #if defined DEBUG
-	assert(res.type == detail::cpp_type_string<bool>);
+	assert(res.type == detail::type_string_cpp<bool>);
 #endif
 
 	bool acc_value = std::any_cast<bool>(res.value);
@@ -186,7 +186,7 @@ Evaluation evaluate(
 
 		const EvaluationResult& eval = *eval_w;
 #if defined DEBUG
-		assert(eval.type == detail::cpp_type_string<bool>);
+		assert(eval.type == detail::type_string_cpp<bool>);
 #endif
 		const bool new_value = std::any_cast<bool>(eval.value);
 
@@ -194,7 +194,7 @@ Evaluation evaluate(
 	}
 
 	return make_good_evaluation<
-		EvaluationResult>(acc_value, detail::cpp_type_string<bool>);
+		EvaluationResult>(acc_value, detail::type_string_cpp<bool>);
 }
 
 } // namespace ast

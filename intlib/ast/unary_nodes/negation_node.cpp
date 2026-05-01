@@ -67,7 +67,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 	if (res_bool_w) {
 		INTERPRETER_PRINT(aleprln, "Evaluation of node: {}.", *res_bool_w);
 		return make_good_evaluation<
-			EvaluationResult>(not*res_bool_w, detail::cpp_type_string<bool>);
+			EvaluationResult>(not*res_bool_w, detail::type_string_cpp<bool>);
 	}
 
 	INTERPRETER_PRINT(aleprln, "Unhandled value of type '{}'.", res.type);

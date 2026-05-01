@@ -49,7 +49,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralFalseNode&)
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation<
-		EvaluationResult>(false, detail::cpp_type_string<bool>);
+		EvaluationResult>(false, detail::type_string_cpp<bool>);
 }
 
 } // namespace ast

@@ -41,45 +41,45 @@ namespace detail {
 
 std::optional<bool> any_to_bool(const memory::WrappedAny& value) noexcept
 {
-	if (value.type == detail::cpp_type_string<bool>) {
+	if (value.type == detail::type_string_cpp<bool>) {
 		return std::any_cast<bool>(value.value);
 	}
 
-	if (value.type == detail::cpp_type_string<int8_t>) {
+	if (value.type == detail::type_string_cpp<int8_t>) {
 		return static_cast<bool>(std::any_cast<int8_t>(value.value));
 	}
-	if (value.type == detail::cpp_type_string<uint8_t>) {
+	if (value.type == detail::type_string_cpp<uint8_t>) {
 		return static_cast<bool>(std::any_cast<uint8_t>(value.value));
 	}
 
-	if (value.type == detail::cpp_type_string<int16_t>) {
+	if (value.type == detail::type_string_cpp<int16_t>) {
 		return static_cast<bool>(std::any_cast<int16_t>(value.value));
 	}
-	if (value.type == detail::cpp_type_string<uint16_t>) {
+	if (value.type == detail::type_string_cpp<uint16_t>) {
 		return static_cast<bool>(std::any_cast<uint16_t>(value.value));
 	}
 
-	if (value.type == detail::cpp_type_string<int32_t>) {
+	if (value.type == detail::type_string_cpp<int32_t>) {
 		return static_cast<bool>(std::any_cast<int32_t>(value.value));
 	}
-	if (value.type == detail::cpp_type_string<uint32_t>) {
+	if (value.type == detail::type_string_cpp<uint32_t>) {
 		return static_cast<bool>(std::any_cast<uint32_t>(value.value));
 	}
 
-	if (value.type == detail::cpp_type_string<int64_t>) {
+	if (value.type == detail::type_string_cpp<int64_t>) {
 		return static_cast<bool>(std::any_cast<int64_t>(value.value));
 	}
-	if (value.type == detail::cpp_type_string<uint64_t>) {
+	if (value.type == detail::type_string_cpp<uint64_t>) {
 		return static_cast<bool>(std::any_cast<uint64_t>(value.value));
 	}
 
-	if (value.type == detail::cpp_type_string<std::float16_t>) {
+	if (value.type == detail::type_string_cpp<std::float16_t>) {
 		return static_cast<bool>(std::any_cast<std::float16_t>(value.value));
 	}
-	if (value.type == detail::cpp_type_string<std::float32_t>) {
+	if (value.type == detail::type_string_cpp<std::float32_t>) {
 		return static_cast<bool>(std::any_cast<std::float32_t>(value.value));
 	}
-	if (value.type == detail::cpp_type_string<std::float64_t>) {
+	if (value.type == detail::type_string_cpp<std::float64_t>) {
 		return static_cast<bool>(std::any_cast<std::float64_t>(value.value));
 	}
 

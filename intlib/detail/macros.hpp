@@ -63,9 +63,9 @@ template <typename type_t>
 [[nodiscard]] constexpr memory::WrappedAny adapt_type(const int64_t v) noexcept
 {
 	if (v >= 0) {
-		return {.value = to_uint64(v), .type = cpp_type_string<uint64_t>};
+		return {.value = to_uint64(v), .type = type_string_cpp<uint64_t>};
 	}
-	return {.value = to_int64(v), .type = cpp_type_string<int64_t>};
+	return {.value = to_int64(v), .type = type_string_cpp<int64_t>};
 }
 
 } // namespace detail

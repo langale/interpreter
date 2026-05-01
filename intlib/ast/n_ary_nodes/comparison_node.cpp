@@ -124,13 +124,13 @@ Evaluation evaluate(
 
 		if (not*comparison_result_w) {
 			return make_good_evaluation<
-				EvaluationResult>(false, detail::cpp_type_string<bool>);
+				EvaluationResult>(false, detail::type_string_cpp<bool>);
 		}
 		previous_w = std::move(current_w);
 	}
 
 	return make_good_evaluation<
-		EvaluationResult>(true, detail::cpp_type_string<bool>);
+		EvaluationResult>(true, detail::type_string_cpp<bool>);
 }
 
 } // namespace ast

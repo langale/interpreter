@@ -66,8 +66,8 @@ namespace ast {
 [[nodiscard]] static bool
 check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 {
-	const bool is_l_uint64 = l.type == detail::cpp_type_string<uint64_t>;
-	const bool is_l_int64 = l.type == detail::cpp_type_string<int64_t>;
+	const bool is_l_uint64 = l.type == detail::type_string_cpp<uint64_t>;
+	const bool is_l_int64 = l.type == detail::type_string_cpp<int64_t>;
 	if (is_l_uint64) {
 		return std::any_cast<uint64_t>(l.value) == detail::to_uint64(r);
 	}
@@ -101,7 +101,7 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 
 		EvaluationResult new_index_w = std::move(*res_w);
 		if (not has_index) {
-			if (new_index_w.type == detail::cpp_type_string<int64_t>) {
+			if (new_index_w.type == detail::type_string_cpp<int64_t>) {
 				const int64_t idx = std::any_cast<int64_t>(new_index_w.value);
 				INTERPRETER_PRINT(
 					aleprln,
@@ -112,7 +112,7 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 				);
 				indices.set_index(d, name, idx);
 			}
-			else if (new_index_w.type == detail::cpp_type_string<uint64_t>) {
+			else if (new_index_w.type == detail::type_string_cpp<uint64_t>) {
 				const uint64_t idx = std::any_cast<uint64_t>(new_index_w.value);
 				INTERPRETER_PRINT(
 					aleprln,
@@ -344,7 +344,7 @@ Evaluation make_sequence_execution_environment(
 	env.set_expression(&expression);
 
 	return make_good_evaluation<
-		EvaluationResult>(std::move(env), detail::cpp_type_string<SequenceExecutionEnvironment>);
+		EvaluationResult>(std::move(env), detail::type_string_cpp<SequenceExecutionEnvironment>);
 }
 
 [[nodiscard]] static std::generator<Evaluation> enumerate_values_sequence(

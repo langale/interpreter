@@ -70,11 +70,11 @@ using RefConstMemVar = std::reference_wrapper<const VariableValue>;
 namespace detail {
 
 template <>
-constexpr inline std::string_view cpp_type_string<memory::RefMemVar> =
+constexpr inline std::string_view type_string_cpp<memory::RefMemVar> =
 	"VariableValue&";
 
 template <>
-constexpr inline std::string_view cpp_type_string<memory::RefConstMemVar> =
+constexpr inline std::string_view type_string_cpp<memory::RefConstMemVar> =
 	"const VariableValue&";
 
 } // namespace detail

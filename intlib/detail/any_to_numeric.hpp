@@ -48,66 +48,66 @@ template <Numeric_c cpp_t>
 [[nodiscard]] std::optional<cpp_t> any_to_numeric(const memory::WrappedAny& wrap
 ) noexcept
 {
-	if (wrap.type == cpp_type_string<memory::RefMemVar>) {
+	if (wrap.type == type_string_cpp<memory::RefMemVar>) {
 		return any_to_numeric<cpp_t>(
 			std::any_cast<memory::RefMemVar>(wrap.value).get().wrap
 		);
 	}
-	if (wrap.type == cpp_type_string<memory::RefConstMemVar>) {
+	if (wrap.type == type_string_cpp<memory::RefConstMemVar>) {
 		return any_to_numeric<cpp_t>(
 			std::any_cast<memory::RefConstMemVar>(wrap.value).get().wrap
 		);
 	}
 
-	if (wrap.type == cpp_type_string<bool>) {
+	if (wrap.type == type_string_cpp<bool>) {
 		return static_cast<cpp_t>(std::any_cast<bool>(wrap.value));
 	}
 
-	if (wrap.type == cpp_type_string<char>) {
+	if (wrap.type == type_string_cpp<char>) {
 		return static_cast<cpp_t>(std::any_cast<char>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<unsigned char>) {
+	if (wrap.type == type_string_cpp<unsigned char>) {
 		return static_cast<cpp_t>(std::any_cast<unsigned char>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<signed char>) {
+	if (wrap.type == type_string_cpp<signed char>) {
 		return static_cast<cpp_t>(std::any_cast<signed char>(wrap.value));
 	}
 
-	if (wrap.type == cpp_type_string<uint8_t>) {
+	if (wrap.type == type_string_cpp<uint8_t>) {
 		return static_cast<cpp_t>(std::any_cast<uint8_t>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<int8_t>) {
+	if (wrap.type == type_string_cpp<int8_t>) {
 		return static_cast<cpp_t>(std::any_cast<int8_t>(wrap.value));
 	}
 
-	if (wrap.type == cpp_type_string<uint16_t>) {
+	if (wrap.type == type_string_cpp<uint16_t>) {
 		return static_cast<cpp_t>(std::any_cast<uint16_t>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<int16_t>) {
+	if (wrap.type == type_string_cpp<int16_t>) {
 		return static_cast<cpp_t>(std::any_cast<int16_t>(wrap.value));
 	}
 
-	if (wrap.type == cpp_type_string<uint32_t>) {
+	if (wrap.type == type_string_cpp<uint32_t>) {
 		return static_cast<cpp_t>(std::any_cast<uint32_t>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<int32_t>) {
+	if (wrap.type == type_string_cpp<int32_t>) {
 		return static_cast<cpp_t>(std::any_cast<int32_t>(wrap.value));
 	}
 
-	if (wrap.type == cpp_type_string<uint64_t>) {
+	if (wrap.type == type_string_cpp<uint64_t>) {
 		return static_cast<cpp_t>(std::any_cast<uint64_t>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<int64_t>) {
+	if (wrap.type == type_string_cpp<int64_t>) {
 		return static_cast<cpp_t>(std::any_cast<int64_t>(wrap.value));
 	}
 
-	if (wrap.type == cpp_type_string<std::float16_t>) {
+	if (wrap.type == type_string_cpp<std::float16_t>) {
 		return static_cast<cpp_t>(std::any_cast<std::float16_t>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<std::float32_t>) {
+	if (wrap.type == type_string_cpp<std::float32_t>) {
 		return static_cast<cpp_t>(std::any_cast<std::float32_t>(wrap.value));
 	}
-	if (wrap.type == cpp_type_string<std::float64_t>) {
+	if (wrap.type == type_string_cpp<std::float64_t>) {
 		return static_cast<cpp_t>(std::any_cast<std::float64_t>(wrap.value));
 	}
 

@@ -76,7 +76,7 @@ template <typename content_t, typename... params_t>
 		else {
 			return ale::detail::make_expected<
 				ale::detail::expected_type_e::Good,
-				Evaluation>(std::any{}, detail::cpp_type_string<void>);
+				Evaluation>(std::any{}, detail::type_string_cpp<void>);
 		}
 	}
 	else {

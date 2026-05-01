@@ -48,7 +48,7 @@ namespace arithmetic {
 [[nodiscard]] inline std::optional<WrappedAny> make_uint64(const uint64_t value)
 {
 	return ale::detail::make_optional<
-		WrappedAny>(value, intlib::detail::cpp_type_string<uint64_t>);
+		WrappedAny>(value, intlib::detail::type_string_cpp<uint64_t>);
 }
 
 [[nodiscard]] inline std::optional<WrappedAny> make_int64(const int64_t value)
@@ -56,11 +56,11 @@ namespace arithmetic {
 	if (value < 0) {
 		return ale::detail::make_optional<
 			memory::
-				WrappedAny>(value, intlib::detail::cpp_type_string<int64_t>);
+				WrappedAny>(value, intlib::detail::type_string_cpp<int64_t>);
 	}
 	return ale::detail::make_optional<
 		memory::
-			WrappedAny>(detail::to_uint64(value), intlib::detail::cpp_type_string<uint64_t>);
+			WrappedAny>(detail::to_uint64(value), intlib::detail::type_string_cpp<uint64_t>);
 }
 
 [[nodiscard]] inline std::optional<WrappedAny>
@@ -68,7 +68,7 @@ make_float64(const std::float64_t value)
 {
 	return ale::detail::make_optional<
 		memory::
-			WrappedAny>(value, intlib::detail::cpp_type_string<std::float64_t>);
+			WrappedAny>(value, intlib::detail::type_string_cpp<std::float64_t>);
 }
 
 } // namespace arithmetic

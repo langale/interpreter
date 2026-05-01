@@ -55,7 +55,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation<
-		EvaluationResult>(v.get_value(), detail::cpp_type_string<std::string>);
+		EvaluationResult>(v.get_value(), detail::type_string_cpp<std::string>);
 }
 
 Evaluation
@@ -64,7 +64,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation<
-		EvaluationResult>(static_cast<std::float64_t>(v.get_value()), detail::cpp_type_string<std::float64_t>);
+		EvaluationResult>(static_cast<std::float64_t>(v.get_value()), detail::type_string_cpp<std::float64_t>);
 }
 
 Evaluation evaluate(
@@ -74,7 +74,7 @@ Evaluation evaluate(
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation<
-		EvaluationResult>(static_cast<uint64_t>(v.get_value()), detail::cpp_type_string<uint64_t>);
+		EvaluationResult>(static_cast<uint64_t>(v.get_value()), detail::type_string_cpp<uint64_t>);
 }
 
 Evaluation
@@ -83,7 +83,7 @@ evaluate(const EvaluationContext&, const ale::ast::LiteralSignedIntegerNode& v)
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	return make_good_evaluation<
-		EvaluationResult>(static_cast<int64_t>(v.get_value()), detail::cpp_type_string<int64_t>);
+		EvaluationResult>(static_cast<int64_t>(v.get_value()), detail::type_string_cpp<int64_t>);
 }
 
 } // namespace ast

@@ -90,7 +90,7 @@ namespace ast {
 	// This is a 'declare' node.
 	ctx.memory.declare_variable(
 		std::move(var_name),
-		{.value = {}, .type = detail::cpp_type_string<void>},
+		{.value = {}, .type = detail::type_string_cpp<void>},
 		var_type
 	);
 	return make_good_evaluation<EvaluationResult>();
@@ -226,12 +226,12 @@ namespace ast {
 
 		memory::WrappedAny value_w = std::move(*value_res_w);
 		const memory::WrappedAny *actual_value_w = nullptr;
-		if (value_w.type == detail::cpp_type_string<memory::RefMemVar>) {
+		if (value_w.type == detail::type_string_cpp<memory::RefMemVar>) {
 			actual_value_w =
 				&std::any_cast<memory::RefMemVar>(value_w.value).get().wrap;
 		}
 		else if (value_w.type ==
-				 detail::cpp_type_string<memory::RefConstMemVar>) {
+				 detail::type_string_cpp<memory::RefConstMemVar>) {
 			actual_value_w =
 				&std::any_cast<memory::RefConstMemVar>(value_w.value)
 					 .get()
@@ -244,7 +244,7 @@ namespace ast {
 		memory::WrappedAny name_w = std::move(*var_res_w);
 #if defined DEBUG
 		INTERPRETER_PRINT(aleprln, "Container of variable name: {}.", name_w);
-		assert(name_w.type == detail::cpp_type_string<std::string>);
+		assert(name_w.type == detail::type_string_cpp<std::string>);
 #endif
 		auto name = std::any_cast<std::string&&>(std::move(name_w.value));
 		const std::string_view var_type = decl.get_variable_type();
@@ -320,11 +320,11 @@ namespace ast {
 
 	memory::WrappedAny rhs_w = std::move(*rhs_res_w);
 	const memory::WrappedAny *actual_rhs_w = nullptr;
-	if (rhs_w.type == detail::cpp_type_string<memory::RefMemVar>) {
+	if (rhs_w.type == detail::type_string_cpp<memory::RefMemVar>) {
 		actual_rhs_w =
 			&std::any_cast<memory::RefMemVar>(rhs_w.value).get().wrap;
 	}
-	else if (rhs_w.type == detail::cpp_type_string<memory::RefConstMemVar>) {
+	else if (rhs_w.type == detail::type_string_cpp<memory::RefConstMemVar>) {
 		actual_rhs_w =
 			&std::any_cast<memory::RefConstMemVar>(rhs_w.value).get().wrap;
 	}
@@ -411,7 +411,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 
 			memory::WrappedAny name_w = std::move(*res_w);
 #if defined DEBUG
-			assert(name_w.type == detail::cpp_type_string<std::string>);
+			assert(name_w.type == detail::type_string_cpp<std::string>);
 #endif
 			auto name = std::any_cast<std::string&&>(std::move(name_w.value));
 			const std::string_view var_type = decl.get_variable_type();

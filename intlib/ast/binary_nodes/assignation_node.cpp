@@ -192,12 +192,12 @@ namespace ast {
 
 		const memory::WrappedAny& value_w = *value_res_w;
 		const memory::WrappedAny *actual_value_w = nullptr;
-		if (value_w.type == detail::cpp_type_string<memory::RefMemVar>) {
+		if (value_w.type == detail::type_string_cpp<memory::RefMemVar>) {
 			actual_value_w =
 				&std::any_cast<memory::RefMemVar>(value_w.value).get().wrap;
 		}
 		else if (value_w.type ==
-				 detail::cpp_type_string<memory::RefConstMemVar>) {
+				 detail::type_string_cpp<memory::RefConstMemVar>) {
 			actual_value_w =
 				&std::any_cast<const memory::RefMemVar>(value_w.value)
 					 .get()
@@ -209,7 +209,7 @@ namespace ast {
 
 		const memory::WrappedAny& name_w = *var_res_w;
 #if defined DEBUG
-		assert(name_w.type == detail::cpp_type_string<std::string>);
+		assert(name_w.type == detail::type_string_cpp<std::string>);
 #endif
 		const auto& var_name = std::any_cast<const std::string&>(name_w.value);
 
@@ -274,11 +274,11 @@ namespace ast {
 
 	const EvaluationResult& rhs_w = *rhs_res_w;
 	const memory::WrappedAny *actual_rhs_w = nullptr;
-	if (rhs_w.type == detail::cpp_type_string<memory::RefMemVar>) {
+	if (rhs_w.type == detail::type_string_cpp<memory::RefMemVar>) {
 		actual_rhs_w =
 			&std::any_cast<memory::RefMemVar>(rhs_w.value).get().wrap;
 	}
-	else if (rhs_w.type == detail::cpp_type_string<memory::RefConstMemVar>) {
+	else if (rhs_w.type == detail::type_string_cpp<memory::RefConstMemVar>) {
 		actual_rhs_w =
 			&std::any_cast<const memory::RefMemVar>(rhs_w.value).get().wrap;
 	}
@@ -312,7 +312,7 @@ namespace ast {
 
 		const memory::WrappedAny& name_w = *var_res_w;
 #if defined DEBUG
-		assert(name_w.type == detail::cpp_type_string<std::string>);
+		assert(name_w.type == detail::type_string_cpp<std::string>);
 #endif
 		const auto& var_name = std::any_cast<const std::string&>(name_w.value);
 

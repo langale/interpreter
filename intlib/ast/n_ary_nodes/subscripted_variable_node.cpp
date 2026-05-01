@@ -74,7 +74,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 
 	const memory::WrappedAny& var_name_w = *res_w;
 #if defined DEBUG
-	assert(var_name_w.type == detail::cpp_type_string<std::string>);
+	assert(var_name_w.type == detail::type_string_cpp<std::string>);
 #endif
 
 	const auto& var_name = std::any_cast<const std::string&>(var_name_w.value);
@@ -106,11 +106,11 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	if (variable.is_constant) {
 		return make_good_evaluation<
 			memory::
-				WrappedAny>(std::cref(variable), detail::cpp_type_string<memory::RefConstMemVar>);
+				WrappedAny>(std::cref(variable), detail::type_string_cpp<memory::RefConstMemVar>);
 	}
 	return make_good_evaluation<
 		memory::
-			WrappedAny>(std::ref(variable), detail::cpp_type_string<memory::RefMemVar>);
+			WrappedAny>(std::ref(variable), detail::type_string_cpp<memory::RefMemVar>);
 }
 
 } // namespace ast

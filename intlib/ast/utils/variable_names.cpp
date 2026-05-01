@@ -84,7 +84,7 @@ namespace ast {
 		const memory::WrappedAny& val = *res_w;
 		std::optional<int64_t> idx_w;
 
-		if (val.type == detail::cpp_type_string<memory::VariableValue>) {
+		if (val.type == detail::type_string_cpp<memory::VariableValue>) {
 			const auto& memory_variable =
 				std::any_cast<const memory::VariableValue&>(val.value);
 
@@ -193,7 +193,7 @@ Evaluation make_subscripted_variable_name(
 		INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
 
 		return make_good_evaluation<
-			EvaluationResult>(std::move(name), detail::cpp_type_string<std::string>);
+			EvaluationResult>(std::move(name), detail::type_string_cpp<std::string>);
 	}
 
 	INTERPRETER_PRINT(
@@ -219,7 +219,7 @@ Evaluation make_subscripted_variable_name(
 	INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
 
 	return make_good_evaluation<
-		EvaluationResult>(std::move(name), detail::cpp_type_string<std::string>);
+		EvaluationResult>(std::move(name), detail::type_string_cpp<std::string>);
 }
 
 Evaluation make_shallow_sequence_indices(
@@ -296,7 +296,7 @@ Evaluation make_shallow_sequence_indices(
 			.right = std::any_cast<Veci64&&>(std::move(right_idxs_w)),
 			.base_name = std::string_view{left_subscripted_variable.get_variable_name()}
 		},
-		detail::cpp_type_string<ShallowSequenceIndices>
+		detail::type_string_cpp<ShallowSequenceIndices>
 	);
 }
 

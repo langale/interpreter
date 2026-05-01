@@ -72,7 +72,7 @@ struct ShallowSequenceIndices {
 namespace detail {
 
 template <>
-constexpr inline std::string_view cpp_type_string<ast::ShallowSequenceIndices> =
+constexpr inline std::string_view type_string_cpp<ast::ShallowSequenceIndices> =
 	"ShallowSequenceIndices";
 
 } // namespace detail

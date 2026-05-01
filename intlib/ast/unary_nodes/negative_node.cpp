@@ -63,24 +63,24 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 	}
 
 	const EvaluationResult& res_w = *int_res_w;
-	if (res_w.type == detail::cpp_type_string<uint64_t>) {
+	if (res_w.type == detail::type_string_cpp<uint64_t>) {
 		const auto ri = std::any_cast<uint64_t>(res_w.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is uint64_t: {}.", ri);
 		return make_good_evaluation<
-			EvaluationResult>(-detail::to_int64(ri), detail::cpp_type_string<int64_t>);
+			EvaluationResult>(-detail::to_int64(ri), detail::type_string_cpp<int64_t>);
 	}
 
-	if (res_w.type == detail::cpp_type_string<int64_t>) {
+	if (res_w.type == detail::type_string_cpp<int64_t>) {
 		const auto ri = std::any_cast<int64_t>(res_w.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is int64_t: {}.", ri);
 		return detail::adapt_type(-ri);
 	}
 
-	if (res_w.type == detail::cpp_type_string<std::float64_t>) {
+	if (res_w.type == detail::type_string_cpp<std::float64_t>) {
 		const auto ri = std::any_cast<std::float64_t>(res_w.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is double: {}.", ri);
 		return make_good_evaluation<
-			EvaluationResult>(-ri, detail::cpp_type_string<std::float64_t>);
+			EvaluationResult>(-ri, detail::type_string_cpp<std::float64_t>);
 	}
 
 	INTERPRETER_PRINT(

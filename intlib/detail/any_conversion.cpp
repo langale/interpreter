@@ -51,7 +51,7 @@ namespace detail {
 	const auto o = func(value);                                                \
 	if (o) {                                                                   \
 		return ale::detail::make_optional<                                     \
-			memory::WrappedAny>(*o, detail::cpp_type_string<CppType>);         \
+			memory::WrappedAny>(*o, detail::type_string_cpp<CppType>);         \
 	}                                                                          \
 	return {};
 
@@ -61,7 +61,7 @@ namespace detail {
 			aleprln, "Found a match at type '{}'.", test_ale_type                                        \
 		);                                                                                               \
 		using CppType = AleToCpp_t<test_ale_type>;                                                       \
-		INTERPRETER_PRINT(aleprln, "Corresponding C++ type is '{}'.", detail::cpp_type_string<CppType>); \
+		INTERPRETER_PRINT(aleprln, "Corresponding C++ type is '{}'.", detail::type_string_cpp<CppType>); \
 		OPTIONAL_TO_ANY(any_to_numeric<CppType>, value, CppType);                                        \
 	}
 
