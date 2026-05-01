@@ -37,6 +37,7 @@
 
 #include <intlib/memory/LocalScope.hpp>
 #include <intlib/memory/VariableValue.hpp>
+#include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
 namespace memory {
@@ -79,23 +80,23 @@ public:
 	/**
 	 * @brief Sets the value of a non-constant variable to the current scope.
 	 * @param name The name of the variable to create.
-	 * @param value_w The value of the variable.
+	 * @param value The value of the variable.
 	 * @param type The type of the variable to create.
 	 * @pre The variable does not exist.
 	 */
 	void declare_variable(
-		std::string&& name, std::any&& value_w, const std::string_view type
+		std::string&& name, WrappedAny&& value, const std::string_view type
 	);
 
 	/**
 	 * @brief Sets the value of a non-constant variable to the current scope.
 	 * @param name The name of the variable to create.
-	 * @param value_w The value of the variable.
+	 * @param value The value of the variable.
 	 * @param type The type of the variable to create.
 	 * @pre The variable does not exist.
 	 */
 	void declare_constant_variable(
-		std::string&& name, std::any&& value_w, const std::string_view type
+		std::string&& name, WrappedAny&& value, const std::string_view type
 	);
 
 	/* GETTERS */

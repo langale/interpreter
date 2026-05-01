@@ -38,6 +38,7 @@
 
 #include <intlib/memory/FunctionScope.hpp>
 #include <intlib/memory/VariableValue.hpp>
+#include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
 namespace memory {
@@ -46,8 +47,8 @@ namespace memory {
  * @brief The memory class
  *
  * This class holds all the variables declared in the program, organized in
- * function scopes (@ref interpreter::memory::scope) and local scopes
- * (@ref interpreter::memory::subscope).
+ * function scopes (@ref interpreter::memory::FunctionScope) and local scopes
+ * (@ref interpreter::memory::LocalScope).
  */
 class Memory {
 public:
@@ -60,23 +61,23 @@ public:
 	/**
 	 * @brief Sets the value of a non-constant variable to the current scope.
 	 * @param name The name of the variable to create.
-	 * @param value_w The value of the variable.
+	 * @param value The value of the variable.
 	 * @param type The type of the variable to create.
 	 * @pre The variable does not exist.
 	 */
 	void declare_variable(
-		std::string&& name, std::any&& value_w, const std::string_view type
+		std::string&& name, WrappedAny&& value, const std::string_view type
 	);
 
 	/**
 	 * @brief Sets the value of a constant variable to the current scope.
 	 * @param name The name of the variable to create.
-	 * @param value_w The value of the variable.
+	 * @param value The value of the variable.
 	 * @param type The type of the variable to create.
 	 * @pre The variable does not exist.
 	*/
 	void declare_constant_variable(
-		std::string&& name, std::any&& value_w, const std::string_view type
+		std::string&& name, WrappedAny&& value, const std::string_view type
 	);
 
 	/* GETTERS */
@@ -85,8 +86,8 @@ public:
 	 * @brief Returns the value of variable @e s.
 	 * @pre The variable exists.
 	 */
-	[[nodiscard]] const VariableValue&
-	get_variable(const std::string& name) const noexcept;
+	[[nodiscard]] const VariableValue& get_variable(const std::string& name
+	) const noexcept;
 
 	/**
 	 * @brief Returns the value of variable @e s.
@@ -111,8 +112,8 @@ public:
 	/// Does a variable @e name exist?
 	[[nodiscard]] bool variable_exists(const std::string& name) const noexcept;
 	/// Does a variable @e name exist in the current subscope?
-	[[nodiscard]] bool
-	variable_exists_shallow(const std::string& name) const noexcept;
+	[[nodiscard]] bool variable_exists_shallow(const std::string& name
+	) const noexcept;
 
 	/// Is the current scope the global scope?
 	[[nodiscard]] bool is_current_scope_global() const noexcept

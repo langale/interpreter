@@ -53,31 +53,31 @@ void FunctionScope::initialize()
 }
 
 void FunctionScope::declare_variable(
-	std::string&& name, std::any&& value_w, const std::string_view type
+	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	m_local_scopes.back().declare_variable(
-		std::move(name), std::move(value_w), type
+		std::move(name), std::move(value), type
 	);
 }
 
 void FunctionScope::declare_constant_variable(
-	std::string&& name, std::any&& value_w, const std::string_view type
+	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
 	m_local_scopes.back().declare_constant_variable(
-		std::move(name), std::move(value_w), type
+		std::move(name), std::move(value), type
 	);
 }
 
 /* GETTERS */
 
-const VariableValue&
-FunctionScope::get_variable(const std::string& name) const noexcept
+const VariableValue& FunctionScope::get_variable(const std::string& name
+) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
 
@@ -125,8 +125,7 @@ bool FunctionScope::variable_exists(const std::string& name) const noexcept
 	return false;
 }
 
-bool FunctionScope::variable_exists_shallow(
-	const std::string& name
+bool FunctionScope::variable_exists_shallow(const std::string& name
 ) const noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);

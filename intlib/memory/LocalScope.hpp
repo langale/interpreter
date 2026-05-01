@@ -35,9 +35,9 @@
 
 #include <string>
 #include <map>
-#include <any>
 
 #include <intlib/memory/VariableValue.hpp>
+#include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
 namespace memory {
@@ -64,23 +64,23 @@ public:
 	/**
 	 * @brief Adds a new mutable variable to this subscope.
 	 * @param name The name of the variable to create.
-	 * @param value_w The value of the variable.
-	 * @param type The type of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The ALE type of the variable to create.
 	 * @pre The variable does not exist.
 	 */
 	void declare_variable(
-		std::string&& name, std::any&& value_w, const std::string_view type
+		std::string&& name, WrappedAny&& value, const std::string_view type
 	);
 
 	/**
 	 * @brief Adds a new constant variable to this subscope.
 	 * @param name The name of the variable to create.
-	 * @param value_w The value of the variable.
-	 * @param type The type of the variable to create.
+	 * @param value The value of the variable.
+	 * @param type The ALE type of the variable to create.
 	 * @pre The variable does not exist.
 	 */
 	void declare_constant_variable(
-		std::string&& name, std::any&& value_w, const std::string_view type
+		std::string&& name, WrappedAny&& value, const std::string_view type
 	);
 
 	/* GETTERS */

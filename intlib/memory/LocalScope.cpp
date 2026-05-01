@@ -46,7 +46,7 @@ namespace memory {
 /* MODIFIERS */
 
 void LocalScope::declare_variable(
-	std::string&& name, std::any&& value_w, const std::string_view type
+	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
@@ -60,13 +60,13 @@ void LocalScope::declare_variable(
 	m_variables.emplace(
 		std::move(name),
 		VariableValue{
-			.value_w = std::move(value_w), .type = type, .is_constant = false
+			.wrap = std::move(value), .ale_type = type, .is_constant = false
 		}
 	);
 }
 
 void LocalScope::declare_constant_variable(
-	std::string&& name, std::any&& value_w, const std::string_view type
+	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
@@ -80,7 +80,7 @@ void LocalScope::declare_constant_variable(
 	m_variables.emplace(
 		std::move(name),
 		VariableValue{
-			.value_w = std::move(value_w), .type = type, .is_constant = true
+			.wrap = std::move(value), .ale_type = type, .is_constant = true
 		}
 	);
 }
