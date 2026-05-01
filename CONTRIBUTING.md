@@ -10,7 +10,9 @@
 
 We provide a `.clang-tidy` to help you write the code in the style of `ALE`. Stick to it. For the style that cannot be enforced through a `.clang-tidy` file: 
 
-- Variables of type `std::optional`, `std::variant`, `std::expected` or `std::any` should be suffixed with `_w`.
+- Should be suffixed with `_w` all variables of types:
+  - `std::optional`, `std::variant`, `std::expected`, `std::any`,
+  - `intlib::WrappedAny`, `intlib::ast::Evaluation`. 
 
 ## Coding style
 
