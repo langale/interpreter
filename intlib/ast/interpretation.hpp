@@ -37,13 +37,13 @@
 
 #include <ale/ast/Node.hpp>
 
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
 namespace ast {
 
-[[nodiscard]] EvaluationResult interpret_node(
+[[nodiscard]] Evaluation interpret_node(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v
 );
 

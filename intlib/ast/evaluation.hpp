@@ -61,8 +61,8 @@
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
 #include <ale/utils/IndexIterator.hpp>
 
-#include <intlib/ast/EvaluationResult.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/Evaluation.hpp>
 
 namespace intlib {
 namespace ast {
@@ -72,35 +72,35 @@ namespace ast {
 
 /* n-ary nodes */
 
-[[nodiscard]] EvaluationResult evaluate(
+[[nodiscard]] Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ArithmeticNode& v,
 	const ale::ast::node_type_e t
 );
 
-[[nodiscard]] EvaluationResult evaluate(
+[[nodiscard]] Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ComparisonNode& v,
 	const ale::ast::node_type_e t
 );
 
-[[nodiscard]] EvaluationResult evaluate_logical_node(
+[[nodiscard]] Evaluation evaluate_logical_node(
 	EvaluationContext& ctx,
 	const ale::ast::LogicalNode& v,
 	const ale::ast::node_type_e t,
 	const std::unique_ptr<ale::ast::Node>& c
 );
 
-[[nodiscard]] EvaluationResult evaluate(
+[[nodiscard]] Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::LogicalNode& v,
 	const ale::ast::node_type_e t
 );
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::CommaSeparatedGroupNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v);
 
 [[nodiscard]] std::optional<std::vector<int64_t>> get_index_sequence(
@@ -111,15 +111,15 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v);
 	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
 );
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::ProgramNode& v);
 
 /* ternary nodes */
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v);
 
 /* binary nodes */
@@ -136,7 +136,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v);
 	std::vector<std::string>& names
 );
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& v);
 
 [[nodiscard]] bool retrieve_variable_names_in_declaration(
@@ -151,49 +151,49 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& v);
 	std::vector<std::string>& names
 );
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v);
 
 /* unary nodes */
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v);
 
 /* zero-ary nodes */
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(const EvaluationContext& ctx, const ale::ast::LiteralTrueNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(const EvaluationContext& ctx, const ale::ast::LiteralFalseNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(const EvaluationContext& ctx, const ale::ast::LiteralStringNode& v);
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(const EvaluationContext& ctx, const ale::ast::LiteralDecimalNode& v);
 
-[[nodiscard]] EvaluationResult evaluate(
+[[nodiscard]] Evaluation evaluate(
 	const EvaluationContext& ctx, const ale::ast::LiteralUnsignedIntegerNode& v
 );
 
-[[nodiscard]] EvaluationResult evaluate(
+[[nodiscard]] Evaluation evaluate(
 	const EvaluationContext& ctx, const ale::ast::LiteralSignedIntegerNode& v
 );
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v);
 
 } // namespace ast

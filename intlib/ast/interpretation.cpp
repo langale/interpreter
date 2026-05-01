@@ -38,7 +38,7 @@
 #include <ale/ast/binary_nodes/declaration_nodes/DeclarationDeclareNode.hpp>
 #include <ale/ast/utils/node_type_to_string.hpp>
 
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 
@@ -46,7 +46,7 @@ namespace intlib {
 namespace ast {
 
 template <typename node_t, typename... params_t>
-[[nodiscard]] EvaluationResult call_evaluate(
+[[nodiscard]] Evaluation call_evaluate(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& v,
 	params_t&&...p
@@ -59,7 +59,7 @@ template <typename node_t, typename... params_t>
 	);
 }
 
-[[nodiscard]] EvaluationResult
+[[nodiscard]] Evaluation
 interpret_node(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v)
 {
 #if defined DEBUG
@@ -153,7 +153,7 @@ interpret_node(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v)
 		break;
 	}
 
-	return make_bad_evaluation_result(
+	return make_bad_evaluation(
 		Vec{evaluation_error_e::Unhandled_Node_Type},
 		Vec{evaluation_function_e::Interpretation_Node},
 		Vec{std::format("Unhandled node type {}.", v->get_node_type())}
