@@ -43,6 +43,8 @@ namespace detail {
 template <typename type_t>
 constexpr inline std::string_view cpp_type_string = "invalid!";
 
+// Basic types
+
 template <>
 constexpr inline std::string_view cpp_type_string<bool> = "bool";
 template <>
@@ -69,14 +71,29 @@ template <>
 constexpr inline std::string_view cpp_type_string<uint64_t> = "unsigned long";
 
 template <>
-inline constexpr std::string_view cpp_type_string<std::float16_t> = "_Float16";
+constexpr inline std::string_view cpp_type_string<std::float16_t> = "_Float16";
 template <>
-inline constexpr std::string_view cpp_type_string<std::float32_t> = "_Float32";
+constexpr inline std::string_view cpp_type_string<std::float32_t> = "_Float32";
 template <>
-inline constexpr std::string_view cpp_type_string<std::float64_t> = "_Float64";
+constexpr inline std::string_view cpp_type_string<std::float64_t> = "_Float64";
 
 template <>
 constexpr inline std::string_view cpp_type_string<void> = "void";
+
+// Structured types
+
+template <>
+constexpr inline std::string_view cpp_type_string<std::string> = "string";
+template <>
+constexpr inline std::string_view cpp_type_string<const std::string> = "const string";
+template <>
+constexpr inline std::string_view cpp_type_string<std::string&> = "string&";
+template <>
+constexpr inline std::string_view cpp_type_string<const std::string&> = "const string&";
+
+template <>
+constexpr inline std::string_view cpp_type_string<std::string_view> =
+	"string_view";
 
 } // namespace detail
 } // namespace intlib
