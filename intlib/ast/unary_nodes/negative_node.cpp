@@ -36,6 +36,7 @@
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/macros.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
 
@@ -44,53 +45,54 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
-evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
+Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& child = v.get_child();
 
-	EvaluationResult res_int_w = interpret_node(ctx, child);
-	if (not res_int_w.has_value()) {
+	Evaluation int_res_w = interpret_node(ctx, child);
+	if (not int_res_w.has_value()) {
 		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
-			std::move(res_int_w.error()),
+			std::move(int_res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Negative,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::any& res_w = *res_int_w;
-	if (detail::holds_cpp_type<uint64_t>(res_w)) {
-		const auto ri = std::any_cast<uint64_t>(res_w);
+	const EvaluationResult& res_w = *int_res_w;
+	if (res_w.type == detail::cpp_type_string<uint64_t>) {
+		const auto ri = std::any_cast<uint64_t>(res_w.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is uint64_t: {}.", ri);
-		return make_good_evaluation_result<int64_t>(-detail::to_int64(ri));
+		return make_good_evaluation<
+			EvaluationResult>(-detail::to_int64(ri), detail::cpp_type_string<int64_t>);
 	}
 
-	if (detail::holds_cpp_type<int64_t>(res_w)) {
-		const auto ri = std::any_cast<int64_t>(res_w);
+	if (res_w.type == detail::cpp_type_string<int64_t>) {
+		const auto ri = std::any_cast<int64_t>(res_w.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is int64_t: {}.", ri);
-		return make_good_evaluation_result<std::any>(detail::adapt_type(-ri));
+		return detail::adapt_type(-ri);
 	}
 
-	if (detail::holds_cpp_type<std::float64_t>(res_w)) {
-		const auto ri = std::any_cast<std::float64_t>(res_w);
+	if (res_w.type == detail::cpp_type_string<std::float64_t>) {
+		const auto ri = std::any_cast<std::float64_t>(res_w.value);
 		INTERPRETER_PRINT(aleprln, "Evaluation of node is double: {}.", ri);
-		return make_good_evaluation_result<std::float64_t>(-ri);
+		return make_good_evaluation<
+			EvaluationResult>(-ri, detail::cpp_type_string<std::float64_t>);
 	}
 
 	INTERPRETER_PRINT(
 		aleprln,
 		"Unhandled variable type '{}'.",
-		detail::get_type_name(*res_int_w)
+		detail::get_type_name(*int_res_w)
 	);
-	return make_bad_evaluation_result(
+	return make_bad_evaluation(
 		Vec{evaluation_error_e::Unhandled_Variable_Type},
 		Vec{evaluation_function_e::Negative},
 		Vec{std::format(
-			"Unhandled type '{}'", detail::get_type_name(*res_int_w)
+			"Unhandled type '{}'", detail::get_type_name(*int_res_w)
 		)}
 	);
 }

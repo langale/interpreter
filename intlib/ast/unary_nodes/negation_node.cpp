@@ -36,6 +36,7 @@
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_bool.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
 
@@ -44,14 +45,13 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
-evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
+Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	const auto& child = v.get_child();
 
-	EvaluationResult res_w = interpret_node(ctx, child);
+	Evaluation res_w = interpret_node(ctx, child);
 	if (not res_w.has_value()) {
 		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
@@ -62,19 +62,19 @@ evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 		);
 	}
 
-	const std::optional res_bool_w = detail::any_to_bool(*res_w);
+	const EvaluationResult& res = *res_w;
+	const std::optional res_bool_w = detail::any_to_bool(res);
 	if (res_bool_w) {
 		INTERPRETER_PRINT(aleprln, "Evaluation of node: {}.", *res_bool_w);
-		return make_good_evaluation_result<bool>(not*res_bool_w);
+		return make_good_evaluation<
+			EvaluationResult>(not*res_bool_w, detail::cpp_type_string<bool>);
 	}
 
-	INTERPRETER_PRINT(
-		aleprln, "Unhandled variable type '{}'.", detail::get_type_name(*res_w)
-	);
-	return make_bad_evaluation_result(
+	INTERPRETER_PRINT(aleprln, "Unhandled value of type '{}'.", res.type);
+	return make_bad_evaluation(
 		Vec{evaluation_error_e::Unhandled_Variable_Type},
 		Vec{evaluation_function_e::Negation},
-		Vec{std::format("Unhandled type '{}'", detail::get_type_name(*res_w))}
+		Vec{std::format("Unhandled type '{}'", res.type)}
 	);
 }
 
