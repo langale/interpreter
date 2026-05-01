@@ -43,17 +43,15 @@
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto& child = v.get_child();
 
 	Evaluation res_w = interpret_node(ctx, child);
 	if (not res_w.has_value()) {
-		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT("Node evaluation failed.");
 		return append_error(
 			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -65,12 +63,12 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 	const EvaluationResult& res = *res_w;
 	const std::optional res_bool_w = detail::any_to_bool(res);
 	if (res_bool_w) {
-		INTERPRETER_PRINT(aleprln, "Evaluation of node: {}.", *res_bool_w);
+		INTERPRETER_PRINT("Evaluation of node: {}.", *res_bool_w);
 		return make_good_evaluation<
 			EvaluationResult>(not*res_bool_w, detail::type_string_cpp<bool>);
 	}
 
-	INTERPRETER_PRINT(aleprln, "Unhandled value of type '{}'.", res.type);
+	INTERPRETER_PRINT("Unhandled value of type '{}'.", res.type);
 	return make_bad_evaluation(
 		Vec{evaluation_error_e::Unhandled_Variable_Type},
 		Vec{evaluation_function_e::Negation},

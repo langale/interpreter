@@ -44,13 +44,11 @@
 namespace intlib {
 namespace comparison {
 
-#define aleprln ale::logger::println
-
 template <typename left_t, typename right_t>
 [[nodiscard]] static std::optional<bool>
 any_comparison_less_equal(const WrappedAny& left_w, const WrappedAny& right_w)
 {
-	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
+	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
 		if (left_w.type == detail::type_string_cpp<left_t> and
@@ -95,7 +93,7 @@ any_comparison_less_equal_right_numeric(
 	const WrappedAny& left_w, const WrappedAny& right_w
 )
 {
-	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
+	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
 	if (const auto r = any_comparison_less_equal<left_t, bool>(left_w, right_w);
 		r.has_value()) {
@@ -122,7 +120,7 @@ any_comparison_less_equal_right_numeric(
 std::optional<bool>
 any_comparison_less_equal(const WrappedAny& left_w, const WrappedAny& right_w)
 {
-	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
+	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
 	if (const auto r =
 			any_comparison_less_equal_right_numeric<bool>(left_w, right_w);

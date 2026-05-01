@@ -45,17 +45,14 @@
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	Evaluation res_w = make_subscripted_variable_name(ctx, v);
 	if (not res_w) {
 		INTERPRETER_PRINT(
-			aleprln,
 			"Full variable name of subscripted variable {} could not be "
 			"retrieved.",
 			v.get_variable_name()
@@ -81,7 +78,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 
 	if (not ctx.memory.variable_exists(var_name)) {
 		INTERPRETER_PRINT(
-			aleprln, "Variable '{}' is not defined in this scope.", var_name
+			"Variable '{}' is not defined in this scope.", var_name
 		);
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Undefined_Variable},
@@ -95,7 +92,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	memory::Variable& variable = ctx.memory.get_variable(var_name);
 
 	if (not variable.wrap.value.has_value()) {
-		INTERPRETER_PRINT(aleprln, "Variable '{}' has no value.", var_name);
+		INTERPRETER_PRINT("Variable '{}' has no value.", var_name);
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},

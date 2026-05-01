@@ -41,19 +41,15 @@
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation
 evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const std::string& name = v.get_variable_name();
 
 	if (not ctx.memory.variable_exists(name)) {
-		INTERPRETER_PRINT(
-			aleprln, "Variable '{}' is not defined in this scope.", name
-		);
+		INTERPRETER_PRINT("Variable '{}' is not defined in this scope.", name);
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Variable},
@@ -65,7 +61,7 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 	memory::Variable& variable = ctx.memory.get_variable(name);
 
 	if (variable.wrap.type == detail::type_string_cpp<void>) {
-		INTERPRETER_PRINT(aleprln, "Variable '{}' has no value.", name);
+		INTERPRETER_PRINT("Variable '{}' has no value.", name);
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Variable},

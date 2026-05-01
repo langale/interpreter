@@ -43,17 +43,15 @@
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto& child = v.get_child();
 
 	Evaluation int_res_w = interpret_node(ctx, child);
 	if (not int_res_w.has_value()) {
-		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT("Node evaluation failed.");
 		return append_error(
 			std::move(int_res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -65,28 +63,26 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 	const EvaluationResult& res = *int_res_w;
 	if (res.type == detail::type_string_cpp<uint64_t>) {
 		const auto ri = std::any_cast<uint64_t>(res.value);
-		INTERPRETER_PRINT(aleprln, "Evaluation of node is uint64_t: {}.", ri);
+		INTERPRETER_PRINT("Evaluation of node is uint64_t: {}.", ri);
 		return make_good_evaluation<
 			EvaluationResult>(detail::to_uint64(ri), detail::type_string_cpp<uint64_t>);
 	}
 
 	if (res.type == detail::type_string_cpp<int64_t>) {
 		const auto ri = std::any_cast<int64_t>(res.value);
-		INTERPRETER_PRINT(aleprln, "Evaluation of node is int64_t: {}.", ri);
+		INTERPRETER_PRINT("Evaluation of node is int64_t: {}.", ri);
 		return make_good_evaluation<
 			EvaluationResult>(detail::to_int64(ri), detail::type_string_cpp<int64_t>);
 	}
 
 	if (res.type == detail::type_string_cpp<std::float64_t>) {
 		const auto ri = std::any_cast<std::float64_t>(res.value);
-		INTERPRETER_PRINT(
-			aleprln, "Evaluation of node is std::float64_t: {}.", ri
-		);
+		INTERPRETER_PRINT("Evaluation of node is std::float64_t: {}.", ri);
 		return make_good_evaluation<
 			EvaluationResult>(ri, detail::type_string_cpp<std::float64_t>);
 	}
 
-	INTERPRETER_PRINT(aleprln, "Unhandled result '{}'.", res);
+	INTERPRETER_PRINT("Unhandled result '{}'.", res);
 	return make_bad_evaluation(
 		Vec{evaluation_error_e::Unhandled_Variable_Type},
 		Vec{evaluation_function_e::Positive},

@@ -55,15 +55,13 @@ using namespace std::string_literals;
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ComparisonNode& v,
 	const ale::ast::node_type_e t
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto& children = v.get_children();
 
@@ -75,7 +73,7 @@ Evaluation evaluate(
 	{
 		Evaluation res = interpret_node(ctx, children.at(0));
 		if (not res.has_value()) {
-			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
+			INTERPRETER_PRINT("Evaluation of node failed.");
 			return append_error(
 				std::move(res.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -91,7 +89,7 @@ Evaluation evaluate(
 
 		Evaluation res_w = interpret_node(ctx, c);
 		if (not res_w.has_value()) {
-			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
+			INTERPRETER_PRINT("Evaluation of node failed.");
 			return append_error(
 				std::move(res_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -106,7 +104,6 @@ Evaluation evaluate(
 
 		if (not comparison_result_w.has_value()) {
 			INTERPRETER_PRINT(
-				aleprln,
 				"Could not compare two std::any values: '{}' and '{}'.",
 				previous_w,
 				current_w

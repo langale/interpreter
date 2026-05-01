@@ -55,16 +55,12 @@ using namespace std::string_literals;
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 [[nodiscard]] static Evaluation
 node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 {
 	Evaluation eval_res = interpret_node(ctx, c);
 	if (not eval_res) {
-		INTERPRETER_PRINT(
-			aleprln, "Evaluation of node within arithmetic node failed."
-		);
+		INTERPRETER_PRINT("Evaluation of node within arithmetic node failed.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
 			Vec{evaluation_function_e::Arithmetic},
@@ -74,7 +70,7 @@ node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 
 	EvaluationResult res = std::move(*eval_res);
 	if (res.type == detail::type_string_cpp<void>) {
-		INTERPRETER_PRINT(aleprln, "Evaluation of node returned a void value.");
+		INTERPRETER_PRINT("Evaluation of node returned a void value.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},
 			Vec{evaluation_function_e::Arithmetic},
@@ -92,7 +88,7 @@ Evaluation evaluate(
 	const ale::ast::node_type_e t
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto& children = v.get_children();
 #if defined DEBUG
@@ -120,7 +116,6 @@ Evaluation evaluate(
 
 		if (not operation_res.has_value()) {
 			INTERPRETER_PRINT(
-				aleprln,
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()
 			);

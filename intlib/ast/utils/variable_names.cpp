@@ -56,30 +56,28 @@ using namespace std::string_literals;
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 [[nodiscard]] static Evaluation get_indices(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	Vec<int64_t> indices;
 	const auto& children = subscripted_variable.get_children();
 
-	INTERPRETER_PRINT(aleprln, "Variable has {} subindices.", children.size());
+	INTERPRETER_PRINT("Variable has {} subindices.", children.size());
 
 	for (const auto& [i, child] : children | std::views::enumerate) {
 
-		INTERPRETER_PRINT(aleprln, "Made index for child {}.", i);
+		INTERPRETER_PRINT("Made index for child {}.", i);
 
 		Evaluation res_w = interpret_node(ctx, child);
 		if (not res_w.has_value()) {
 			return res_w;
 		}
 
-		INTERPRETER_PRINT(aleprln, "Successfully evaluated child.");
+		INTERPRETER_PRINT("Successfully evaluated child.");
 
 		const memory::WrappedAny& val = *res_w;
 		std::optional<int64_t> idx_w;
@@ -92,7 +90,6 @@ namespace ast {
 
 			if (not idx_w) {
 				INTERPRETER_PRINT(
-					aleprln,
 					"Could not convert variable '{}' into a numeric int64_t.",
 					memory_variable
 				);
@@ -103,9 +100,7 @@ namespace ast {
 
 			if (not idx_w) {
 				INTERPRETER_PRINT(
-					aleprln,
-					"Could not convert value '{}' into a numeric int64_t.",
-					val
+					"Could not convert value '{}' into a numeric int64_t.", val
 				);
 			}
 		}
@@ -120,7 +115,7 @@ namespace ast {
 		}
 
 		const auto idx = *idx_w;
-		INTERPRETER_PRINT(aleprln, "Made index {}.", idx);
+		INTERPRETER_PRINT("Made index {}.", idx);
 		indices.push_back(idx);
 	}
 
@@ -147,13 +142,12 @@ Evaluation make_subscripted_variable_name(
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	std::string name = subscripted_variable.get_variable_name();
 
 	if (ctx.sequence_execution_environment.has_value()) {
 		INTERPRETER_PRINT(
-			aleprln,
 			"There is a sequence environment so using the precomputed data."
 		);
 
@@ -177,27 +171,24 @@ Evaluation make_subscripted_variable_name(
 			const int64_t idx = first_index + plus_distance;
 
 			INTERPRETER_PRINT(
-				aleprln, "Index '{}' corresponds to depth '{}'.", i, depth
+				"Index '{}' corresponds to depth '{}'.", i, depth
 			);
-			INTERPRETER_PRINT(aleprln, "First index value: '{}'.", first_index);
-			INTERPRETER_PRINT(
-				aleprln, "Working distance: '{}'.", plus_distance
-			);
-			INTERPRETER_PRINT(aleprln, "Resulting index: '{}'.", idx);
+			INTERPRETER_PRINT("First index value: '{}'.", first_index);
+			INTERPRETER_PRINT("Working distance: '{}'.", plus_distance);
+			INTERPRETER_PRINT("Resulting index: '{}'.", idx);
 
 			name += "_" + std::to_string(idx);
 
-			INTERPRETER_PRINT(aleprln, "Name so far: '{}'.", name);
+			INTERPRETER_PRINT("Name so far: '{}'.", name);
 		}
 
-		INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
+		INTERPRETER_PRINT("Name constructed '{}'.", name);
 
 		return make_good_evaluation<
 			EvaluationResult>(std::move(name), detail::type_string_cpp<std::string>);
 	}
 
 	INTERPRETER_PRINT(
-		aleprln,
 		"There is no sequence environment so retrieving the indices normally."
 	);
 
@@ -206,17 +197,17 @@ Evaluation make_subscripted_variable_name(
 		return res_w;
 	}
 
-	INTERPRETER_PRINT(aleprln, "Successfully made indices.");
+	INTERPRETER_PRINT("Successfully made indices.");
 
 	memory::WrappedAny indices_w = std::move(*res_w);
 
-	INTERPRETER_PRINT(aleprln, "Make indices for variable {}.", name);
+	INTERPRETER_PRINT("Make indices for variable {}.", name);
 
 	const auto indices =
 		std::any_cast<Vec<int64_t>&&>(std::move(indices_w.value));
 	append_variable_name(name, indices);
 
-	INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
+	INTERPRETER_PRINT("Name constructed '{}'.", name);
 
 	return make_good_evaluation<
 		EvaluationResult>(std::move(name), detail::type_string_cpp<std::string>);
@@ -226,7 +217,7 @@ Evaluation make_shallow_sequence_indices(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence_comma
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 #if defined DEBUG
 	assert(sequence_comma.get_operator_type().has_value());
@@ -273,14 +264,10 @@ Evaluation make_shallow_sequence_indices(
 	std::any right_idxs_w = std::move(*res_right_indices_w);
 
 	INTERPRETER_PRINT(
-		aleprln,
-		"Type inside left indices: {}.",
-		detail::get_type_name(left_idxs_w)
+		"Type inside left indices: {}.", detail::get_type_name(left_idxs_w)
 	);
 	INTERPRETER_PRINT(
-		aleprln,
-		"Type inside right indices: {}.",
-		detail::get_type_name(right_idxs_w)
+		"Type inside right indices: {}.", detail::get_type_name(right_idxs_w)
 	);
 
 	using Veci64 = Vec<int64_t>;

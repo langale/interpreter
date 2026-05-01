@@ -47,18 +47,16 @@ using namespace std::string_literals;
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto& first_child = v.get_first_child();
 	const auto& second_child = v.get_second_child();
 	const auto& third_child = v.get_third_child();
 
 	if (first_child == nullptr) {
-		INTERPRETER_PRINT(aleprln, "Condition of if statement is null.");
+		INTERPRETER_PRINT("Condition of if statement is null.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::If_Statement_Condition_Empty},
 			Vec{evaluation_function_e::If_Else},
@@ -68,7 +66,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	Evaluation cond_res = interpret_node(ctx, first_child);
 	if (not cond_res.has_value()) {
-		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT("Node evaluation failed.");
 		return append_error(
 			std::move(cond_res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -81,9 +79,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	const std::optional cond_bool_w = detail::any_to_bool(cond);
 	if (not cond_bool_w) {
 		INTERPRETER_PRINT(
-			aleprln,
-			"Unhandled variable type '{}'.",
-			detail::get_type_name(*cond_bool_w)
+			"Unhandled variable type '{}'.", detail::get_type_name(*cond_bool_w)
 		);
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Conversion_To_Bool_Failed},
@@ -98,7 +94,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	if (*cond_bool_w) {
 		if (second_child == nullptr) {
 			INTERPRETER_PRINT(
-				aleprln, "Condition is true but first branch of 'if' is empty."
+				"Condition is true but first branch of 'if' is empty."
 			);
 			return make_bad_evaluation(
 				Vec{evaluation_error_e::Node_Is_Malformed},
@@ -112,7 +108,6 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 
 	if (third_child == nullptr) {
 		INTERPRETER_PRINT(
-			aleprln,
 			"Condition is true but the second branch of if statement is empty."
 		);
 		return make_bad_evaluation(

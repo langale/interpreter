@@ -61,8 +61,6 @@
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 [[nodiscard]] static bool
 check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 {
@@ -104,7 +102,6 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 			if (new_index_w.type == detail::type_string_cpp<int64_t>) {
 				const int64_t idx = std::any_cast<int64_t>(new_index_w.value);
 				INTERPRETER_PRINT(
-					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
 					name,
@@ -115,7 +112,6 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 			else if (new_index_w.type == detail::type_string_cpp<uint64_t>) {
 				const uint64_t idx = std::any_cast<uint64_t>(new_index_w.value);
 				INTERPRETER_PRINT(
-					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
 					name,
@@ -139,7 +135,6 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 				}
 				const auto idx = std::any_cast<int64_t>(idx_w);
 				INTERPRETER_PRINT(
-					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
 					name,
@@ -152,7 +147,6 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 			const int64_t known_index = indices.get_index(d, name);
 			if (not check_equal_anys(new_index_w, known_index)) {
 				INTERPRETER_PRINT(
-					aleprln,
 					"Mismatch between known index value '{}' and new "
 					"computed index value '{}', for variable '{}'",
 					known_index,
@@ -296,7 +290,7 @@ Evaluation make_sequence_execution_environment(
 
 	SequenceExecutionEnvironment env;
 
-	INTERPRETER_PRINT(aleprln, "Going to extract first indices.");
+	INTERPRETER_PRINT("Going to extract first indices.");
 
 	const auto& left = seq.get_left_child();
 	auto res_left = add_indices<indices_type_e::first>(
@@ -306,7 +300,7 @@ Evaluation make_sequence_execution_environment(
 		return res_left;
 	}
 
-	INTERPRETER_PRINT(aleprln, "Going to extract last indices.");
+	INTERPRETER_PRINT("Going to extract last indices.");
 
 	const auto& right = seq.get_right_child();
 	auto res_right = add_indices<indices_type_e::last>(
@@ -316,7 +310,7 @@ Evaluation make_sequence_execution_environment(
 		return res_right;
 	}
 
-	INTERPRETER_PRINT(aleprln, "Going to check correctness.");
+	INTERPRETER_PRINT("Going to check correctness.");
 
 	// check correctness: variables match
 	const auto depth_start = env.get_first_indices().depth();
@@ -465,9 +459,7 @@ std::generator<Evaluation> enumerate_names_sequence(
 	);
 #endif
 
-	INTERPRETER_PRINT(
-		aleprln, "Going to enumerate the variable names of a sequence."
-	);
+	INTERPRETER_PRINT("Going to enumerate the variable names of a sequence.");
 
 	auto gen = enumerate_names_sequence(ctx, env, 0);
 	auto pos = gen.begin();

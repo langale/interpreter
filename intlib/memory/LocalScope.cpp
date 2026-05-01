@@ -41,15 +41,13 @@
 namespace intlib {
 namespace memory {
 
-#define aleprln ale::logger::println
-
 /* MODIFIERS */
 
 void LocalScope::declare_variable(
 	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	const auto it = find(name);
 
@@ -69,7 +67,7 @@ void LocalScope::declare_constant_variable(
 	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	const auto it = find(name);
 
@@ -87,10 +85,9 @@ void LocalScope::declare_constant_variable(
 
 /* GETTERS */
 
-const Variable&
-LocalScope::get_variable(const std::string& name) const noexcept
+const Variable& LocalScope::get_variable(const std::string& name) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	const auto it = find(name);
 #if defined DEBUG
@@ -101,7 +98,7 @@ LocalScope::get_variable(const std::string& name) const noexcept
 
 Variable& LocalScope::get_variable(const std::string& name) noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	const auto it = find(name);
 #if defined DEBUG

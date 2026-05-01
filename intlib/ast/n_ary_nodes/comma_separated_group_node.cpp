@@ -46,22 +46,17 @@
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation
 evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
-	INTERPRETER_PRINT(
-		aleprln, "Cannot evaluate nodes of type '{}'.", v.get_node_type()
-	);
+	INTERPRETER_PRINT("Cannot evaluate nodes of type '{}'.", v.get_node_type());
 	return make_bad_evaluation(
 		Vec{evaluation_error_e::Evaluation_Of_Node_Is_Forbidden},
 		Vec{evaluation_function_e::Comma_Separated_Group},
-		Vec{std::format(
-			"Cannot evaluate nodes of type '{}'", v.get_node_type()
-		)}
+		Vec{std::format("Cannot evaluate nodes of type '{}'", v.get_node_type())
+		}
 	);
 }
 

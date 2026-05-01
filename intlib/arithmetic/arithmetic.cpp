@@ -41,15 +41,13 @@
 namespace intlib {
 namespace arithmetic {
 
-#define aleprln ale::logger::println
-
 std::optional<WrappedAny> any_arithmetic(
 	const ale::ast::node_type_e t,
 	const WrappedAny& left_w,
 	const WrappedAny& right_w
 )
 {
-	INTERPRETER_ENTER_ARITHMETIC_FUNCTION(aleprln);
+	INTERPRETER_ENTER_ARITHMETIC_FUNCTION;
 
 	switch (t) {
 	case ale::ast::node_type_e::Arithmetic_Addition:
@@ -71,7 +69,7 @@ std::optional<WrappedAny> any_arithmetic(
 		return arithmetic_subtraction(left_w, right_w);
 
 	default:
-		INTERPRETER_PRINT(aleprln, "Wrong node type '{}' for arithmetic.", t);
+		INTERPRETER_PRINT("Wrong node type '{}' for arithmetic.", t);
 		return {};
 	}
 }

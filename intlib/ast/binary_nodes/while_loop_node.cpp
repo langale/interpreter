@@ -47,17 +47,15 @@ using namespace std::string_literals;
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto& left_child = v.get_left_child();
 	const auto& right_child = v.get_right_child();
 
 	if (left_child == nullptr) {
-		INTERPRETER_PRINT(aleprln, "Condition in while loop is missing.");
+		INTERPRETER_PRINT("Condition in while loop is missing.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Node_Is_Malformed},
 			Vec{evaluation_function_e::While_Loop},
@@ -69,7 +67,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 	while (not stop) {
 		Evaluation cond_w = interpret_node(ctx, left_child);
 		if (not cond_w) {
-			INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
+			INTERPRETER_PRINT("Node evaluation failed.");
 			return append_error(
 				std::move(cond_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -81,7 +79,6 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		const std::optional cond_res_w = detail::any_to_bool(*cond_w);
 		if (not cond_res_w) {
 			INTERPRETER_PRINT(
-				aleprln,
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
 			);
@@ -104,9 +101,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 
 			Evaluation res_w = interpret_node(ctx, right_child);
 			if (not res_w) {
-				INTERPRETER_PRINT(
-					aleprln, "Evaluation of while loop body failed."
-				);
+				INTERPRETER_PRINT("Evaluation of while loop body failed.");
 				return append_error(
 					std::move(cond_w.error()),
 					evaluation_error_e::Evaluation_Of_Node_While_Loop_Failed,

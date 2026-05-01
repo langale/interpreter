@@ -55,13 +55,11 @@
 namespace intlib {
 namespace ast {
 
-#define aleprln ale::logger::println
-
 [[nodiscard]] static bool compute_logical_expression(
 	const ale::ast::node_type_e t, const bool l, const bool r
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return l and r;
@@ -70,7 +68,7 @@ namespace ast {
 		return l or r;
 	}
 
-	INTERPRETER_PRINT(aleprln, "Wrong node type {}.", t);
+	INTERPRETER_PRINT("Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -80,7 +78,7 @@ namespace ast {
 
 [[nodiscard]] static bool break_when(const ale::ast::node_type_e t)
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	if (t == ale::ast::node_type_e::Logical_And) {
 		return false;
@@ -89,7 +87,7 @@ namespace ast {
 		return true;
 	}
 
-	INTERPRETER_PRINT(aleprln, "Wrong node type {}.", t);
+	INTERPRETER_PRINT("Wrong node type {}.", t);
 #if defined DEBUG
 	assert(false);
 #endif
@@ -101,11 +99,11 @@ Evaluation evaluate_logical_node(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	Evaluation res_w = interpret_node(ctx, c);
 	if (not res_w) {
-		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT("Node evaluation failed.");
 		return append_error(
 			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -115,10 +113,10 @@ Evaluation evaluate_logical_node(
 	}
 
 	const EvaluationResult& res = *res_w;
-	INTERPRETER_PRINT(aleprln, "Evaluation of node '{}'", res);
+	INTERPRETER_PRINT("Evaluation of node '{}'", res);
 
 	if (res.type == detail::type_string_cpp<void>) {
-		INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
+		INTERPRETER_PRINT("Evaluation of node failed.");
 		return append_error(
 			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Is_Void,
@@ -130,9 +128,7 @@ Evaluation evaluate_logical_node(
 	const std::optional r_conv_w = detail::any_to_bool(res);
 	if (not r_conv_w) {
 		INTERPRETER_PRINT(
-			aleprln,
-			"Value '{}' could not be converted to a Boolean value.",
-			res
+			"Value '{}' could not be converted to a Boolean value.", res
 		);
 		return append_error(
 			std::move(res_w.error()),
@@ -152,13 +148,13 @@ Evaluation evaluate(
 	const ale::ast::node_type_e t
 )
 {
-	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto& children = v.get_children();
 
 	Evaluation eval_w = evaluate_logical_node(ctx, children.at(0));
 	if (not eval_w) {
-		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
+		INTERPRETER_PRINT("Node evaluation failed.");
 		return eval_w;
 	}
 
@@ -180,7 +176,7 @@ Evaluation evaluate(
 
 		eval_w = evaluate_logical_node(ctx, c);
 		if (not eval_w) {
-			INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
+			INTERPRETER_PRINT("Node evaluation failed.");
 			return eval_w;
 		}
 

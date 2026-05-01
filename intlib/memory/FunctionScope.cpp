@@ -41,13 +41,11 @@
 namespace intlib {
 namespace memory {
 
-#define aleprln ale::logger::println
-
 /* MODIFIERS */
 
 void FunctionScope::initialize()
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	m_local_scopes.emplace_back();
 }
@@ -56,7 +54,7 @@ void FunctionScope::declare_variable(
 	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	m_local_scopes.back().declare_variable(
 		std::move(name), std::move(value), type
@@ -67,7 +65,7 @@ void FunctionScope::declare_constant_variable(
 	std::string&& name, WrappedAny&& value, const std::string_view type
 )
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	m_local_scopes.back().declare_constant_variable(
 		std::move(name), std::move(value), type
@@ -79,7 +77,7 @@ void FunctionScope::declare_constant_variable(
 const Variable& FunctionScope::get_variable(const std::string& name
 ) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
@@ -97,7 +95,7 @@ const Variable& FunctionScope::get_variable(const std::string& name
 
 Variable& FunctionScope::get_variable(const std::string& name) noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
@@ -115,7 +113,7 @@ Variable& FunctionScope::get_variable(const std::string& name) noexcept
 
 bool FunctionScope::variable_exists(const std::string& name) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	for (auto it = m_local_scopes.rbegin(); it != m_local_scopes.rend(); ++it) {
 		if (it->variable_exists(name)) {
@@ -128,7 +126,7 @@ bool FunctionScope::variable_exists(const std::string& name) const noexcept
 bool FunctionScope::variable_exists_shallow(const std::string& name
 ) const noexcept
 {
-	INTERPRETER_ENTER_MEMORY_FUNCTION(aleprln);
+	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
 	return m_local_scopes.back().variable_exists(name);
 }
