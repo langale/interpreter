@@ -41,7 +41,7 @@ using namespace std::string_literals;
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
 
 namespace intlib {
@@ -49,8 +49,7 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
-evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
+Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
@@ -59,7 +58,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 
 	if (left_child == nullptr) {
 		INTERPRETER_PRINT(aleprln, "Condition in while loop is missing.");
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Node_Is_Malformed},
 			Vec{evaluation_function_e::While_Loop},
 			Vec{"Condition in while loop is missing"s}
@@ -68,7 +67,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 
 	bool stop = false;
 	while (not stop) {
-		EvaluationResult cond_w = interpret_node(ctx, left_child);
+		Evaluation cond_w = interpret_node(ctx, left_child);
 		if (not cond_w) {
 			INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 			return append_error(
@@ -103,7 +102,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 				continue;
 			}
 
-			EvaluationResult res_w = interpret_node(ctx, right_child);
+			Evaluation res_w = interpret_node(ctx, right_child);
 			if (not res_w) {
 				INTERPRETER_PRINT(
 					aleprln, "Evaluation of while loop body failed."
@@ -118,7 +117,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 		}
 	}
 
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
 } // namespace ast

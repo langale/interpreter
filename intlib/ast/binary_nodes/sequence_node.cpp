@@ -35,18 +35,18 @@
 
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult evaluate(EvaluationContext&, const ale::ast::SequenceNode&)
+Evaluation evaluate(EvaluationContext&, const ale::ast::SequenceNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
 } // namespace ast

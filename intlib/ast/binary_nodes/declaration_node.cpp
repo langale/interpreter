@@ -49,17 +49,18 @@ using namespace std::string_literals;
 #include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_conversion.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/iterators.hpp>
 #include <intlib/ast/utils/evaluation_error_to_string.hpp>
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-[[nodiscard]] static EvaluationResult declare_variable(
+[[nodiscard]] static Evaluation declare_variable(
 	EvaluationContext& ctx,
 	std::string&& var_name,
 	const std::string_view var_type
@@ -79,7 +80,7 @@ namespace ast {
 		INTERPRETER_PRINT(
 			aleprln, "Attempt to redeclare variable {}.", var_name
 		);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Memory_Variable_Already_Exists},
 			Vec{evaluation_function_e::Declaration},
 			Vec{std::format("Attempted to redeclare variable '{}'", var_name)}
@@ -87,16 +88,20 @@ namespace ast {
 	}
 
 	// This is a 'declare' node.
-	ctx.memory.declare_variable(std::move(var_name), {}, var_type);
-	return make_good_evaluation_result<std::any>();
+	ctx.memory.declare_variable(
+		std::move(var_name),
+		{.value = {}, .type = detail::cpp_type_string<void>},
+		var_type
+	);
+	return make_good_evaluation<EvaluationResult>();
 }
 
-[[nodiscard]] static EvaluationResult declare_variable(
+[[nodiscard]] static Evaluation declare_variable(
 	EvaluationContext& ctx,
 	const ale::ast::node_type_e t,
 	std::string&& var_name,
 	const std::string_view var_type,
-	const std::any& value_w
+	const memory::WrappedAny& value_w
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
@@ -113,28 +118,28 @@ namespace ast {
 		INTERPRETER_PRINT(
 			aleprln, "Attempt to redeclare variable {}.", var_name
 		);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Memory_Variable_Already_Exists},
 			Vec{evaluation_function_e::Declaration},
 			Vec{std::format("Attempted to redeclare variable '{}'", var_name)}
 		);
 	}
 
-	std::any value_conv_w = detail::convert_to_ale_type(value_w, var_type);
+	std::optional value_conv_w = detail::convert_to_ale_type(value_w, var_type);
 
-	if (detail::holds_cpp_type<void>(value_conv_w)) {
+	if (not value_conv_w) {
 		INTERPRETER_PRINT(
 			aleprln,
 			"Could not convert value '{}' to a value of type '{}'.",
-			detail::AnyView{value_w},
+			value_w,
 			var_type
 		);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Conversion_Generic},
 			Vec{evaluation_function_e::Declaration},
 			Vec{std::format(
 				"Could not convert value '{}' to a value of type '{}'",
-				detail::AnyView{value_w},
+				value_w,
 				var_type
 			)}
 		);
@@ -144,17 +149,17 @@ namespace ast {
 		aleprln,
 		"Value after conversion to '{}' is: '{}'.",
 		var_type,
-		detail::AnyView{value_conv_w}
+		*value_conv_w
 	);
 
 	if (t == ale::ast::node_type_e::Declaration_Const) {
 		ctx.memory.declare_constant_variable(
-			std::move(var_name), std::move(value_conv_w), var_type
+			std::move(var_name), std::move(*value_conv_w), var_type
 		);
 	}
 	else {
 		ctx.memory.declare_variable(
-			std::move(var_name), std::move(value_conv_w), var_type
+			std::move(var_name), std::move(*value_conv_w), var_type
 		);
 	}
 
@@ -162,10 +167,10 @@ namespace ast {
 		aleprln, "Successfully declared variable '{}'.", variable_name_copy
 	);
 
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
-[[nodiscard]] static EvaluationResult declare_multiple_values_rhs(
+[[nodiscard]] static Evaluation declare_multiple_values_rhs(
 	EvaluationContext& ctx,
 	const ale::ast::DeclarationNode& decl,
 	const ale::ast::node_type_e decl_t,
@@ -173,6 +178,8 @@ namespace ast {
 	const std::unique_ptr<ale::ast::Node>& right_child
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+
 	auto var_iter = make_name_iterator(ctx, left_child);
 	auto var_iter_pos = var_iter.begin();
 	auto var_iter_end = var_iter.end();
@@ -184,64 +191,70 @@ namespace ast {
 	while (var_iter_pos != var_iter_end and value_iter_pos != value_iter_end) {
 		INTERPRETER_PRINT(aleprln, "Going to declare a variable.");
 
-		EvaluationResult var_res = *var_iter_pos;
-		if (not var_res) {
+		Evaluation var_res_w = *var_iter_pos;
+		if (not var_res_w) {
 			INTERPRETER_PRINT(
 				aleprln,
 				"Something went wrong when retrieving the next variable."
 			);
 			INTERPRETER_PRINT(
-				aleprln, "Error: '{}'", var_res.error().errors.at(0)
+				aleprln, "Error: '{}'", var_res_w.error().errors.at(0)
 			);
 			return append_error(
-				std::move(var_res.error()),
+				std::move(var_res_w.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Declaration,
 				"Something went wrong when retrieving the next variable"
 			);
 		}
 
-		EvaluationResult value_res = *value_iter_pos;
-		if (not value_res) {
+		Evaluation value_res_w = *value_iter_pos;
+		if (not value_res_w) {
 			INTERPRETER_PRINT(
 				aleprln, "Something went wrong when computing the next value."
 			);
 			INTERPRETER_PRINT(
-				aleprln, "Error: '{}'", value_res.error().errors.at(0)
+				aleprln, "Error: '{}'", value_res_w.error().errors.at(0)
 			);
 			return append_error(
-				std::move(value_res.error()),
+				std::move(value_res_w.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Declaration,
 				"Something went wrong when retrieving the next value"
 			);
 		}
-		std::any value_w = std::move(*value_res);
-		const std::any *actual_value_w = nullptr;
-		if (detail::holds_cpp_type<memory::RefMemVar>(value_w)) {
+
+		memory::WrappedAny value_w = std::move(*value_res_w);
+		const memory::WrappedAny *actual_value_w = nullptr;
+		if (value_w.type == detail::cpp_type_string<memory::RefMemVar>) {
 			actual_value_w =
-				&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
+				&std::any_cast<memory::RefMemVar>(value_w.value).get().wrap;
 		}
-		else if (detail::holds_cpp_type<memory::RefConstMemVar>(value_w)) {
+		else if (value_w.type ==
+				 detail::cpp_type_string<memory::RefConstMemVar>) {
 			actual_value_w =
-				&std::any_cast<memory::RefConstMemVar>(value_w).get().value_w;
+				&std::any_cast<memory::RefConstMemVar>(value_w.value)
+					 .get()
+					 .wrap;
 		}
 		else {
 			actual_value_w = &value_w;
 		}
 
-		std::any var_name_w = std::move(*var_res);
-		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
+		memory::WrappedAny name_w = std::move(*var_res_w);
+#if defined DEBUG
+		INTERPRETER_PRINT(aleprln, "Container of variable name: {}.", name_w);
+		assert(name_w.type == detail::cpp_type_string<std::string>);
+#endif
+		auto name = std::any_cast<std::string&&>(std::move(name_w.value));
 		const std::string_view var_type = decl.get_variable_type();
 
-		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
+		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", name);
 		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
-		INTERPRETER_PRINT(
-			aleprln, "Of value: '{}'.", detail::AnyView{*actual_value_w}
-		);
+		INTERPRETER_PRINT(aleprln, "Of value: '{}'.", *actual_value_w);
 
-		EvaluationResult declaration_res = declare_variable(
-			ctx, decl_t, std::move(var_name), var_type, *actual_value_w
+		Evaluation declaration_res = declare_variable(
+			ctx, decl_t, std::move(name), var_type, *actual_value_w
 		);
 		if (not declaration_res) {
 			return append_error(
@@ -258,7 +271,7 @@ namespace ast {
 
 	if (var_iter_pos != var_iter_end) {
 		INTERPRETER_PRINT(aleprln, "Too many values in the right hand side");
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Overfull_Right_Hand_Side_Values},
 			Vec{evaluation_function_e::Declaration},
 			Vec{"Too many values in the right hand side"s}
@@ -267,17 +280,17 @@ namespace ast {
 
 	if (value_iter_pos != value_iter_end) {
 		INTERPRETER_PRINT(aleprln, "Too many values in the left hand side");
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Overfull_Left_Hand_Side_Values},
 			Vec{evaluation_function_e::Declaration},
 			Vec{"Too many values in the left hand side"s}
 		);
 	}
 
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
-[[nodiscard]] static EvaluationResult declare_single_values_rhs(
+[[nodiscard]] static Evaluation declare_single_values_rhs(
 	EvaluationContext& ctx,
 	const ale::ast::DeclarationNode& decl,
 	const ale::ast::node_type_e decl_t,
@@ -285,68 +298,75 @@ namespace ast {
 	const std::unique_ptr<ale::ast::Node>& right_child
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
+
+	INTERPRETER_PRINT(aleprln, "Going to make name iterator.");
+
 	auto var_iter = make_name_iterator(ctx, left_child);
 	auto var_iter_pos = var_iter.begin();
 	auto var_iter_end = var_iter.end();
 
-	EvaluationResult compute_res = interpret_node(ctx, right_child);
-	if (not compute_res) {
+	Evaluation rhs_res_w = interpret_node(ctx, right_child);
+	if (not rhs_res_w) {
 		return append_error(
-			std::move(compute_res.error()),
+			std::move(rhs_res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Declaration,
 			"Something went wrong when evaluating a node"
 		);
 	}
 
-	std::any value_w = std::move(*compute_res);
-	const std::any *actual_value_w = nullptr;
-	if (detail::holds_cpp_type<memory::RefMemVar>(value_w)) {
-		INTERPRETER_PRINT(aleprln, "Value is a variable reference.");
-		actual_value_w =
-			&std::any_cast<memory::RefMemVar>(value_w).get().value_w;
+	INTERPRETER_PRINT(aleprln, "Going to retrieve the actual rhs value.");
+
+	memory::WrappedAny rhs_w = std::move(*rhs_res_w);
+	const memory::WrappedAny *actual_rhs_w = nullptr;
+	if (rhs_w.type == detail::cpp_type_string<memory::RefMemVar>) {
+		actual_rhs_w =
+			&std::any_cast<memory::RefMemVar>(rhs_w.value).get().wrap;
 	}
-	else if (detail::holds_cpp_type<memory::RefConstMemVar>(value_w)) {
-		INTERPRETER_PRINT(aleprln, "Value is a variable const-reference.");
-		actual_value_w =
-			&std::any_cast<memory::RefConstMemVar>(value_w).get().value_w;
+	else if (rhs_w.type == detail::cpp_type_string<memory::RefConstMemVar>) {
+		actual_rhs_w =
+			&std::any_cast<memory::RefConstMemVar>(rhs_w.value).get().wrap;
 	}
 	else {
-		actual_value_w = &value_w;
+		actual_rhs_w = &rhs_w;
 	}
 
 	while (var_iter_pos != var_iter_end) {
 		INTERPRETER_PRINT(aleprln, "Going to declare a variable.");
 
-		EvaluationResult var_res = *var_iter_pos;
-		if (not var_res) {
+		Evaluation var_res_w = *var_iter_pos;
+		if (not var_res_w) {
 			INTERPRETER_PRINT(
 				aleprln,
 				"Something went wrong when retrieving the next variable."
 			);
 			INTERPRETER_PRINT(
-				aleprln, "Error: '{}'", var_res.error().errors.at(0)
+				aleprln, "Error: '{}'", var_res_w.error().errors.at(0)
 			);
 			return append_error(
-				std::move(var_res.error()),
+				std::move(var_res_w.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Declaration,
 				"Something went wrong when retrieving the next variable"
 			);
 		}
 
-		std::any var_name_w = std::move(*var_res);
-		auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
-		const std::string_view var_type = decl.get_variable_type();
-
-		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", var_name);
-		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
 		INTERPRETER_PRINT(
-			aleprln, "Of value: '{}'.", detail::AnyView{*actual_value_w}
+			aleprln, "Going to retrieve the name of the variable."
 		);
 
-		EvaluationResult declaration_res = declare_variable(
-			ctx, decl_t, std::move(var_name), var_type, *actual_value_w
+		memory::WrappedAny name_w = std::move(*var_res_w);
+
+		auto name = std::any_cast<std::string&&>(std::move(name_w.value));
+		const std::string_view var_type = decl.get_variable_type();
+
+		INTERPRETER_PRINT(aleprln, "Of name:  '{}'.", name);
+		INTERPRETER_PRINT(aleprln, "Of type:  '{}'.", var_type);
+		INTERPRETER_PRINT(aleprln, "Of value: '{}'.", *actual_rhs_w);
+
+		Evaluation declaration_res = declare_variable(
+			ctx, decl_t, std::move(name), var_type, *actual_rhs_w
 		);
 		if (not declaration_res) {
 			return append_error(
@@ -359,10 +379,10 @@ namespace ast {
 		++var_iter_pos;
 	}
 
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
-EvaluationResult
+Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
@@ -379,22 +399,25 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		auto var_iter_end = var_iter.end();
 
 		while (var_iter_pos != var_iter_end) {
-			EvaluationResult res = *var_iter_pos;
-			if (not res) {
+			Evaluation res_w = *var_iter_pos;
+			if (not res_w) {
 				return append_error(
-					std::move(res.error()),
+					std::move(res_w.error()),
 					evaluation_error_e::List_Iteration,
 					evaluation_function_e::Declaration,
 					"Something went wrong when retrieving the next variable"
 				);
 			}
 
-			std::any var_name_w = std::move(*res);
-			auto var_name = std::any_cast<std::string&&>(std::move(var_name_w));
+			memory::WrappedAny name_w = std::move(*res_w);
+#if defined DEBUG
+			assert(name_w.type == detail::cpp_type_string<std::string>);
+#endif
+			auto name = std::any_cast<std::string&&>(std::move(name_w.value));
 			const std::string_view var_type = decl.get_variable_type();
 
 			auto declaration_res =
-				declare_variable(ctx, std::move(var_name), var_type);
+				declare_variable(ctx, std::move(name), var_type);
 
 			if (not declaration_res) {
 				return append_error(
@@ -406,7 +429,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 			}
 			++var_iter_pos;
 		}
-		return make_good_evaluation_result<std::any>();
+		return make_good_evaluation<EvaluationResult>();
 	}
 
 	const auto& right_child = decl.get_right_child();
