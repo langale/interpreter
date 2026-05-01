@@ -38,7 +38,8 @@
 #include <ale/ast/Node.hpp>
 
 #include <intlib/ast/SequenceIndices.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace ast {
@@ -48,13 +49,13 @@ public:
 
 	/* MODIFIERS */
 
-	void
-	set_expression(const std::unique_ptr<ale::ast::Node> * const expr) noexcept
+	void set_expression(const std::unique_ptr<ale::ast::Node> * const expr
+	) noexcept
 	{
 		m_expression = expr;
 	}
 
-	[[nodiscard]] EvaluationResult make_distances();
+	[[nodiscard]] Evaluation make_distances();
 
 	void
 	set_working_distance(const uint64_t depth, const int64_t distance) noexcept
@@ -67,8 +68,8 @@ public:
 
 	/* GETTERS */
 
-	[[nodiscard]] int64_t
-	get_working_distance(const uint64_t depth) const noexcept
+	[[nodiscard]] int64_t get_working_distance(const uint64_t depth
+	) const noexcept
 	{
 #if defined DEBUG
 		assert(depth < m_working_distances.size());

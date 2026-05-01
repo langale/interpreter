@@ -36,15 +36,16 @@
 #if defined DEBUG
 #include <cassert>
 #endif
+
 #include <optional>
 #include <ranges>
 
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 
 namespace intlib {
 namespace ast {
 
-EvaluationResult SequenceExecutionEnvironment::make_distances()
+Evaluation SequenceExecutionEnvironment::make_distances()
 {
 	const auto depth_levels = m_first_indices.depth();
 	m_distances.resize(depth_levels, 0);
@@ -56,7 +57,7 @@ EvaluationResult SequenceExecutionEnvironment::make_distances()
 		for (const auto& [var, first_index] : first) {
 
 			if (not last.contains(var)) {
-				return make_bad_evaluation_result(
+				return make_bad_evaluation(
 					Vec{evaluation_error_e::
 							Sequence_Environment_Missing_Right_Variable},
 					Vec{evaluation_function_e::
@@ -77,7 +78,7 @@ EvaluationResult SequenceExecutionEnvironment::make_distances()
 				distance = new_distance;
 			}
 			else if (*distance != new_distance) {
-				return make_bad_evaluation_result(
+				return make_bad_evaluation(
 					Vec{evaluation_error_e::
 							Sequence_Environment_Mismatch_Distance},
 					Vec{evaluation_function_e::
@@ -103,7 +104,7 @@ EvaluationResult SequenceExecutionEnvironment::make_distances()
 	m_working_distances.resize(m_distances.size());
 	std::ranges::fill(m_working_distances, 0);
 
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
 } // namespace ast
