@@ -38,7 +38,7 @@
 #include <ale/logger/Logger.hpp>
 #include <ale/logger/AutomaticTab.hpp>
 
-#define INTERPRETER_ENTER_AST_FUNCTION(func)                                   \
+#define INTERPRETER_ENTER_AST_FUNCTION                                         \
 	ale::logger::GreenTab ale_tabulator_variable_do_not_use(                   \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
@@ -48,11 +48,11 @@
 			std::format_string<types_t...> fmt, types_t&&...args               \
 		)                                                                      \
 		{                                                                      \
-			func(fmt, std::forward<types_t>(args)...);                         \
+			ale::logger::println(fmt, std::forward<types_t>(args)...);         \
 		}                                                                      \
 	)
 
-#define INTERPRETER_ENTER_ARITHMETIC_FUNCTION(func)                            \
+#define INTERPRETER_ENTER_ARITHMETIC_FUNCTION                                  \
 	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
@@ -62,11 +62,11 @@
 			std::format_string<types_t...> fmt, types_t&&...args               \
 		)                                                                      \
 		{                                                                      \
-			func(fmt, std::forward<types_t>(args)...);                         \
+			ale::logger::println(fmt, std::forward<types_t>(args)...);         \
 		}                                                                      \
 	)
 
-#define INTERPRETER_ENTER_COMPARISON_FUNCTION(func)                            \
+#define INTERPRETER_ENTER_COMPARISON_FUNCTION                                  \
 	ale::logger::RedTab ale_tabulator_variable_do_not_use(                     \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
@@ -76,11 +76,11 @@
 			std::format_string<types_t...> fmt, types_t&&...args               \
 		)                                                                      \
 		{                                                                      \
-			func(fmt, std::forward<types_t>(args)...);                         \
+			ale::logger::println(fmt, std::forward<types_t>(args)...);         \
 		}                                                                      \
 	)
 
-#define INTERPRETER_ENTER_MEMORY_FUNCTION(func)                                \
+#define INTERPRETER_ENTER_MEMORY_FUNCTION                                      \
 	ale::logger::PurpleTab ale_tabulator_variable_do_not_use(                  \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
@@ -90,11 +90,11 @@
 			std::format_string<types_t...> fmt, types_t&&...args               \
 		)                                                                      \
 		{                                                                      \
-			func(fmt, std::forward<types_t>(args)...);                         \
+			ale::logger::println(fmt, std::forward<types_t>(args)...);         \
 		}                                                                      \
 	)
 
-#define INTERPRETER_ENTER_DETAIL_FUNCTION(func)                                \
+#define INTERPRETER_ENTER_DETAIL_FUNCTION                                      \
 	ale::logger::YellowTab ale_tabulator_variable_do_not_use(                  \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
@@ -104,14 +104,12 @@
 			std::format_string<types_t...> fmt, types_t&&...args               \
 		)                                                                      \
 		{                                                                      \
-			func(fmt, std::forward<types_t>(args)...);                         \
+			ale::logger::println(fmt, std::forward<types_t>(args)...);         \
 		}                                                                      \
 	)
 
-#define ALE_FUNC_LOCATION_NAME(func) func##loc
-
-#define INTERPRETER_PRINT(func, fmt, ...)                                      \
-	ALE_FUNC_LOCATION_NAME(func)(                                              \
+#define INTERPRETER_PRINT(fmt, ...)                                            \
+	ale::logger::printlnloc(                                                   \
 		ale::logger::SourceLocation(                                           \
 			std::source_location::current(), INTERPRETER_PROJECT_DIRECTORY     \
 		),                                                                     \
@@ -120,16 +118,16 @@
 
 #else
 
-#define INTERPRETER_ENTER_AST_FUNCTION(func)
+#define INTERPRETER_ENTER_AST_FUNCTION
 
-#define INTERPRETER_ENTER_ARITHMETIC_FUNCTION(func)
+#define INTERPRETER_ENTER_ARITHMETIC_FUNCTION
 
-#define INTERPRETER_ENTER_COMPARISON_FUNCTION(func)
+#define INTERPRETER_ENTER_COMPARISON_FUNCTION
 
-#define INTERPRETER_ENTER_MEMORY_FUNCTION(func)
+#define INTERPRETER_ENTER_MEMORY_FUNCTION
 
-#define INTERPRETER_ENTER_DETAIL_FUNCTION(func)
+#define INTERPRETER_ENTER_DETAIL_FUNCTION
 
-#define INTERPRETER_PRINT(func, fmt, ...)
+#define INTERPRETER_PRINT(fmt, ...)
 
 #endif
