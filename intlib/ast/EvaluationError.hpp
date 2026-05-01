@@ -31,24 +31,22 @@
  *
  ********************************************************************/
 
+#pragma once
+
+#include <vector>
+#include <string>
+
 #include <intlib/ast/utils/evaluation_error_enum.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/utils/evaluation_function_enum.hpp>
 
 namespace intlib {
 namespace ast {
 
-EvaluationResult append_error(
-	EvaluationError&& err,
-	const evaluation_error_e t,
-	const evaluation_function_e f,
-	std::string&& msg
-)
-{
-	err.errors.push_back(t);
-	err.functions.push_back(f);
-	err.messages.push_back(std::move(msg));
-	return make_bad_evaluation_result(std::move(err));
-}
+struct EvaluationError {
+	std::vector<evaluation_error_e> errors;
+	std::vector<evaluation_function_e> functions;
+	std::vector<std::string> messages;
+};
 
 } // namespace ast
 } // namespace intlib

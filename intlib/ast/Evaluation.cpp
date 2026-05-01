@@ -31,14 +31,24 @@
  *
  ********************************************************************/
 
-#pragma once
-
-#include <intlib/memory/WrappedAny.hpp>
+#include <intlib/ast/utils/evaluation_error_enum.hpp>
+#include <intlib/ast/Evaluation.hpp>
 
 namespace intlib {
 namespace ast {
 
-using EvaluationResult = memory::WrappedAny;
+Evaluation append_error(
+	EvaluationError&& err,
+	const evaluation_error_e t,
+	const evaluation_function_e f,
+	std::string&& msg
+)
+{
+	err.errors.push_back(t);
+	err.functions.push_back(f);
+	err.messages.push_back(std::move(msg));
+	return make_bad_evaluation(std::move(err));
+}
 
 } // namespace ast
 } // namespace intlib
