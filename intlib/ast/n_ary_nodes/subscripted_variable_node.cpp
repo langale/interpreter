@@ -47,13 +47,13 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
+Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	EvaluationResult res = make_subscripted_variable_name(ctx, v);
-	if (not res) {
+	Evaluation res_w = make_subscripted_variable_name(ctx, v);
+	if (not res_w) {
 		INTERPRETER_PRINT(
 			aleprln,
 			"Full variable name of subscripted variable {} could not be "
@@ -61,7 +61,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 			v.get_variable_name()
 		);
 		return append_error(
-			std::move(res.error()),
+			std::move(res_w.error()),
 			evaluation_error_e::Valueless_Variable,
 			evaluation_function_e::Subscripted_Variable,
 			std::format(
@@ -72,14 +72,18 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 		);
 	}
 
-	const std::any& var_name_w = *res;
-	const auto& var_name = std::any_cast<const std::string&>(var_name_w);
+	const memory::WrappedAny& var_name_w = *res_w;
+#if defined DEBUG
+	assert(var_name_w.type == detail::cpp_type_string<std::string>);
+#endif
+
+	const auto& var_name = std::any_cast<const std::string&>(var_name_w.value);
 
 	if (not ctx.memory.variable_exists(var_name)) {
 		INTERPRETER_PRINT(
 			aleprln, "Variable '{}' is not defined in this scope.", var_name
 		);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Undefined_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},
 			Vec{std::format(
@@ -90,9 +94,9 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 
 	memory::VariableValue& variable = ctx.memory.get_variable(var_name);
 
-	if (not variable.value_w.has_value()) {
+	if (not variable.wrap.value.has_value()) {
 		INTERPRETER_PRINT(aleprln, "Variable '{}' has no value.", var_name);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Subscripted_Variable},
 			Vec{std::format("Variable '{}' has no value", var_name)}
@@ -100,11 +104,13 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 	}
 
 	if (variable.is_constant) {
-		return make_good_evaluation_result<memory::RefConstMemVar>(
-			std::cref(variable)
-		);
+		return make_good_evaluation<
+			memory::
+				WrappedAny>(std::cref(variable), detail::cpp_type_string<memory::RefConstMemVar>);
 	}
-	return make_good_evaluation_result<memory::RefMemVar>(std::ref(variable));
+	return make_good_evaluation<
+		memory::
+			WrappedAny>(std::ref(variable), detail::cpp_type_string<memory::RefMemVar>);
 }
 
 } // namespace ast

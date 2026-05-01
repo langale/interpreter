@@ -47,8 +47,10 @@
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/detail/any_output.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 namespace intlib {
 namespace ast {
@@ -95,57 +97,56 @@ namespace ast {
 	return false;
 }
 
-EvaluationResult evaluate_logical_node(
+Evaluation evaluate_logical_node(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	EvaluationResult res_int = interpret_node(ctx, c);
-	if (not res_int) {
+	Evaluation res_w = interpret_node(ctx, c);
+	if (not res_w) {
 		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
 		return append_error(
-			std::move(res_int.error()),
+			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Logical,
 			"Node evaluation failed"
 		);
 	}
 
-	const std::any& res_w = *res_int;
-	INTERPRETER_PRINT(aleprln, "Evaluation of node '{}'", detail::AnyView{res_w});
+	const EvaluationResult& res = *res_w;
+	INTERPRETER_PRINT(aleprln, "Evaluation of node '{}'", res);
 
-	if (detail::holds_cpp_type<void>(res_w)) {
+	if (res.type == detail::cpp_type_string<void>) {
 		INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 		return append_error(
-			std::move(res_int.error()),
+			std::move(res_w.error()),
 			evaluation_error_e::Evaluation_Of_Node_Is_Void,
 			evaluation_function_e::Logical,
 			"Evaluation of node produced a void value"
 		);
 	}
 
-	const std::optional r_conv_w = detail::any_to_bool(res_w);
+	const std::optional r_conv_w = detail::any_to_bool(res);
 	if (not r_conv_w) {
 		INTERPRETER_PRINT(
 			aleprln,
-			"Evaluation of node '{}' could not be converted to a Boolean value "
-			"'{}'.",
-			detail::AnyView{res_w},
-			detail::AnyView{r_conv_w}
+			"Value '{}' could not be converted to a Boolean value.",
+			res
 		);
 		return append_error(
-			std::move(res_int.error()),
+			std::move(res_w.error()),
 			evaluation_error_e::Conversion_To_Bool_Failed,
 			evaluation_function_e::Logical,
 			"Evaluation of node could not be converted to a Boolean value"
 		);
 	}
 
-	return make_good_evaluation_result<bool>(*r_conv_w);
+	return make_good_evaluation<
+		memory::WrappedAny>(*r_conv_w, detail::cpp_type_string<bool>);
 }
 
-EvaluationResult evaluate(
+Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::LogicalNode& v,
 	const ale::ast::node_type_e t
@@ -155,33 +156,45 @@ EvaluationResult evaluate(
 
 	const auto& children = v.get_children();
 
-	EvaluationResult res = evaluate_logical_node(ctx, children.at(0));
-	if (not res) {
+	Evaluation eval_w = evaluate_logical_node(ctx, children.at(0));
+	if (not eval_w) {
 		INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
-		return res.error();
+		return eval_w;
 	}
 
 	const bool when_to_break = break_when(t);
 
-	bool rc_value = std::any_cast<bool>(*res);
+	const EvaluationResult& res = *eval_w;
+#if defined DEBUG
+	assert(res.type == detail::cpp_type_string<bool>);
+#endif
+
+	bool acc_value = std::any_cast<bool>(res.value);
+
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		if (rc_value == when_to_break) {
+		if (acc_value == when_to_break) {
 			break;
 		}
 
-		EvaluationResult rv = evaluate_logical_node(ctx, c);
-		if (not rv) {
+		eval_w = evaluate_logical_node(ctx, c);
+		if (not eval_w) {
 			INTERPRETER_PRINT(aleprln, "Node evaluation failed.");
-			return res.error();
+			return eval_w;
 		}
 
-		const bool rv_value = std::any_cast<bool>(*rv);
-		rc_value = compute_logical_expression(t, rc_value, rv_value);
+		const EvaluationResult& eval = *eval_w;
+#if defined DEBUG
+		assert(eval.type == detail::cpp_type_string<bool>);
+#endif
+		const bool new_value = std::any_cast<bool>(eval.value);
+
+		acc_value = compute_logical_expression(t, acc_value, new_value);
 	}
 
-	return make_good_evaluation_result<std::any>(rc_value);
+	return make_good_evaluation<
+		EvaluationResult>(acc_value, detail::cpp_type_string<bool>);
 }
 
 } // namespace ast

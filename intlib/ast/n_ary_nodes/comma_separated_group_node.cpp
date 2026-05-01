@@ -41,14 +41,14 @@
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
+Evaluation
 evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
@@ -56,7 +56,7 @@ evaluate(EvaluationContext&, const ale::ast::CommaSeparatedGroupNode& v)
 	INTERPRETER_PRINT(
 		aleprln, "Cannot evaluate nodes of type '{}'.", v.get_node_type()
 	);
-	return make_bad_evaluation_result(
+	return make_bad_evaluation(
 		Vec{evaluation_error_e::Evaluation_Of_Node_Is_Forbidden},
 		Vec{evaluation_function_e::Comma_Separated_Group},
 		Vec{std::format(

@@ -45,14 +45,14 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
+Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
 	ctx.memory.get_current_scope().push_local_scope();
 	for (const auto& w : v.get_children()) {
-		EvaluationResult res_w = interpret_node(ctx, w);
+		Evaluation res_w = interpret_node(ctx, w);
 		if (not res_w) {
 			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 			return append_error(
@@ -71,7 +71,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 		}
 	}
 	ctx.memory.get_current_scope().pop_local_scope();
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
 } // namespace ast

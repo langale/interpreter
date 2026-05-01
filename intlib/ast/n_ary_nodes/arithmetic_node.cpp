@@ -48,15 +48,45 @@ using namespace std::string_literals;
 #include <intlib/detail/any_output.hpp>
 #include <intlib/arithmetic/arithmetic.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult evaluate(
+[[nodiscard]] static Evaluation
+node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
+{
+	Evaluation eval_res = interpret_node(ctx, c);
+	if (not eval_res) {
+		INTERPRETER_PRINT(
+			aleprln, "Evaluation of node within arithmetic node failed."
+		);
+		return make_bad_evaluation(
+			Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
+			Vec{evaluation_function_e::Arithmetic},
+			Vec{"Evaluation of node within arithmetic node failed"s}
+		);
+	}
+
+	EvaluationResult res = std::move(*eval_res);
+	if (res.type == detail::cpp_type_string<void>) {
+		INTERPRETER_PRINT(aleprln, "Evaluation of node returned a void value.");
+		return make_bad_evaluation(
+			Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},
+			Vec{evaluation_function_e::Arithmetic},
+			Vec{"Evaluation of node returned a void value"s}
+		);
+	}
+	return make_good_evaluation<EvaluationResult>(
+		std::move(res.value), res.type
+	);
+}
+
+Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ArithmeticNode& v,
 	const ale::ast::node_type_e t
@@ -69,83 +99,46 @@ EvaluationResult evaluate(
 	assert(children.size() >= 2);
 #endif
 
-	const auto node_eval = [&](const std::unique_ptr<ale::ast::Node>& c
-						   ) -> EvaluationResult
-	{
-		EvaluationResult res = interpret_node(ctx, c);
-		if (not res) {
-			INTERPRETER_PRINT(
-				aleprln, "Evaluation of node within arithmetic node failed."
-			);
-			return make_bad_evaluation_result(
-				Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
-				Vec{evaluation_function_e::Arithmetic},
-				Vec{"Evaluation of node within arithmetic node failed"s}
-			);
-		}
-
-		if (detail::holds_cpp_type<void>(*res)) {
-			INTERPRETER_PRINT(
-				aleprln, "Evaluation of node returned a void value."
-			);
-			return make_bad_evaluation_result(
-				Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},
-				Vec{evaluation_function_e::Arithmetic},
-				Vec{"Evaluation of node returned a void value"s}
-			);
-		}
-		return make_good_evaluation_result<std::any>(std::move(*res));
-	};
-
-	EvaluationResult res = node_eval(children[0]);
-	if (not res) {
-		return append_error(
-			std::move(res.error()),
-			evaluation_error_e::Evaluation_Of_Node_Failed,
-			evaluation_function_e::Arithmetic,
-			"Evaluation of node failed"
-		);
+	Evaluation eval_res = node_eval(ctx, children[0]);
+	if (not eval_res) {
+		return eval_res;
 	}
 
-	std::any expr_res_w = std::move(*res);
+	EvaluationResult expr_res_1 = std::move(*eval_res);
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		res = node_eval(c);
-		if (not res) {
-			return append_error(
-				std::move(res.error()),
-				evaluation_error_e::Evaluation_Of_Node_Failed,
-				evaluation_function_e::Arithmetic,
-				"Evaluation of node failed"
-			);
+		eval_res = node_eval(ctx, c);
+		if (not eval_res) {
+			return eval_res;
 		}
 
-		std::any operation_res_w =
-			arithmetic::any_arithmetic(t, expr_res_w, *res);
+		EvaluationResult expr_res_2 = std::move(*eval_res);
+		std::optional<EvaluationResult> operation_res =
+			arithmetic::any_arithmetic(t, expr_res_1, expr_res_2);
 
-		if (not operation_res_w.has_value()) {
+		if (not operation_res.has_value()) {
 			INTERPRETER_PRINT(
 				aleprln,
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()
 			);
-			return make_bad_evaluation_result(
+			return make_bad_evaluation(
 				Vec{evaluation_error_e::Arithmetic_Operation_Failed},
 				Vec{evaluation_function_e::Arithmetic},
 				Vec{std::format(
 					"Could not operate two std::any values: '{}' and '{}'",
-					detail::AnyView{expr_res_w},
-					detail::AnyView{res}
+					expr_res_1,
+					expr_res_2
 				)}
 			);
 		}
 
-		expr_res_w = std::move(operation_res_w);
+		expr_res_1 = std::move(*operation_res);
 	}
 
-	return make_good_evaluation_result<std::any>(std::move(expr_res_w));
+	return make_good_evaluation<EvaluationResult>(std::move(expr_res_1));
 }
 
 } // namespace ast

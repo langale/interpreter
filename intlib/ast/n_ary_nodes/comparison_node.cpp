@@ -44,12 +44,12 @@ using namespace std::string_literals;
 #include <ale/ast/n_ary_nodes/ComparisonNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
-#include <intlib/ast/evaluation.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 #include <intlib/comparison/comparison.hpp>
 
 namespace intlib {
@@ -57,7 +57,7 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult evaluate(
+Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::ComparisonNode& v,
 	const ale::ast::node_type_e t
@@ -71,9 +71,9 @@ EvaluationResult evaluate(
 	assert(children.size() > 0);
 #endif
 
-	std::any previous_w;
+	EvaluationResult previous_w;
 	{
-		EvaluationResult res = interpret_node(ctx, children.at(0));
+		Evaluation res = interpret_node(ctx, children.at(0));
 		if (not res.has_value()) {
 			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 			return append_error(
@@ -89,17 +89,17 @@ EvaluationResult evaluate(
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		EvaluationResult res = interpret_node(ctx, c);
-		if (not res.has_value()) {
+		Evaluation res_w = interpret_node(ctx, c);
+		if (not res_w.has_value()) {
 			INTERPRETER_PRINT(aleprln, "Evaluation of node failed.");
 			return append_error(
-				std::move(res.error()),
+				std::move(res_w.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				evaluation_function_e::Comparison,
 				"Evaluation of node failed"
 			);
 		}
-		std::any current_w = std::move(*res);
+		EvaluationResult current_w = std::move(*res_w);
 
 		const std::optional<bool> comparison_result_w =
 			comparison::any_comparison(t, previous_w, current_w);
@@ -108,27 +108,29 @@ EvaluationResult evaluate(
 			INTERPRETER_PRINT(
 				aleprln,
 				"Could not compare two std::any values: '{}' and '{}'.",
-				detail::AnyView{previous_w},
-				detail::AnyView{current_w}
+				previous_w,
+				current_w
 			);
-			return make_bad_evaluation_result(
+			return make_bad_evaluation(
 				Vec{evaluation_error_e::Comparison_Operation_Failed},
 				Vec{evaluation_function_e::Comparison},
 				Vec{std::format(
 					"Could not compare two std::any values: '{}' and '{}'",
-					detail::AnyView{previous_w},
-					detail::AnyView{current_w}
+					previous_w,
+					current_w
 				)}
 			);
 		}
 
-		if (not *comparison_result_w) {
-			return false;
+		if (not*comparison_result_w) {
+			return make_good_evaluation<
+				EvaluationResult>(false, detail::cpp_type_string<bool>);
 		}
 		previous_w = std::move(current_w);
 	}
 
-	return true;
+	return make_good_evaluation<
+		EvaluationResult>(true, detail::cpp_type_string<bool>);
 }
 
 } // namespace ast

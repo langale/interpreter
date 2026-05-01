@@ -38,7 +38,7 @@
 #include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
@@ -46,11 +46,11 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult evaluate(EvaluationContext&, const ale::ast::ProgramNode&)
+Evaluation evaluate(EvaluationContext&, const ale::ast::ProgramNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
 } // namespace ast
