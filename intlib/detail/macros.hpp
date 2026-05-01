@@ -33,19 +33,14 @@
 
 #pragma once
 
-#include <concepts>
 #include <stdfloat>
 #include <cstdint>
-#include <any>
+
+#include <intlib/memory/WrappedAny.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace detail {
-
-template <typename type_t>
-[[nodiscard]] double to_double(const type_t& x) noexcept
-{
-	return static_cast<double>(x);
-}
 
 template <typename type_t>
 [[nodiscard]] std::float64_t to_float64(const type_t& x) noexcept
@@ -65,13 +60,12 @@ template <typename type_t>
 	return static_cast<int64_t>(x);
 }
 
-template <std::integral type_t>
-[[nodiscard]] constexpr std::any adapt_type(type_t v) noexcept
+[[nodiscard]] constexpr memory::WrappedAny adapt_type(const int64_t v) noexcept
 {
 	if (v >= 0) {
-		return detail::to_uint64(v);
+		return {.value = to_uint64(v), .type = cpp_type_string<uint64_t>};
 	}
-	return detail::to_int64(v);
+	return {.value = to_int64(v), .type = cpp_type_string<int64_t>};
 }
 
 } // namespace detail
