@@ -36,6 +36,7 @@
 #include <string>
 
 #include <intlib/memory/WrappedAny.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace memory {
@@ -65,4 +66,16 @@ using RefMemVar = std::reference_wrapper<VariableValue>;
 using RefConstMemVar = std::reference_wrapper<const VariableValue>;
 
 } // namespace memory
+
+namespace detail {
+
+template <>
+constexpr inline std::string_view cpp_type_string<memory::RefMemVar> =
+	"VariableValue&";
+
+template <>
+constexpr inline std::string_view cpp_type_string<memory::RefConstMemVar> =
+	"const VariableValue&";
+
+} // namespace detail
 } // namespace intlib
