@@ -34,7 +34,7 @@
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/detail/any_type.hpp>
 
@@ -43,7 +43,7 @@ namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
+Evaluation
 evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
@@ -54,7 +54,7 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 		INTERPRETER_PRINT(
 			aleprln, "Variable '{}' is not defined in this scope.", name
 		);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Variable},
 			Vec{std::format("Variable '{}' is not defined in this scope.", name)
@@ -64,9 +64,9 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 
 	memory::VariableValue& variable = ctx.memory.get_variable(name);
 
-	if (not variable.value_w.has_value()) {
+	if (variable.wrap.type == detail::cpp_type_string<void>) {
 		INTERPRETER_PRINT(aleprln, "Variable '{}' has no value.", name);
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Valueless_Variable},
 			Vec{evaluation_function_e::Variable},
 			Vec{std::format("Variable '{}' has no value.", name)}
@@ -74,11 +74,13 @@ evaluate(const EvaluationContext& ctx, const ale::ast::VariableNode& v)
 	}
 
 	if (variable.is_constant) {
-		return make_good_evaluation_result<memory::RefConstMemVar>(
-			std::cref(variable)
-		);
+		return make_good_evaluation<
+			memory::
+				WrappedAny>(std::cref(variable), detail::cpp_type_string<memory::RefConstMemVar>);
 	}
-	return make_good_evaluation_result<memory::RefMemVar>(std::ref(variable));
+	return make_good_evaluation<
+		memory::
+			WrappedAny>(std::ref(variable), detail::cpp_type_string<memory::RefMemVar>);
 }
 
 } // namespace ast

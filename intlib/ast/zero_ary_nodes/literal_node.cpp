@@ -40,45 +40,50 @@
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralSignedIntegerNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
+Evaluation
 evaluate(const EvaluationContext&, const ale::ast::LiteralStringNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<std::string>(v.get_value());
+	return make_good_evaluation<
+		EvaluationResult>(v.get_value(), detail::cpp_type_string<std::string>);
 }
 
-EvaluationResult
+Evaluation
 evaluate(const EvaluationContext&, const ale::ast::LiteralDecimalNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<std::float64_t>(v.get_value());
+	return make_good_evaluation<
+		EvaluationResult>(static_cast<std::float64_t>(v.get_value()), detail::cpp_type_string<std::float64_t>);
 }
 
-EvaluationResult evaluate(
+Evaluation evaluate(
 	const EvaluationContext&, const ale::ast::LiteralUnsignedIntegerNode& v
 )
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<uint64_t>(v.get_value());
+	return make_good_evaluation<
+		EvaluationResult>(static_cast<uint64_t>(v.get_value()), detail::cpp_type_string<uint64_t>);
 }
 
-EvaluationResult
+Evaluation
 evaluate(const EvaluationContext&, const ale::ast::LiteralSignedIntegerNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<int64_t>(v.get_value());
+	return make_good_evaluation<
+		EvaluationResult>(static_cast<int64_t>(v.get_value()), detail::cpp_type_string<int64_t>);
 }
 
 } // namespace ast

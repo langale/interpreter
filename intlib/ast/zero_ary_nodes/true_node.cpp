@@ -34,20 +34,21 @@
 #include <ale/ast/zero_ary_nodes/LiteralTrueNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-EvaluationResult
-evaluate(const EvaluationContext&, const ale::ast::LiteralTrueNode&)
+Evaluation evaluate(const EvaluationContext&, const ale::ast::LiteralTrueNode&)
 {
 	INTERPRETER_ENTER_AST_FUNCTION(aleprln);
 
-	return make_good_evaluation_result<bool>(true);
+	return make_good_evaluation<
+		EvaluationResult>(true, detail::cpp_type_string<bool>);
 }
 
 } // namespace ast
