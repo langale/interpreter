@@ -34,13 +34,15 @@
 #pragma once
 
 #include <string>
-#include <any>
+
+#include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
 namespace detail {
 
-[[nodiscard]] std::any
-convert_to_ale_type(const std::any& value_w, std::string_view to_ale_type);
+[[nodiscard]] std::optional<memory::WrappedAny> convert_to_ale_type(
+	const memory::WrappedAny& value, const std::string_view ale_type
+);
 
 } // namespace detail
 } // namespace intlib

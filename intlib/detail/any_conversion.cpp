@@ -32,69 +32,72 @@
  ********************************************************************/
 
 #include <string>
-#include <any>
 
-#include <ale/logger/Logger.hpp>
+#include <ale/detail/make_optional.hpp>
 
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/detail/type_string_ale.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/logger/macros.hpp>
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 namespace intlib {
 namespace detail {
 
 #define aleprln ale::logger::println
 
-#define OPTIONAL_TO_ANY(func, value)                                           \
+#define OPTIONAL_TO_ANY(func, value, CppType)                                  \
 	const auto o = func(value);                                                \
 	if (o) {                                                                   \
-		return std::any{*o};                                                   \
+		return ale::detail::make_optional<                                     \
+			memory::WrappedAny>(*o, detail::cpp_type_string<CppType>);         \
 	}                                                                          \
 	return {};
 
-#define TEST(test_ale_type)                                                    \
-	if (to_ale_type == (test_ale_type)) {                                      \
-		using CppType = AleToCpp_t<test_ale_type>;                             \
-		OPTIONAL_TO_ANY(any_to_numeric<CppType>, value_w);                     \
+#define TEST(test_ale_type)                                                                              \
+	if (ale_type == (test_ale_type)) {                                                                   \
+		INTERPRETER_PRINT(                                                                               \
+			aleprln, "Found a match at type '{}'.", test_ale_type                                        \
+		);                                                                                               \
+		using CppType = AleToCpp_t<test_ale_type>;                                                       \
+		INTERPRETER_PRINT(aleprln, "Corresponding C++ type is '{}'.", detail::cpp_type_string<CppType>); \
+		OPTIONAL_TO_ANY(any_to_numeric<CppType>, value, CppType);                                        \
 	}
 
-std::any
-convert_to_ale_type(const std::any& value_w, const std::string_view to_ale_type)
+std::optional<memory::WrappedAny> convert_to_ale_type(
+	const memory::WrappedAny& value, const std::string_view ale_type
+)
 {
 	INTERPRETER_ENTER_DETAIL_FUNCTION(aleprln);
 
 	INTERPRETER_PRINT(
-		aleprln,
-		"Convert std::any object to a value of ALE type '{}'.",
-		to_ale_type
+		aleprln, "Convert '{}' to a value of ALE type '{}'.", value, ale_type
 	);
 
-	if (to_ale_type == bool_ale) {
-		OPTIONAL_TO_ANY(any_to_bool, value_w);
+	if (ale_type == ale_bool) {
+		OPTIONAL_TO_ANY(any_to_bool, value, bool);
 	}
 
-	if (is_ale_type_numeric(to_ale_type)) {
-		TEST(i8_ale);
-		TEST(u8_ale);
+	if (is_ale_type_numeric(ale_type)) {
+		TEST(ale_i8);
+		TEST(ale_u8);
 
-		TEST(i16_ale);
-		TEST(u16_ale);
+		TEST(ale_i16);
+		TEST(ale_u16);
 
-		TEST(i32_ale);
-		TEST(u32_ale);
+		TEST(ale_i32);
+		TEST(ale_u32);
 
-		TEST(i64_ale);
-		TEST(u64_ale);
+		TEST(ale_i64);
+		TEST(ale_u64);
 
-		TEST(f16_ale);
-		TEST(f32_ale);
-		TEST(f64_ale);
+		TEST(ale_f16);
+		TEST(ale_f32);
+		TEST(ale_f64);
 	}
 
-	INTERPRETER_PRINT(
-		aleprln, "Unhandled conversion to type '{}'.", to_ale_type
-	);
+	INTERPRETER_PRINT(aleprln, "Unhandled conversion to type '{}'.", ale_type);
 
 	return {};
 }

@@ -39,22 +39,50 @@
 namespace intlib {
 namespace detail {
 
-std::optional<bool> any_to_bool(const std::any& value_w) noexcept
+std::optional<bool> any_to_bool(const memory::WrappedAny& value) noexcept
 {
-	const std::string type = get_type_name(value_w);
+	if (value.type == detail::cpp_type_string<bool>) {
+		return std::any_cast<bool>(value.value);
+	}
 
-	if (detail::is_cpp_basic_type<bool>(type)) {
-		return std::any_cast<bool>(value_w);
+	if (value.type == detail::cpp_type_string<int8_t>) {
+		return static_cast<bool>(std::any_cast<int8_t>(value.value));
 	}
-	if (detail::is_cpp_basic_type<int64_t>(type)) {
-		return std::any_cast<int64_t>(value_w);
+	if (value.type == detail::cpp_type_string<uint8_t>) {
+		return static_cast<bool>(std::any_cast<uint8_t>(value.value));
 	}
-	if (detail::is_cpp_basic_type<uint64_t>(type)) {
-		return std::any_cast<uint64_t>(value_w);
+
+	if (value.type == detail::cpp_type_string<int16_t>) {
+		return static_cast<bool>(std::any_cast<int16_t>(value.value));
 	}
-	if (detail::is_cpp_basic_type<double>(type)) {
-		return to_int64(std::any_cast<double>(value_w));
+	if (value.type == detail::cpp_type_string<uint16_t>) {
+		return static_cast<bool>(std::any_cast<uint16_t>(value.value));
 	}
+
+	if (value.type == detail::cpp_type_string<int32_t>) {
+		return static_cast<bool>(std::any_cast<int32_t>(value.value));
+	}
+	if (value.type == detail::cpp_type_string<uint32_t>) {
+		return static_cast<bool>(std::any_cast<uint32_t>(value.value));
+	}
+
+	if (value.type == detail::cpp_type_string<int64_t>) {
+		return static_cast<bool>(std::any_cast<int64_t>(value.value));
+	}
+	if (value.type == detail::cpp_type_string<uint64_t>) {
+		return static_cast<bool>(std::any_cast<uint64_t>(value.value));
+	}
+
+	if (value.type == detail::cpp_type_string<std::float16_t>) {
+		return static_cast<bool>(std::any_cast<std::float16_t>(value.value));
+	}
+	if (value.type == detail::cpp_type_string<std::float32_t>) {
+		return static_cast<bool>(std::any_cast<std::float32_t>(value.value));
+	}
+	if (value.type == detail::cpp_type_string<std::float64_t>) {
+		return static_cast<bool>(std::any_cast<std::float64_t>(value.value));
+	}
+
 	return {};
 }
 

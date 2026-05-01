@@ -34,12 +34,14 @@
 #pragma once
 
 #include <optional>
-#include <any>
+
+#include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
 namespace detail {
 
-[[nodiscard]] std::optional<bool> any_to_bool(const std::any& value_w) noexcept;
+[[nodiscard]] std::optional<bool> any_to_bool(const memory::WrappedAny& value
+) noexcept;
 
 } // namespace detail
 } // namespace intlib
