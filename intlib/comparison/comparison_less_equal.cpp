@@ -37,7 +37,9 @@
 #include <any>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
+#include <intlib/memory/WrappedAny.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
+#include <intlib/comparison/definitions.hpp>
 
 namespace intlib {
 namespace comparison {
@@ -46,16 +48,16 @@ namespace comparison {
 
 template <typename left_t, typename right_t>
 [[nodiscard]] static std::optional<bool>
-any_comparison_less_equal(const std::any& left_w, const std::any& right_w)
+any_comparison_less_equal(const WrappedAny& left_w, const WrappedAny& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 
 	if constexpr (std::equality_comparable_with<left_t, right_t>) {
-		if (detail::holds_cpp_type<left_t>(left_w) and
-			detail::holds_cpp_type<right_t>(right_w)) {
+		if (left_w.type == detail::cpp_type_string<left_t> and
+			right_w.type == detail::cpp_type_string<right_t>) {
 
-			const auto left = std::any_cast<left_t>(left_w);
-			const auto right = std::any_cast<right_t>(right_w);
+			const auto left = std::any_cast<left_t>(left_w.value);
+			const auto right = std::any_cast<right_t>(right_w.value);
 
 			if constexpr (std::is_floating_point_v<left_t> or
 						  std::is_floating_point_v<right_t>) {
@@ -90,7 +92,7 @@ any_comparison_less_equal(const std::any& left_w, const std::any& right_w)
 template <typename left_t>
 [[nodiscard]] static std::optional<bool>
 any_comparison_less_equal_right_numeric(
-	const std::any& left_w, const std::any& right_w
+	const WrappedAny& left_w, const WrappedAny& right_w
 )
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
@@ -118,7 +120,7 @@ any_comparison_less_equal_right_numeric(
 }
 
 std::optional<bool>
-any_comparison_less_equal(const std::any& left_w, const std::any& right_w)
+any_comparison_less_equal(const WrappedAny& left_w, const WrappedAny& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
 

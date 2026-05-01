@@ -34,9 +34,11 @@
 #pragma once
 
 #include <optional>
-#include <any>
 
 #include <ale/ast/utils/node_type_enum.hpp>
+
+#include <intlib/memory/WrappedAny.hpp>
+#include <intlib/comparison/definitions.hpp>
 
 namespace intlib {
 namespace comparison {
@@ -51,22 +53,24 @@ namespace comparison {
  * int64_t.
  */
 [[nodiscard]] std::optional<bool>
-any_comparison_equal(const std::any& left_w, const std::any& right_w);
+any_comparison_equal(const WrappedAny& left_w, const WrappedAny& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_not_equal(const std::any& left_w, const std::any& right_w);
+any_comparison_not_equal(const WrappedAny& left_w, const WrappedAny& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_less_than(const std::any& left_w, const std::any& right_w);
+any_comparison_less_than(const WrappedAny& left_w, const WrappedAny& right_w);
 
 [[nodiscard]] std::optional<bool>
-any_comparison_less_equal(const std::any& left_w, const std::any& right_w);
+any_comparison_less_equal(const WrappedAny& left_w, const WrappedAny& right_w);
 
-[[nodiscard]] std::optional<bool>
-any_comparison_greater_than(const std::any& left_w, const std::any& right_w);
+[[nodiscard]] std::optional<bool> any_comparison_greater_than(
+	const WrappedAny& left_w, const WrappedAny& right_w
+);
 
-[[nodiscard]] std::optional<bool>
-any_comparison_greater_equal(const std::any& left_w, const std::any& right_w);
+[[nodiscard]] std::optional<bool> any_comparison_greater_equal(
+	const WrappedAny& left_w, const WrappedAny& right_w
+);
 
 /**
  * @brief Comparison operation determined by @e t between two std::any objects.
@@ -80,8 +84,8 @@ any_comparison_greater_equal(const std::any& left_w, const std::any& right_w);
  */
 [[nodiscard]] std::optional<bool> any_comparison(
 	const ale::ast::node_type_e t,
-	const std::any& left_w,
-	const std::any& right_w
+	const WrappedAny& left_w,
+	const WrappedAny& right_w
 );
 
 } // namespace comparison

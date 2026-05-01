@@ -31,54 +31,14 @@
  *
  ********************************************************************/
 
-#include <optional>
-#include <any>
+#pragma once
 
-#if defined ALE_LOGGING_MESSAGES
-#include <ale/ast/utils/node_type_to_string.hpp>
-#endif
-
-#include <intlib/logger/macros.hpp>
-#include <intlib/comparison/comparison.hpp>
-#include <intlib/comparison/definitions.hpp>
+#include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
 namespace comparison {
 
-#define aleprln ale::logger::println
-
-std::optional<bool> any_comparison(
-	const ale::ast::node_type_e t,
-	const WrappedAny& left_w,
-	const WrappedAny& right_w
-)
-{
-	INTERPRETER_ENTER_COMPARISON_FUNCTION(aleprln);
-
-	switch (t) {
-	case ale::ast::node_type_e::Comparison_Equal:
-		return any_comparison_equal(left_w, right_w);
-
-	case ale::ast::node_type_e::Comparison_Not_Equal:
-		return any_comparison_not_equal(left_w, right_w);
-
-	case ale::ast::node_type_e::Comparison_Less_Than:
-		return any_comparison_less_than(left_w, right_w);
-
-	case ale::ast::node_type_e::Comparison_Less_Equal:
-		return any_comparison_less_equal(left_w, right_w);
-
-	case ale::ast::node_type_e::Comparison_Greater_Than:
-		return any_comparison_greater_than(left_w, right_w);
-
-	case ale::ast::node_type_e::Comparison_Greater_Equal:
-		return any_comparison_greater_equal(left_w, right_w);
-
-	default:
-		INTERPRETER_PRINT(aleprln, "Wrong node type '{}' for comparison.", t);
-		return {};
-	}
-}
+using WrappedAny = memory::WrappedAny;
 
 } // namespace comparison
 } // namespace intlib
