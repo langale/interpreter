@@ -116,4 +116,13 @@ private:
 };
 
 } // namespace ast
+
+namespace detail {
+
+template <>
+constexpr inline std::string_view
+	cpp_type_string<ast::SequenceExecutionEnvironment> =
+		"SequenceExecutionEnvironment";
+
+} // namespace detail
 } // namespace intlib
