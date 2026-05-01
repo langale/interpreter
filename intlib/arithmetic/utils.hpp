@@ -31,49 +31,44 @@
  *
  ********************************************************************/
 
-#if defined ALE_LOGGING_MESSAGES
-#include <ale/ast/utils/node_type_to_string.hpp>
-#endif
+#pragma once
 
-#include <intlib/logger/macros.hpp>
-#include <intlib/arithmetic/arithmetic.hpp>
+#include <optional>
+
+#include <ale/detail/make_optional.hpp>
+
+#include <intlib/memory/WrappedAny.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
+#include <intlib/detail/macros.hpp>
+#include <intlib/arithmetic/definitions.hpp>
 
 namespace intlib {
 namespace arithmetic {
 
-#define aleprln ale::logger::println
-
-std::optional<WrappedAny> any_arithmetic(
-	const ale::ast::node_type_e t,
-	const WrappedAny& left_w,
-	const WrappedAny& right_w
-)
+[[nodiscard]] inline std::optional<WrappedAny> make_uint64(const uint64_t value)
 {
-	INTERPRETER_ENTER_ARITHMETIC_FUNCTION(aleprln);
+	return ale::detail::make_optional<
+		WrappedAny>(value, intlib::detail::cpp_type_string<uint64_t>);
+}
 
-	switch (t) {
-	case ale::ast::node_type_e::Arithmetic_Addition:
-		return arithmetic_addition(left_w, right_w);
-
-	case ale::ast::node_type_e::Arithmetic_Division:
-		return arithmetic_division(left_w, right_w);
-
-	case ale::ast::node_type_e::Arithmetic_Exponentiation:
-		return arithmetic_exponentiation(left_w, right_w);
-
-	case ale::ast::node_type_e::Arithmetic_Modulus:
-		return arithmetic_modulus(left_w, right_w);
-
-	case ale::ast::node_type_e::Arithmetic_Multiplication:
-		return arithmetic_multiplication(left_w, right_w);
-
-	case ale::ast::node_type_e::Arithmetic_Subtraction:
-		return arithmetic_subtraction(left_w, right_w);
-
-	default:
-		INTERPRETER_PRINT(aleprln, "Wrong node type '{}' for arithmetic.", t);
-		return {};
+[[nodiscard]] inline std::optional<WrappedAny> make_int64(const int64_t value)
+{
+	if (value < 0) {
+		return ale::detail::make_optional<
+			memory::
+				WrappedAny>(value, intlib::detail::cpp_type_string<int64_t>);
 	}
+	return ale::detail::make_optional<
+		memory::
+			WrappedAny>(detail::to_uint64(value), intlib::detail::cpp_type_string<uint64_t>);
+}
+
+[[nodiscard]] inline std::optional<WrappedAny>
+make_float64(const std::float64_t value)
+{
+	return ale::detail::make_optional<
+		memory::
+			WrappedAny>(value, intlib::detail::cpp_type_string<std::float64_t>);
 }
 
 } // namespace arithmetic

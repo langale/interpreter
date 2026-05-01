@@ -33,92 +33,92 @@
 
 #pragma once
 
-#include <any>
+#include <optional>
 
 #include <ale/ast/utils/node_type_enum.hpp>
+
+#include <intlib/memory/WrappedAny.hpp>
+#include <intlib/arithmetic/definitions.hpp>
 
 namespace intlib {
 namespace arithmetic {
 
 /**
- * @brief Addition between two std::any objects.
+ * @brief Addition between two WrappedAny objects.
  * @param left_w Value.
  * @param right_w Value.
- * @returns If any of the two input values is a double, returns a std::any object
- * that contains a double. Otherwise: if the result is positive, a std::any that
- * contains a uint64_t; if the result is negative, a std::any that contains an
+ * @returns If any of the two input values is a double, returns a WrappedAny object
+ * that contains a double. Otherwise: if the result is positive, a WrappedAny that
+ * contains a uint64_t; if the result is negative, a WrappedAny that contains an
  * int64_t.
  */
-[[nodiscard]] std::any
-arithmetic_addition(const std::any& left_w, const std::any& right_w) noexcept;
+[[nodiscard]] std::optional<WrappedAny>
+arithmetic_addition(const WrappedAny& left_w, const WrappedAny& right_w);
 
 /**
- * @brief Subtraction between two std::any objects.
+ * @brief Subtraction between two WrappedAny objects.
  * @param left_w Value.
  * @param right_w Value.
- * @returns If any of the two input values is a double, returns a std::any object
- * that contains a double. Otherwise: if the result is positive, a std::any that
- * contains a uint64_t; if the result is negative, a std::any that contains an
+ * @returns If any of the two input values is a double, returns a WrappedAny object
+ * that contains a double. Otherwise: if the result is positive, a WrappedAny that
+ * contains a uint64_t; if the result is negative, a WrappedAny that contains an
  * int64_t.
  */
-[[nodiscard]] std::any arithmetic_subtraction(
-	const std::any& left_w, const std::any& right_w
-) noexcept;
+[[nodiscard]] std::optional<WrappedAny>
+arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w);
 
 /**
- * @brief Multiplication between two std::any objects.
+ * @brief Multiplication between two WrappedAny objects.
  * @param left_w Value.
  * @param right_w Value.
- * @returns If any of the two input values is a double, returns a std::any object
- * that contains a double. Otherwise: if the result is positive, a std::any that
- * contains a uint64_t; if the result is negative, a std::any that contains an
+ * @returns If any of the two input values is a double, returns a WrappedAny object
+ * that contains a double. Otherwise: if the result is positive, a WrappedAny that
+ * contains a uint64_t; if the result is negative, a WrappedAny that contains an
  * int64_t.
  */
-[[nodiscard]] std::any arithmetic_multiplication(
-	const std::any& left_w, const std::any& right_w
-) noexcept;
+[[nodiscard]] std::optional<WrappedAny>
+arithmetic_multiplication(const WrappedAny& left_w, const WrappedAny& right_w);
 
 /**
- * @brief Division between two std::any objects.
+ * @brief Division between two WrappedAny objects.
  * @param left_w Value.
  * @param right_w Value.
- * @returns If any of the two input values is a double, returns a std::any object
- * that contains a double. Otherwise: if the result is positive, a std::any that
- * contains a uint64_t; if the result is negative, a std::any that contains an
+ * @returns If any of the two input values is a double, returns a WrappedAny object
+ * that contains a double. Otherwise: if the result is positive, a WrappedAny that
+ * contains a uint64_t; if the result is negative, a WrappedAny that contains an
  * int64_t.
  */
-[[nodiscard]] std::any
-arithmetic_division(const std::any& left_w, const std::any& right_w) noexcept;
+[[nodiscard]] std::optional<WrappedAny>
+arithmetic_division(const WrappedAny& left_w, const WrappedAny& right_w);
 
 /**
- * @brief Multiplication between two std::any objects.
+ * @brief Multiplication between two WrappedAny objects.
  * @param left_w Value.
  * @param right_w Value.
- * @returns A std::any object that contains a double, regardless of the two input
+ * @returns A WrappedAny object that contains a double, regardless of the two input
  * values.
  */
-[[nodiscard]] std::any arithmetic_exponentiation(
-	const std::any& left_w, const std::any& right_w
-) noexcept;
+[[nodiscard]] std::optional<WrappedAny>
+arithmetic_exponentiation(const WrappedAny& left_w, const WrappedAny& right_w);
 
 /**
- * @brief Modulus between two std::any objects.
+ * @brief Modulus between two WrappedAny objects.
  *
  * Floating-point values are cast-ed to integer values.
  * @param left_w Value.
  * @param right_w Value.
- * @returns If the result is positive, a std::any that contains a uint64_t; if
- * the result is negative, a std::any that contains an int64_t.
+ * @returns If the result is positive, a WrappedAny that contains a uint64_t; if
+ * the result is negative, a WrappedAny that contains an int64_t.
  */
-[[nodiscard]] std::any
-arithmetic_modulus(const std::any& left_w, const std::any& right_w) noexcept;
+[[nodiscard]] std::optional<WrappedAny>
+arithmetic_modulus(const WrappedAny& left_w, const WrappedAny& right_w);
 
-/// Arithmetic operation determined by @e t between two std::any objects
-[[nodiscard]] std::any any_arithmetic(
+/// Arithmetic operation determined by @e t between two WrappedAny objects
+[[nodiscard]] std::optional<WrappedAny> any_arithmetic(
 	const ale::ast::node_type_e t,
-	const std::any& left_w,
-	const std::any& right_w
-) noexcept;
+	const WrappedAny& left_w,
+	const WrappedAny& right_w
+);
 
 } // namespace arithmetic
 } // namespace intlib
