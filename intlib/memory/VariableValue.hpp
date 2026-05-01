@@ -34,7 +34,8 @@
 #pragma once
 
 #include <string>
-#include <any>
+
+#include <intlib/memory/WrappedAny.hpp>
 
 namespace intlib {
 namespace memory {
@@ -49,15 +50,15 @@ namespace memory {
  */
 struct VariableValue {
 	/// The actual value that the variable holds.
-	std::any value_w;
+	WrappedAny wrap;
 	/// The type of this variable. This is an ALE's type.
-	const std::string_view type;
+	const std::string_view ale_type;
 	/// Whether the variable is declared with 'const'.
 	const bool is_constant;
 };
 
 static constinit VariableValue empty_variable{
-	.value_w = {}, .type = "", .is_constant = true
+	.wrap = {}, .ale_type = "", .is_constant = true
 };
 
 using RefMemVar = std::reference_wrapper<VariableValue>;
