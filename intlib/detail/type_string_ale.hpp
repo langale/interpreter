@@ -37,37 +37,35 @@
 #include <ranges>
 #include <array>
 
-#include <intlib/detail/compile_time_strings.hpp>
-
 namespace intlib {
 namespace detail {
 
-static constexpr auto bool_ale = as_c_str("bool"_lr);
-static constexpr auto i8_ale = as_c_str("i8"_lr);
-static constexpr auto u8_ale = as_c_str("u8"_lr);
-static constexpr auto i16_ale = as_c_str("i16"_lr);
-static constexpr auto u16_ale = as_c_str("u16"_lr);
-static constexpr auto i32_ale = as_c_str("i32"_lr);
-static constexpr auto u32_ale = as_c_str("u32"_lr);
-static constexpr auto i64_ale = as_c_str("i64"_lr);
-static constexpr auto u64_ale = as_c_str("u64"_lr);
-static constexpr auto f16_ale = as_c_str("f16"_lr);
-static constexpr auto f32_ale = as_c_str("f32"_lr);
-static constexpr auto f64_ale = as_c_str("f64"_lr);
+static constexpr inline char ale_bool[] = "bool";
+static constexpr inline char ale_i8[] = "i8";
+static constexpr inline char ale_u8[] = "u8";
+static constexpr inline char ale_i16[] = "i16";
+static constexpr inline char ale_u16[] = "u16";
+static constexpr inline char ale_i32[] = "i32";
+static constexpr inline char ale_u32[] = "u32";
+static constexpr inline char ale_i64[] = "i64";
+static constexpr inline char ale_u64[] = "u64";
+static constexpr inline char ale_f16[] = "f16";
+static constexpr inline char ale_f32[] = "f32";
+static constexpr inline char ale_f64[] = "f64";
 
 static constexpr std::array numeric_types{
-	bool_ale,
-	u8_ale,
-	i8_ale,
-	u16_ale,
-	i16_ale,
-	u32_ale,
-	i32_ale,
-	u64_ale,
-	i64_ale,
-	f16_ale,
-	f32_ale,
-	f64_ale
+	ale_bool,
+	ale_u8,
+	ale_i8,
+	ale_u16,
+	ale_i16,
+	ale_u32,
+	ale_i32,
+	ale_u64,
+	ale_i64,
+	ale_f16,
+	ale_f32,
+	ale_f64
 };
 
 template <auto>
@@ -84,18 +82,18 @@ using AleToCpp_t = AleToCpp<identifier>::type;
 		using type = cpp;                                                      \
 	}
 
-MAKE_ALE_TO_CPP(bool_ale, int8_t);
-MAKE_ALE_TO_CPP(i8_ale, int8_t);
-MAKE_ALE_TO_CPP(u8_ale, uint8_t);
-MAKE_ALE_TO_CPP(i16_ale, int16_t);
-MAKE_ALE_TO_CPP(u16_ale, uint16_t);
-MAKE_ALE_TO_CPP(i32_ale, int32_t);
-MAKE_ALE_TO_CPP(u32_ale, uint32_t);
-MAKE_ALE_TO_CPP(i64_ale, int64_t);
-MAKE_ALE_TO_CPP(u64_ale, uint64_t);
-MAKE_ALE_TO_CPP(f16_ale, std::float16_t);
-MAKE_ALE_TO_CPP(f32_ale, std::float32_t);
-MAKE_ALE_TO_CPP(f64_ale, std::float64_t);
+MAKE_ALE_TO_CPP(ale_bool, int8_t);
+MAKE_ALE_TO_CPP(ale_i8, int8_t);
+MAKE_ALE_TO_CPP(ale_u8, uint8_t);
+MAKE_ALE_TO_CPP(ale_i16, int16_t);
+MAKE_ALE_TO_CPP(ale_u16, uint16_t);
+MAKE_ALE_TO_CPP(ale_i32, int32_t);
+MAKE_ALE_TO_CPP(ale_u32, uint32_t);
+MAKE_ALE_TO_CPP(ale_i64, int64_t);
+MAKE_ALE_TO_CPP(ale_u64, uint64_t);
+MAKE_ALE_TO_CPP(ale_f16, std::float16_t);
+MAKE_ALE_TO_CPP(ale_f32, std::float32_t);
+MAKE_ALE_TO_CPP(ale_f64, std::float64_t);
 
 [[nodiscard]] static constexpr bool
 is_ale_type_numeric(const std::string_view type) noexcept
