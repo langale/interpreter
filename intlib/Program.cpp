@@ -36,7 +36,7 @@
 
 #include <intlib/Program.hpp>
 #include <intlib/ast/interpretation.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
@@ -48,7 +48,7 @@ Program::Program() noexcept
 
 /* OTHERS */
 
-ast::EvaluationResult Program::run_program()
+ast::Evaluation Program::run_program()
 {
 	ast::EvaluationContext ctx = ast::new_evaluation_context(m_memory);
 	return ast::interpret_node(ctx, m_program_node);
