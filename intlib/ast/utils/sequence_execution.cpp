@@ -47,7 +47,7 @@
 #include <ale/ast/utils/node_is_type.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/SequenceIndices.hpp>
 #include <intlib/ast/SequenceExecutionEnvironment.hpp>
 #include <intlib/ast/interpretation.hpp>
@@ -56,6 +56,7 @@
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/any_output.hpp>
 #include <intlib/detail/macros.hpp>
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 namespace intlib {
 namespace ast {
@@ -63,20 +64,20 @@ namespace ast {
 #define aleprln ale::logger::println
 
 [[nodiscard]] static bool
-check_equal_anys(const std::any& l, const int64_t r) noexcept
+check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 {
-	const bool is_l_uint64 = detail::holds_cpp_type<uint64_t>(l);
-	const bool is_l_int64 = detail::holds_cpp_type<int64_t>(l);
+	const bool is_l_uint64 = l.type == detail::cpp_type_string<uint64_t>;
+	const bool is_l_int64 = l.type == detail::cpp_type_string<int64_t>;
 	if (is_l_uint64) {
-		return std::any_cast<uint64_t>(l) == detail::to_uint64(r);
+		return std::any_cast<uint64_t>(l.value) == detail::to_uint64(r);
 	}
 	if (is_l_int64) {
-		return std::any_cast<int64_t>(l) == r;
+		return std::any_cast<int64_t>(l.value) == r;
 	}
 	return false;
 }
 
-[[nodiscard]] static EvaluationResult add_indices_from_subvar(
+[[nodiscard]] static Evaluation add_indices_from_subvar(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& n,
 	const size_t d,
@@ -93,15 +94,15 @@ check_equal_anys(const std::any& l, const int64_t r) noexcept
 		const auto& child = children[i];
 		const bool has_index = indices.has_index(d, name);
 
-		EvaluationResult res = interpret_node(ctx, child);
-		if (not res.has_value()) {
-			return res;
+		Evaluation res_w = interpret_node(ctx, child);
+		if (not res_w.has_value()) {
+			return res_w;
 		}
 
-		auto new_index_w = std::move(*res);
+		EvaluationResult new_index_w = std::move(*res_w);
 		if (not has_index) {
-			if (detail::holds_cpp_type<int64_t>(new_index_w)) {
-				const int64_t idx = std::any_cast<int64_t>(new_index_w);
+			if (new_index_w.type == detail::cpp_type_string<int64_t>) {
+				const int64_t idx = std::any_cast<int64_t>(new_index_w.value);
 				INTERPRETER_PRINT(
 					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
@@ -111,8 +112,8 @@ check_equal_anys(const std::any& l, const int64_t r) noexcept
 				);
 				indices.set_index(d, name, idx);
 			}
-			else if (detail::holds_cpp_type<uint64_t>(new_index_w)) {
-				const uint64_t idx = std::any_cast<uint64_t>(new_index_w);
+			else if (new_index_w.type == detail::cpp_type_string<uint64_t>) {
+				const uint64_t idx = std::any_cast<uint64_t>(new_index_w.value);
 				INTERPRETER_PRINT(
 					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
@@ -123,9 +124,20 @@ check_equal_anys(const std::any& l, const int64_t r) noexcept
 				indices.set_index(d, name, detail::to_int64(idx));
 			}
 			else {
-				const std::any idx_w =
+				const std::optional idx_w =
 					detail::any_to_numeric<int64_t>(new_index_w);
-				const int64_t idx = std::any_cast<int64_t>(idx_w);
+				if (not idx_w) {
+					return make_bad_evaluation(
+						Vec{evaluation_error_e::Conversion_To_Numeric_Failed},
+						Vec{evaluation_function_e::
+								Sequence_Execution_Environment_Construction},
+						Vec{std::format(
+							"Could not convert value '{}' to int64_t.",
+							new_index_w
+						)}
+					);
+				}
+				const auto idx = std::any_cast<int64_t>(idx_w);
 				INTERPRETER_PRINT(
 					aleprln,
 					"At depth '{}', for variable '{}', set index '{}'.",
@@ -148,7 +160,7 @@ check_equal_anys(const std::any& l, const int64_t r) noexcept
 					name
 				);
 
-				return make_bad_evaluation_result(
+				return make_bad_evaluation(
 					Vec{evaluation_error_e::Sequence_Environment_Index_Mismatch
 					},
 					Vec{evaluation_function_e::
@@ -164,16 +176,16 @@ check_equal_anys(const std::any& l, const int64_t r) noexcept
 			}
 		}
 	}
-	return make_good_evaluation_result<std::any>();
+	return make_good_evaluation<EvaluationResult>();
 }
 
-enum class indices_type_e {
+enum class indices_type_e : int8_t {
 	first,
 	last
 };
 
 template <indices_type_e indices_type>
-[[nodiscard]] static EvaluationResult add_indices(
+[[nodiscard]] static Evaluation add_indices(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& n,
 	const size_t d,
@@ -217,7 +229,7 @@ template <indices_type_e indices_type>
 			if (not res2.has_value()) {
 				return res2;
 			}
-			return make_good_evaluation_result<std::any>();
+			return make_good_evaluation<EvaluationResult>();
 		}
 
 		if (ale::ast::is_node_ternary(t)) {
@@ -241,7 +253,7 @@ template <indices_type_e indices_type>
 			if (not res3.has_value()) {
 				return res3;
 			}
-			return make_good_evaluation_result<std::any>();
+			return make_good_evaluation<EvaluationResult>();
 		}
 
 		if (ale::ast::is_node_n_ary(t)) {
@@ -252,11 +264,11 @@ template <indices_type_e indices_type>
 					return res;
 				}
 			}
-			return make_good_evaluation_result<std::any>();
+			return make_good_evaluation<EvaluationResult>();
 		}
 
 		// Node is zero-ary. Ignore
-		return make_good_evaluation_result<std::any>();
+		return make_good_evaluation<EvaluationResult>();
 	}
 
 	return add_indices_from_subvar(ctx, n, d, indices);
@@ -274,7 +286,7 @@ get_expression(const ale::ast::SequenceNode& seq) noexcept
 	return next_child;
 }
 
-EvaluationResult make_sequence_execution_environment(
+Evaluation make_sequence_execution_environment(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& seq
 )
 {
@@ -310,7 +322,7 @@ EvaluationResult make_sequence_execution_environment(
 	const auto depth_start = env.get_first_indices().depth();
 	const auto depth_end = env.get_first_indices().depth();
 	if (depth_start != depth_end) {
-		return make_bad_evaluation_result(
+		return make_bad_evaluation(
 			Vec{evaluation_error_e::Sequence_Environment_Mismatch_Depth},
 			Vec{evaluation_function_e::
 					Sequence_Execution_Environment_Construction},
@@ -331,12 +343,11 @@ EvaluationResult make_sequence_execution_environment(
 	const auto& expression = get_expression(seq);
 	env.set_expression(&expression);
 
-	return make_good_evaluation_result<SequenceExecutionEnvironment>(
-		std::move(env)
-	);
+	return make_good_evaluation<
+		EvaluationResult>(std::move(env), detail::cpp_type_string<SequenceExecutionEnvironment>);
 }
 
-[[nodiscard]] static std::generator<EvaluationResult> enumerate_values_sequence(
+[[nodiscard]] static std::generator<Evaluation> enumerate_values_sequence(
 	EvaluationContext& ctx,
 	SequenceExecutionEnvironment& env,
 	const size_t depth
@@ -344,7 +355,7 @@ EvaluationResult make_sequence_execution_environment(
 {
 	if (depth == env.get_depth()) {
 		ctx.sequence_execution_environment = std::optional{&env};
-		EvaluationResult res = interpret_node(ctx, env.get_expression());
+		Evaluation res = interpret_node(ctx, env.get_expression());
 		ctx.sequence_execution_environment = {};
 		co_yield std::move(res);
 		co_return;
@@ -362,7 +373,7 @@ EvaluationResult make_sequence_execution_environment(
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
-			EvaluationResult res = *pos;
+			Evaluation res = *pos;
 			if (not res) {
 				co_yield std::move(res);
 				co_return;
@@ -375,7 +386,7 @@ EvaluationResult make_sequence_execution_environment(
 	co_return;
 }
 
-std::generator<EvaluationResult> enumerate_values_sequence(
+std::generator<Evaluation> enumerate_values_sequence(
 	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 )
 {
@@ -383,7 +394,7 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 	auto pos = gen.begin();
 	const auto end = gen.end();
 	while (pos != end) {
-		EvaluationResult res = *pos;
+		Evaluation res = *pos;
 		if (not res) {
 			co_yield std::move(res);
 			co_return;
@@ -393,7 +404,7 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 	}
 }
 
-[[nodiscard]] static std::generator<EvaluationResult> enumerate_names_sequence(
+[[nodiscard]] static std::generator<Evaluation> enumerate_names_sequence(
 	EvaluationContext& ctx,
 	SequenceExecutionEnvironment& env,
 	const size_t depth
@@ -411,7 +422,7 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 			*static_cast<const ale::ast::SubscriptedVariableNode *>(expr.get());
 
 		ctx.sequence_execution_environment = {&env};
-		EvaluationResult res = make_subscripted_variable_name(ctx, sub);
+		Evaluation res = make_subscripted_variable_name(ctx, sub);
 		ctx.sequence_execution_environment = {};
 
 		co_yield std::move(res);
@@ -430,7 +441,7 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
-			EvaluationResult res = *pos;
+			Evaluation res = *pos;
 			if (not res) {
 				co_yield std::move(res);
 				co_return;
@@ -443,7 +454,7 @@ std::generator<EvaluationResult> enumerate_values_sequence(
 	co_return;
 }
 
-std::generator<EvaluationResult> enumerate_names_sequence(
+std::generator<Evaluation> enumerate_names_sequence(
 	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 )
 {
@@ -462,7 +473,7 @@ std::generator<EvaluationResult> enumerate_names_sequence(
 	auto pos = gen.begin();
 	const auto end = gen.end();
 	while (pos != end) {
-		EvaluationResult res = *pos;
+		Evaluation res = *pos;
 		if (not res) {
 			co_yield std::move(res);
 			co_return;

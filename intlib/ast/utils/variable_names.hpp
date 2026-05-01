@@ -39,7 +39,7 @@
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
@@ -52,7 +52,7 @@ void append_variable_name(
 	const std::string& name, const std::vector<int64_t>& indices
 );
 
-[[nodiscard]] EvaluationResult make_subscripted_variable_name(
+[[nodiscard]] Evaluation make_subscripted_variable_name(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
 );
@@ -63,9 +63,17 @@ struct ShallowSequenceIndices {
 	std::string_view base_name;
 };
 
-[[nodiscard]] EvaluationResult make_shallow_sequence_indices(
+[[nodiscard]] Evaluation make_shallow_sequence_indices(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence_comma
 );
 
 } // namespace ast
+
+namespace detail {
+
+template <>
+constexpr inline std::string_view cpp_type_string<ast::ShallowSequenceIndices> =
+	"ShallowSequenceIndices";
+
+} // namespace detail
 } // namespace intlib

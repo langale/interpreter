@@ -45,21 +45,20 @@ using namespace std::string_literals;
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/utils/IndexIterator.hpp>
 
+#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_type.hpp>
-#if defined ALE_LOGGING_MESSAGES
-#include <intlib/detail/any_output.hpp>
-#endif
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
-#include <intlib/logger/macros.hpp>
+#include <intlib/memory/utils/variable_value_to_string.hpp>
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 namespace intlib {
 namespace ast {
 
 #define aleprln ale::logger::println
 
-[[nodiscard]] static EvaluationResult get_indices(
+[[nodiscard]] static Evaluation get_indices(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
@@ -75,45 +74,44 @@ namespace ast {
 
 		INTERPRETER_PRINT(aleprln, "Made index for child {}.", i);
 
-		auto res = interpret_node(ctx, child);
-		if (not res.has_value()) {
-			return res;
+		Evaluation res_w = interpret_node(ctx, child);
+		if (not res_w.has_value()) {
+			return res_w;
 		}
 
 		INTERPRETER_PRINT(aleprln, "Successfully evaluated child.");
 
-		const std::any& val_w = *res;
+		const memory::WrappedAny& val = *res_w;
 		std::optional<int64_t> idx_w;
 
-		if (detail::holds_cpp_type<memory::VariableValue>(val_w)) {
+		if (val.type == detail::cpp_type_string<memory::VariableValue>) {
 			const auto& memory_variable =
-				std::any_cast<const memory::VariableValue&>(val_w);
-			idx_w = detail::any_to_numeric<int64_t>(memory_variable.value_w);
+				std::any_cast<const memory::VariableValue&>(val.value);
+
+			idx_w = detail::any_to_numeric<int64_t>(memory_variable);
 
 			if (not idx_w) {
 				INTERPRETER_PRINT(
 					aleprln,
-					"Could not convert node evaluation '{}' into a numeric "
-					"int64_t.",
-					detail::AnyView{memory_variable.value_w}
+					"Could not convert variable '{}' into a numeric int64_t.",
+					memory_variable
 				);
 			}
 		}
 		else {
-			idx_w = detail::any_to_numeric<int64_t>(val_w);
+			idx_w = detail::any_to_numeric<int64_t>(val);
 
 			if (not idx_w) {
 				INTERPRETER_PRINT(
 					aleprln,
-					"Could not convert node evaluation '{}' into a numeric "
-					"int64_t.",
-					detail::AnyView{val_w}
+					"Could not convert value '{}' into a numeric int64_t.",
+					val
 				);
 			}
 		}
 
 		if (not idx_w) {
-			return make_bad_evaluation_result(
+			return make_bad_evaluation(
 				Vec{evaluation_error_e::
 						Evaluation_Of_Node_Is_Not_A_Numeric_Value},
 				Vec{evaluation_function_e::Variable_Names},
@@ -126,7 +124,7 @@ namespace ast {
 		indices.push_back(idx);
 	}
 
-	return make_good_evaluation_result<Vec<int64_t>>(std::move(indices));
+	return make_good_evaluation<EvaluationResult>(std::move(indices), "");
 }
 
 void append_variable_name(std::string& name, const Vec<int64_t>& indices)
@@ -144,7 +142,7 @@ make_indexed_variable_name(const std::string& name, const Vec<int64_t>& indices)
 	return n;
 }
 
-EvaluationResult make_subscripted_variable_name(
+Evaluation make_subscripted_variable_name(
 	EvaluationContext& ctx,
 	const ale::ast::SubscriptedVariableNode& subscripted_variable
 )
@@ -188,11 +186,14 @@ EvaluationResult make_subscripted_variable_name(
 			INTERPRETER_PRINT(aleprln, "Resulting index: '{}'.", idx);
 
 			name += "_" + std::to_string(idx);
+
+			INTERPRETER_PRINT(aleprln, "Name so far: '{}'.", name);
 		}
 
 		INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
 
-		return make_good_evaluation_result<std::string>(std::move(name));
+		return make_good_evaluation<
+			EvaluationResult>(std::move(name), detail::cpp_type_string<std::string>);
 	}
 
 	INTERPRETER_PRINT(
@@ -200,26 +201,28 @@ EvaluationResult make_subscripted_variable_name(
 		"There is no sequence environment so retrieving the indices normally."
 	);
 
-	auto res_w = get_indices(ctx, subscripted_variable);
+	Evaluation res_w = get_indices(ctx, subscripted_variable);
 	if (not res_w.has_value()) {
 		return res_w;
 	}
 
 	INTERPRETER_PRINT(aleprln, "Successfully made indices.");
 
-	std::any indices_w = std::move(*res_w);
+	memory::WrappedAny indices_w = std::move(*res_w);
 
 	INTERPRETER_PRINT(aleprln, "Make indices for variable {}.", name);
 
-	const auto indices = std::any_cast<Vec<int64_t>&&>(std::move(indices_w));
+	const auto indices =
+		std::any_cast<Vec<int64_t>&&>(std::move(indices_w.value));
 	append_variable_name(name, indices);
 
 	INTERPRETER_PRINT(aleprln, "Name constructed '{}'.", name);
 
-	return make_good_evaluation_result<std::string>(std::move(name));
+	return make_good_evaluation<
+		EvaluationResult>(std::move(name), detail::cpp_type_string<std::string>);
 }
 
-EvaluationResult make_shallow_sequence_indices(
+Evaluation make_shallow_sequence_indices(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence_comma
 )
 {
@@ -250,22 +253,20 @@ EvaluationResult make_shallow_sequence_indices(
 
 	// left indices
 	const auto& left_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(
-			left_child.get()
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(left_child.get()
 		);
 	auto res_left_indices_w = get_indices(ctx, left_subscripted_variable);
 	if (not res_left_indices_w.has_value()) {
-		return std::move(res_left_indices_w.error());
+		return res_left_indices_w;
 	}
 
 	// right indices
 	const auto& right_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(
-			right_child.get()
-		);
+		*static_cast<const ale::ast::SubscriptedVariableNode *>(right_child.get(
+		));
 	auto res_right_indices_w = get_indices(ctx, right_subscripted_variable);
 	if (not res_right_indices_w.has_value()) {
-		return std::move(res_right_indices_w.error());
+		return res_right_indices_w;
 	}
 
 	std::any left_idxs_w = std::move(*res_left_indices_w);
@@ -289,10 +290,13 @@ EvaluationResult make_shallow_sequence_indices(
 	assert(detail::holds_cpp_type<Veci64>(right_idxs_w));
 #endif
 
-	return make_good_evaluation_result<ShallowSequenceIndices>(
-		std::any_cast<Veci64&&>(std::move(left_idxs_w)),
-		std::any_cast<Veci64&&>(std::move(right_idxs_w)),
-		std::string_view{left_subscripted_variable.get_variable_name()}
+	return make_good_evaluation<EvaluationResult>(
+		ShallowSequenceIndices{
+			.left = std::any_cast<Veci64&&>(std::move(left_idxs_w)),
+			.right = std::any_cast<Veci64&&>(std::move(right_idxs_w)),
+			.base_name = std::string_view{left_subscripted_variable.get_variable_name()}
+		},
+		detail::cpp_type_string<ShallowSequenceIndices>
 	);
 }
 

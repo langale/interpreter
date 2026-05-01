@@ -38,21 +38,21 @@
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 
 #include <intlib/ast/SequenceExecutionEnvironment.hpp>
-#include <intlib/ast/EvaluationResult.hpp>
+#include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 
 namespace intlib {
 namespace ast {
 
-[[nodiscard]] EvaluationResult make_sequence_execution_environment(
+[[nodiscard]] Evaluation make_sequence_execution_environment(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& n
 );
 
-[[nodiscard]] std::generator<EvaluationResult> enumerate_values_sequence(
+[[nodiscard]] std::generator<Evaluation> enumerate_values_sequence(
 	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 );
 
-[[nodiscard]] std::generator<EvaluationResult> enumerate_names_sequence(
+[[nodiscard]] std::generator<Evaluation> enumerate_names_sequence(
 	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 );
 
