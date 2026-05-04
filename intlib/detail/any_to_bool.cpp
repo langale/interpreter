@@ -33,7 +33,6 @@
 
 #include <optional>
 
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/macros.hpp>
 
 namespace intlib {

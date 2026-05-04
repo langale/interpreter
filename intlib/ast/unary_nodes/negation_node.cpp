@@ -34,7 +34,6 @@
 #include <ale/ast/unary_nodes/NegationNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/ast/EvaluationContext.hpp>

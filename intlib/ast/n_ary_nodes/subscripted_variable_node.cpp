@@ -38,7 +38,6 @@
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
 

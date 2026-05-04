@@ -36,7 +36,6 @@
 #include <optional>
 #include <stdfloat>
 
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/concepts.hpp>
 #include <intlib/detail/type_string_ale.hpp>
 #include <intlib/memory/Variable.hpp>

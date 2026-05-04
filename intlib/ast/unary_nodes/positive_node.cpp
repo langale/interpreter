@@ -34,7 +34,6 @@
 #include <ale/ast/unary_nodes/PositiveNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>

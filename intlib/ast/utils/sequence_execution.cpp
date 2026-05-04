@@ -52,9 +52,7 @@
 #include <intlib/ast/SequenceExecutionEnvironment.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/detail/macros.hpp>
 #include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
@@ -150,7 +148,7 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 					"Mismatch between known index value '{}' and new "
 					"computed index value '{}', for variable '{}'",
 					known_index,
-					detail::AnyView{new_index_w},
+					new_index_w,
 					name
 				);
 
@@ -163,7 +161,7 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 						"Mismatch between known index value '{}' and new "
 						"computed index value '{}', for variable '{}'",
 						known_index,
-						detail::AnyView{new_index_w},
+						new_index_w,
 						name
 					)}
 				);

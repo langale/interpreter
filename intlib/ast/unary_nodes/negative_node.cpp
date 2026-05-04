@@ -34,11 +34,11 @@
 #include <ale/ast/unary_nodes/NegativeNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/macros.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 
 namespace intlib {
 namespace ast {
@@ -81,15 +81,11 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 			EvaluationResult>(-ri, detail::type_string_cpp<std::float64_t>);
 	}
 
-	INTERPRETER_PRINT(
-		"Unhandled variable type '{}'.", detail::get_type_name(*int_res_w)
-	);
+	INTERPRETER_PRINT("Unhandled value '{}'.", res_w);
 	return make_bad_evaluation(
 		Vec{evaluation_error_e::Unhandled_Variable_Type},
 		Vec{evaluation_function_e::Negative},
-		Vec{std::format(
-			"Unhandled type '{}'", detail::get_type_name(*int_res_w)
-		)}
+		Vec{std::format("Unhandled value '{}'", res_w)}
 	);
 }
 

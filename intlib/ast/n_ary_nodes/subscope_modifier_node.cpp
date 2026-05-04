@@ -36,7 +36,6 @@
 #include <ale/ast/n_ary_nodes/SubscopeModifierNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
 

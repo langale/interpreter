@@ -45,7 +45,6 @@ using namespace std::string_literals;
 #include <ale/utils/IndexIterator.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_conversion.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>

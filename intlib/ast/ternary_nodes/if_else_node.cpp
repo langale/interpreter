@@ -38,11 +38,10 @@ using namespace std::string_literals;
 #include <ale/ast/ternary_nodes/IfElseNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 namespace intlib {
 namespace ast {
@@ -78,16 +77,11 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v)
 	const EvaluationResult& cond = *cond_res;
 	const std::optional cond_bool_w = detail::any_to_bool(cond);
 	if (not cond_bool_w) {
-		INTERPRETER_PRINT(
-			"Unhandled variable type '{}'.", detail::get_type_name(*cond_bool_w)
-		);
+		INTERPRETER_PRINT("Unhandled variable type '{}'.", cond);
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Conversion_To_Bool_Failed},
 			Vec{evaluation_function_e::If_Else},
-			Vec{std::format(
-				"Conversion to bool failed for type '{}'",
-				detail::get_type_name(*cond_bool_w)
-			)}
+			Vec{std::format("Conversion to bool failed for value '{}'", cond)}
 		);
 	}
 

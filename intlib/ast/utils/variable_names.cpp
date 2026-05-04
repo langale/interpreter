@@ -46,7 +46,6 @@ using namespace std::string_literals;
 #include <ale/utils/IndexIterator.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
@@ -211,80 +210,6 @@ Evaluation make_subscripted_variable_name(
 
 	return make_good_evaluation<
 		EvaluationResult>(std::move(name), detail::type_string_cpp<std::string>);
-}
-
-Evaluation make_shallow_sequence_indices(
-	EvaluationContext& ctx, const ale::ast::SequenceNode& sequence_comma
-)
-{
-	INTERPRETER_ENTER_AST_FUNCTION;
-
-#if defined DEBUG
-	assert(sequence_comma.get_operator_type().has_value());
-	assert(
-		sequence_comma.get_operator_type() ==
-		ale::ast::node_type_e::Comma_Separated_Group
-	);
-#endif
-
-	const auto& left_child = sequence_comma.get_left_child();
-	const auto& right_child = sequence_comma.get_right_child();
-
-#if defined DEBUG
-	assert(
-		left_child->get_node_type() ==
-		ale::ast::node_type_e::Subscripted_Variable
-	);
-
-	assert(
-		right_child->get_node_type() ==
-		ale::ast::node_type_e::Subscripted_Variable
-	);
-#endif
-
-	// left indices
-	const auto& left_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(left_child.get()
-		);
-	auto res_left_indices_w = get_indices(ctx, left_subscripted_variable);
-	if (not res_left_indices_w.has_value()) {
-		return res_left_indices_w;
-	}
-
-	// right indices
-	const auto& right_subscripted_variable =
-		*static_cast<const ale::ast::SubscriptedVariableNode *>(right_child.get(
-		));
-	auto res_right_indices_w = get_indices(ctx, right_subscripted_variable);
-	if (not res_right_indices_w.has_value()) {
-		return res_right_indices_w;
-	}
-
-	std::any left_idxs_w = std::move(*res_left_indices_w);
-	std::any right_idxs_w = std::move(*res_right_indices_w);
-
-	INTERPRETER_PRINT(
-		"Type inside left indices: {}.", detail::get_type_name(left_idxs_w)
-	);
-	INTERPRETER_PRINT(
-		"Type inside right indices: {}.", detail::get_type_name(right_idxs_w)
-	);
-
-	using Veci64 = Vec<int64_t>;
-
-#if defined DEBUG
-	assert(detail::holds_cpp_type<Veci64>(left_idxs_w));
-	assert(detail::holds_cpp_type<Veci64>(right_idxs_w));
-#endif
-
-	return make_good_evaluation<EvaluationResult>(
-		ShallowSequenceIndices{
-			.left = std::any_cast<Veci64&&>(std::move(left_idxs_w)),
-			.right = std::any_cast<Veci64&&>(std::move(right_idxs_w)),
-			.base_name = std::string_view{left_subscripted_variable.get_variable_name()}
-		},
-		detail::type_string_cpp<ShallowSequenceIndices>
-	);
 }
 
 } // namespace ast

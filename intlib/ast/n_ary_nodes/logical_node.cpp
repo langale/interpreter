@@ -43,9 +43,7 @@
 #include <ale/ast/n_ary_nodes/LogicalNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_to_bool.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>

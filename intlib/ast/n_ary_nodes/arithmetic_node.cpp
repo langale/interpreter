@@ -44,8 +44,6 @@ using namespace std::string_literals;
 #include <ale/ast/n_ary_nodes/ArithmeticNode.hpp>
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_type.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/arithmetic/arithmetic.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
