@@ -35,10 +35,50 @@
 #include <format>
 #include <any>
 
-#include <intlib/detail/any_type.hpp>
 #include <intlib/detail/any_output.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/memory/Variable.hpp>
 #include <intlib/memory/utils/variable_to_string.hpp>
+#include <intlib/detail/any_type.hpp>
+
+template <typename type_t>
+static constexpr bool is_cpp_builtin_type_v =
+	std::is_same_v<type_t, bool> or std::is_same_v<type_t, char> or
+	std::is_same_v<type_t, unsigned char> or
+	std::is_same_v<type_t, signed char> or std::is_same_v<type_t, int8_t> or
+	std::is_same_v<type_t, uint8_t> or std::is_same_v<type_t, int16_t> or
+	std::is_same_v<type_t, uint16_t> or std::is_same_v<type_t, int32_t> or
+	std::is_same_v<type_t, uint32_t> or std::is_same_v<type_t, int64_t> or
+	std::is_same_v<type_t, uint64_t> or
+	std::is_same_v<type_t, std::float16_t> or
+	std::is_same_v<type_t, std::float32_t> or std::is_same_v<type_t, float> or
+	std::is_same_v<type_t, std::float64_t> or std::is_same_v<type_t, double> or
+	std::is_void_v<type_t>;
+
+template <typename type_t>
+[[nodiscard]] constexpr bool is_cpp_basic_type(const std::string_view name
+) noexcept
+{
+	static_assert(is_cpp_builtin_type_v<type_t>);
+	return name == intlib::detail::type_string_cpp<type_t>;
+}
+
+template <typename type_t>
+[[nodiscard]] bool is_cpp_type(const std::string_view name)
+{
+	if constexpr (is_cpp_builtin_type_v<type_t>) {
+		return is_cpp_basic_type<type_t>(name);
+	}
+
+	return name == intlib::detail::demangle_name_type(typeid(type_t).name());
+}
+
+template <typename type_t>
+[[nodiscard]] bool holds_cpp_type(const std::any& value_w)
+{
+	const std::string name = intlib::detail::get_type_name(value_w);
+	return is_cpp_type<type_t>(name);
+}
 
 using namespace intlib::detail;
 
@@ -58,8 +98,7 @@ std::formatter<AnyView>::OutT std::formatter<AnyView>::format(
 		return std::format_to(ctx.out(), "{}", var.get());
 	}
 	if (holds_cpp_type<intlib::memory::RefConstVar>(value_w)) {
-		const auto& var =
-			std::any_cast<intlib::memory::RefConstVar>(value_w);
+		const auto& var = std::any_cast<intlib::memory::RefConstVar>(value_w);
 		return std::format_to(ctx.out(), "{}", var.get());
 	}
 
