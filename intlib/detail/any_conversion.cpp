@@ -40,7 +40,9 @@
 #include <intlib/detail/type_string_ale.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
 #include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#endif
 
 namespace intlib {
 namespace detail {

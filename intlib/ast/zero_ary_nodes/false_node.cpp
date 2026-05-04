@@ -33,10 +33,12 @@
 
 #include <ale/ast/zero_ary_nodes/LiteralFalseNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#endif
 
 namespace intlib {
 namespace ast {

@@ -37,11 +37,13 @@ using namespace std::string_literals;
 
 #include <ale/ast/binary_nodes/WhileLoopNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#endif
 
 namespace intlib {
 namespace ast {

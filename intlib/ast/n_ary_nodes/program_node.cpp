@@ -35,9 +35,11 @@
 
 #include <ale/ast/n_ary_nodes/ProgramNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#endif
 
 namespace intlib {
 namespace ast {

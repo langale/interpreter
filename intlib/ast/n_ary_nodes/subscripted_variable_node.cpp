@@ -34,12 +34,13 @@
 #include <optional>
 #include <ranges>
 
-#include <ale/logger/Logger.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#endif
 
 namespace intlib {
 namespace ast {

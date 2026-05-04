@@ -39,16 +39,19 @@
 #include <any>
 
 #include <ale/ast/utils/node_type_enum.hpp>
-#include <ale/ast/utils/node_type_to_string.hpp>
 #include <ale/ast/n_ary_nodes/LogicalNode.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <ale/ast/utils/node_type_to_string.hpp>
+#endif
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
-#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 #include <intlib/ast/interpretation.hpp>
-#include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
+#endif
 
 namespace intlib {
 namespace ast {

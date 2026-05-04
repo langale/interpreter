@@ -46,7 +46,6 @@
 #include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/utils/node_is_type.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/SequenceIndices.hpp>
 #include <intlib/ast/SequenceExecutionEnvironment.hpp>
@@ -54,7 +53,8 @@
 #include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/macros.hpp>
-#include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#include <intlib/logger/macros.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 
 namespace intlib {
 namespace ast {

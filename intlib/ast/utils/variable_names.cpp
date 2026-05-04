@@ -40,17 +40,16 @@
 #include <ranges>
 using namespace std::string_literals;
 
-#include <ale/ast/Node.hpp>
-#include <ale/ast/binary_nodes/SequenceNode.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
-#include <ale/utils/IndexIterator.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
 #include <intlib/memory/utils/variable_to_string.hpp>
 #include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#endif
 
 namespace intlib {
 namespace ast {

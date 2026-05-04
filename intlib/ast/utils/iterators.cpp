@@ -39,15 +39,15 @@
 using namespace std::string_literals;
 
 #include <ale/ast/utils/node_is_type.hpp>
-#include <ale/ast/utils/node_type_to_string.hpp>
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
-#include <ale/utils/IndexIterator.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <ale/ast/utils/node_type_to_string.hpp>
+#endif
 
 #include <intlib/logger/macros.hpp>
-#include <intlib/detail/any_output.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/SequenceExecutionEnvironment.hpp>
@@ -55,7 +55,12 @@ using namespace std::string_literals;
 #include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/ast/utils/sequence_execution.hpp>
 #include <intlib/ast/evaluation.hpp>
-#include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <intlib/ast/utils/evaluation_function_to_string.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
+#endif
+
 
 namespace intlib {
 namespace ast {

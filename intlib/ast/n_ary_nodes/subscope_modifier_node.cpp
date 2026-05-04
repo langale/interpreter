@@ -35,9 +35,11 @@
 
 #include <ale/ast/n_ary_nodes/SubscopeModifierNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#endif
 
 namespace intlib {
 namespace ast {
@@ -62,8 +64,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 
 		const std::any& value = *res_w;
 		if (value.has_value()) {
-			INTERPRETER_PRINT("Potentially-ignored return value or expression."
-			);
+			INTERPRETER_PRINT("Ignored return value or expression.");
 		}
 	}
 	ctx.memory.get_current_scope().pop_local_scope();

@@ -38,9 +38,13 @@
 #include <ale/ast/utils/node_type_to_string.hpp>
 #endif
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/comparison/comparison.hpp>
 #include <intlib/comparison/definitions.hpp>
+#include <intlib/logger/macros.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#endif
+
 
 namespace intlib {
 namespace comparison {

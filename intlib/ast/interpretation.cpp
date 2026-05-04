@@ -33,9 +33,35 @@
 
 #include <string>
 
+#include <ale/ast/n_ary_nodes/ArithmeticNode.hpp>
+#include <ale/ast/n_ary_nodes/ComparisonNode.hpp>
+#include <ale/ast/n_ary_nodes/LogicalNode.hpp>
+#include <ale/ast/n_ary_nodes/SubscopeModifierNode.hpp>
+#include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
+#include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
+#include <ale/ast/n_ary_nodes/ProgramNode.hpp>
+
+#include <ale/ast/ternary_nodes/IfElseNode.hpp>
+
 #include <ale/ast/binary_nodes/declaration_nodes/DeclarationConstNode.hpp>
 #include <ale/ast/binary_nodes/declaration_nodes/DeclarationLetNode.hpp>
 #include <ale/ast/binary_nodes/declaration_nodes/DeclarationDeclareNode.hpp>
+#include <ale/ast/binary_nodes/AssignationNode.hpp>
+#include <ale/ast/binary_nodes/SequenceNode.hpp>
+#include <ale/ast/binary_nodes/WhileLoopNode.hpp>
+
+#include <ale/ast/unary_nodes/NegationNode.hpp>
+#include <ale/ast/unary_nodes/NegativeNode.hpp>
+#include <ale/ast/unary_nodes/PositiveNode.hpp>
+
+#include <ale/ast/zero_ary_nodes/LiteralTrueNode.hpp>
+#include <ale/ast/zero_ary_nodes/LiteralFalseNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/LiteralStringNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralDecimalNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralUnsignedIntegerNode.hpp>
+#include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralSignedIntegerNode.hpp>
+#include <ale/ast/zero_ary_nodes/VariableNode.hpp>
+
 #include <ale/ast/utils/node_type_to_string.hpp>
 
 #include <intlib/ast/Evaluation.hpp>

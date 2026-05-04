@@ -37,11 +37,11 @@ using namespace std::string_literals;
 
 #include <ale/ast/ternary_nodes/IfElseNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_bool.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
-#include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#include <intlib/logger/macros.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 
 namespace intlib {
 namespace ast {

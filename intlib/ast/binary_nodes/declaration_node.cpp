@@ -37,21 +37,21 @@
 #include <generator>
 #include <optional>
 #include <string>
-#include <ranges>
 #include <any>
 using namespace std::string_literals;
 
 #include <ale/ast/binary_nodes/DeclarationNode.hpp>
-#include <ale/utils/IndexIterator.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_conversion.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/iterators.hpp>
+#include <intlib/logger/macros.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
+#if defined ALE_LOGGING_MESSAGES
 #include <intlib/ast/utils/evaluation_error_to_string.hpp>
-#include <intlib/memory/utils/wrapped_any_to_string.hpp>
+#endif
 
 namespace intlib {
 namespace ast {

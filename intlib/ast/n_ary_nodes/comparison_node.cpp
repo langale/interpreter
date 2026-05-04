@@ -42,13 +42,13 @@ using namespace std::string_literals;
 #include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/n_ary_nodes/ComparisonNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
-#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 #include <intlib/comparison/comparison.hpp>
+#include <intlib/logger/macros.hpp>
+#include <intlib/ast/utils/evaluation_result_to_string.hpp>
 
 namespace intlib {
 namespace ast {

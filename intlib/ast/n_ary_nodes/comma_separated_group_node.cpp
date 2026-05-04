@@ -31,16 +31,14 @@
  *
  ********************************************************************/
 
-#include <optional>
-#include <ranges>
 
 #include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
 #include <ale/ast/utils/node_type_to_string.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
+#include <intlib/logger/macros.hpp>
 
 namespace intlib {
 namespace ast {

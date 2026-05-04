@@ -35,8 +35,8 @@
 #include <cassert>
 #endif
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/memory/FunctionScope.hpp>
+#include <intlib/logger/macros.hpp>
 
 namespace intlib {
 namespace memory {

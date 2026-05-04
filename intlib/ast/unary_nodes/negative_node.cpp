@@ -33,11 +33,11 @@
 
 #include <ale/ast/unary_nodes/NegativeNode.hpp>
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/macros.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/logger/macros.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
 
 namespace intlib {
