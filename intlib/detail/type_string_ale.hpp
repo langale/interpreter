@@ -34,7 +34,7 @@
 #pragma once
 
 #include <string_view>
-#include <ranges>
+#include <cstdint>
 #include <array>
 
 namespace intlib {
