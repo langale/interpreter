@@ -59,7 +59,6 @@
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralUnsignedIntegerNode.hpp>
 #include <ale/ast/zero_ary_nodes/literal_nodes/numeric_nodes/LiteralSignedIntegerNode.hpp>
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
-#include <ale/utils/IndexIterator.hpp>
 
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
@@ -103,14 +102,6 @@ evaluate(EvaluationContext& ctx, const ale::ast::CommaSeparatedGroupNode& v);
 [[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v);
 
-[[nodiscard]] std::optional<std::vector<int64_t>> get_index_sequence(
-	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
-);
-
-[[nodiscard]] std::optional<std::string> make_full_variable_name(
-	EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v
-);
-
 [[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v);
 
@@ -124,32 +115,8 @@ evaluate(EvaluationContext& ctx, const ale::ast::IfElseNode& v);
 
 /* binary nodes */
 
-[[nodiscard]] bool retrieve_variable_names_in_assignation(
-	EvaluationContext& ctx,
-	const ale::ast::SequenceNode& seq,
-	std::vector<std::string>& names
-);
-
-[[nodiscard]] bool retrieve_variable_names_in_assignation(
-	EvaluationContext& ctx,
-	const ale::ast::CommaSeparatedGroupNode& n,
-	std::vector<std::string>& names
-);
-
 [[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& v);
-
-[[nodiscard]] bool retrieve_variable_names_in_declaration(
-	EvaluationContext& ctx,
-	const ale::ast::SequenceNode& seq,
-	std::vector<std::string>& names
-);
-
-[[nodiscard]] bool retrieve_variable_names_in_declaration(
-	EvaluationContext& ctx,
-	const ale::ast::CommaSeparatedGroupNode& seq,
-	std::vector<std::string>& names
-);
 
 [[nodiscard]] Evaluation
 evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl);
