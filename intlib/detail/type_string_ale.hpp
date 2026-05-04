@@ -35,6 +35,7 @@
 
 #include <string_view>
 #include <cstdint>
+#include <ranges>
 #include <array>
 
 namespace intlib {
