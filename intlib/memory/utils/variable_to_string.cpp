@@ -36,6 +36,7 @@
 #include <intlib/detail/any_output.hpp>
 #include <intlib/memory/Variable.hpp>
 #include <intlib/memory/utils/variable_to_string.hpp>
+#include <intlib/memory/utils/wrapped_any_to_string.hpp>
 
 std::formatter<intlib::memory::Variable>::OutT
 std::formatter<intlib::memory::Variable>::format(
@@ -43,10 +44,6 @@ std::formatter<intlib::memory::Variable>::format(
 ) const
 {
 	return std::format_to(
-		ctx.out(),
-		"Variable: (ale: {}) (c++: {}) = {}",
-		var.ale_type,
-		var.wrap.type,
-		intlib::detail::AnyView{var.wrap.value}
+		ctx.out(), "Variable: (ale: {}) {}", var.ale_type, var.wrap
 	);
 }

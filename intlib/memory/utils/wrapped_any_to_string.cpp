@@ -41,6 +41,13 @@
 #include <intlib/detail/type_string_cpp.hpp>
 #include <intlib/memory/utils/variable_to_string.hpp>
 
+#define print(cpp_type, value)                                                 \
+	if (type == intlib::detail::type_string_cpp<cpp_type>) {                   \
+		return std::format_to(                                                 \
+			ctx.out(), "[C++: {}] {}", type, std::any_cast<cpp_type>(value)    \
+		);                                                                     \
+	}
+
 std::formatter<intlib::memory::WrappedAny>::OutT
 std::formatter<intlib::memory::WrappedAny>::format(
 	const intlib::memory::WrappedAny& res, std::format_context& ctx
@@ -48,7 +55,41 @@ std::formatter<intlib::memory::WrappedAny>::format(
 {
 	const std::any& value = res.value;
 	const std::string_view type = res.type;
+
+	if (not value.has_value()) {
+		return std::format_to(ctx.out(), "[C++: {}] <empty>", type);
+	}
+
+	if (type == intlib::detail::type_string_cpp<intlib::memory::RefVar>) {
+		const auto& var = std::any_cast<intlib::memory::RefVar>(value);
+		return std::format_to(ctx.out(), "{}", var.get());
+	}
+	if (type == intlib::detail::type_string_cpp<intlib::memory::RefConstVar>) {
+		const auto& var = std::any_cast<intlib::memory::RefConstVar>(value);
+		return std::format_to(ctx.out(), "{}", var.get());
+	}
+
+	print(bool, value);
+
+	print(int8_t, value);
+	print(uint8_t, value);
+
+	print(int16_t, value);
+	print(uint16_t, value);
+
+	print(int32_t, value);
+	print(uint32_t, value);
+
+	print(int64_t, value);
+	print(uint64_t, value);
+
+	print(std::float16_t, value);
+	print(std::float32_t, value);
+	print(std::float64_t, value);
+
+	print(std::string, value);
+
 	return std::format_to(
-		ctx.out(), "(c++: {}): {}", type, intlib::detail::AnyView{value}
+		ctx.out(), "[c++: {}]: {}", type, intlib::detail::AnyView{value}
 	);
 }
