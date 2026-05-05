@@ -208,8 +208,37 @@ std::generator<Evaluation> make_value_iterator(
 		*sequence.get_operator_type()
 	);
 
+	INTERPRETER_PRINT("Going to make the sequence execution environment.");
+
+	Evaluation seq_env_eval =
+		make_sequence_execution_environment(ctx, sequence);
+	if (not seq_env_eval.has_value()) {
+		co_yield append_error(
+			std::move(seq_env_eval.error()),
+			evaluation_error_e::Evaluation_Of_Node_Failed,
+			evaluation_function_e::Iterator_Value_Sequence,
+			"Could not construct sequence execution environment"
+		);
+		co_return;
+	}
+
+	INTERPRETER_PRINT(
+		"Successfully constructed the sequence execution environment."
+	);
+
+	memory::WrappedAny seq_env_w = std::move(*seq_env_eval);
+#if defined DEBUG
+	INTERPRETER_PRINT("Type of result: '{}'.", seq_env_w.type);
+	assert(seq_env_w.type == detail::type_string_cpp<SequenceExecutionEnvironment>);
+#endif
+	SequenceExecutionEnvironment seq_env =
+		std::any_cast<SequenceExecutionEnvironment&&>(std::move(seq_env_w.value)
+		);
+
 	if (is_node_interpretable(*sequence.get_operator_type())) {
+		ctx.sequence_execution_environment = {&seq_env};
 		Evaluation res = evaluate(ctx, sequence);
+		ctx.sequence_execution_environment = {};
 		co_yield append_error(
 			std::move(res.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
@@ -218,32 +247,6 @@ std::generator<Evaluation> make_value_iterator(
 		);
 		co_return;
 	}
-
-	INTERPRETER_PRINT("Going to make the sequence execution environment.");
-
-	Evaluation res_w = make_sequence_execution_environment(ctx, sequence);
-
-	INTERPRETER_PRINT(
-		"Successfully constructed the sequence execution environment."
-	);
-
-	if (not res_w.has_value()) {
-		co_yield append_error(
-			std::move(res_w.error()),
-			evaluation_error_e::Evaluation_Of_Node_Failed,
-			evaluation_function_e::Iterator_Value_Sequence,
-			"Could not construct sequence execution environment"
-		);
-		co_return;
-	}
-
-	memory::WrappedAny res = std::move(*res_w);
-#if defined DEBUG
-	INTERPRETER_PRINT("Type of result: '{}'.", res.type);
-	assert(res.type == detail::type_string_cpp<SequenceExecutionEnvironment>);
-#endif
-	SequenceExecutionEnvironment seq_env =
-		std::any_cast<SequenceExecutionEnvironment&&>(std::move(res.value));
 
 	const size_t env_depth = seq_env.get_depth();
 	INTERPRETER_PRINT("Environment's depth: {}.", env_depth);

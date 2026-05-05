@@ -82,6 +82,7 @@ public:
 		return *m_expression;
 	}
 
+	/// The depth corresponds to the number of indices to be enumerated.
 	[[nodiscard]] size_t get_depth() const noexcept
 	{
 		return m_distances.size();

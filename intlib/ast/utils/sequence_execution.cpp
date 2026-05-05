@@ -195,6 +195,11 @@ template <indices_type_e indices_type>
 		}
 
 		if (ale::ast::is_node_binary(t)) {
+
+			static_assert(
+				ale::ast::is_node_binary(ale::ast::node_type_e::Sequence)
+			);
+
 			const auto& binary = *static_cast<ale::ast::BinaryNode *>(n.get());
 			if (t == ale::ast::node_type_e::Sequence) {
 				if constexpr (indices_type == indices_type_e::first) {
@@ -291,21 +296,21 @@ Evaluation make_sequence_execution_environment(
 	INTERPRETER_PRINT("Going to extract first indices.");
 
 	const auto& left = seq.get_left_child();
-	auto res_left = add_indices<indices_type_e::first>(
+	auto left_eval = add_indices<indices_type_e::first>(
 		ctx, left, 0, env.get_first_indices()
 	);
-	if (not res_left.has_value()) {
-		return res_left;
+	if (not left_eval.has_value()) {
+		return left_eval;
 	}
 
 	INTERPRETER_PRINT("Going to extract last indices.");
 
 	const auto& right = seq.get_right_child();
-	auto res_right = add_indices<indices_type_e::last>(
+	auto right_eval = add_indices<indices_type_e::last>(
 		ctx, right, 0, env.get_last_indices()
 	);
-	if (not res_right.has_value()) {
-		return res_right;
+	if (not right_eval.has_value()) {
+		return right_eval;
 	}
 
 	INTERPRETER_PRINT("Going to check correctness.");
@@ -326,10 +331,10 @@ Evaluation make_sequence_execution_environment(
 		);
 	}
 
-	// check correctness: correct distances
-	auto res = env.make_distances();
-	if (not res) {
-		return res;
+	// make distances and check correctness
+	auto distances_eval = env.make_distances();
+	if (not distances_eval) {
+		return distances_eval;
 	}
 
 	const auto& expression = get_expression(seq);

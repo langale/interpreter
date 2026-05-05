@@ -36,15 +36,19 @@
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/logger/macros.hpp>
-#if defined ALE_LOGGING_MESSAGES
-#endif
+#include <intlib/ast/utils/sequence_execution.hpp>
 
 namespace intlib {
 namespace ast {
 
-Evaluation evaluate(EvaluationContext&, const ale::ast::SequenceNode&)
+Evaluation evaluate(EvaluationContext&, const ale::ast::SequenceNode& seq)
 {
 	INTERPRETER_ENTER_AST_FUNCTION;
+
+#if defined DEBUG
+	assert(seq.get_operator_type().has_value());
+	assert(is_node_interpretable(*seq.get_operator_type()));
+#endif
 
 	return make_good_evaluation<EvaluationResult>();
 }
