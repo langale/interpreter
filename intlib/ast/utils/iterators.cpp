@@ -47,7 +47,6 @@ using namespace std::string_literals;
 #include <ale/ast/utils/node_type_to_string.hpp>
 #endif
 
-#include <intlib/logger/macros.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/SequenceExecutionEnvironment.hpp>
@@ -60,7 +59,6 @@ using namespace std::string_literals;
 #include <intlib/ast/utils/evaluation_function_to_string.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
 #endif
-
 
 namespace intlib {
 namespace ast {
