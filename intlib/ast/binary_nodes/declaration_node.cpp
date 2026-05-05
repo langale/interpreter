@@ -165,11 +165,13 @@ namespace ast {
 {
 	INTERPRETER_ENTER_AST_FUNCTION;
 
-	auto var_iter = make_name_iterator(ctx, left_child);
+	EvaluationContext lhs_ctx = new_evaluation_context(ctx.memory);
+	auto var_iter = make_name_iterator(lhs_ctx, left_child);
 	auto var_iter_pos = var_iter.begin();
 	auto var_iter_end = var_iter.end();
 
-	auto value_iter = make_value_iterator(ctx, right_child);
+	EvaluationContext rhs_ctx = new_evaluation_context(ctx.memory);
+	auto value_iter = make_value_iterator(rhs_ctx, right_child);
 	auto value_iter_pos = value_iter.begin();
 	auto value_iter_end = value_iter.end();
 
@@ -279,11 +281,13 @@ namespace ast {
 
 	INTERPRETER_PRINT("Going to make name iterator.");
 
-	auto var_iter = make_name_iterator(ctx, left_child);
+	EvaluationContext lhs_ctx = new_evaluation_context(ctx.memory);
+	auto var_iter = make_name_iterator(lhs_ctx, left_child);
 	auto var_iter_pos = var_iter.begin();
 	auto var_iter_end = var_iter.end();
 
-	Evaluation rhs_eval = interpret_node(ctx, right_child);
+	EvaluationContext rhs_ctx = new_evaluation_context(ctx.memory);
+	Evaluation rhs_eval = interpret_node(rhs_ctx, right_child);
 	if (not rhs_eval) {
 		return append_error(
 			std::move(rhs_eval.error()),
