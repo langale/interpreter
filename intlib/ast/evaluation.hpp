@@ -66,9 +66,6 @@
 namespace intlib {
 namespace ast {
 
-[[nodiscard]] std::optional<std::any> get_variable_value(const std::string& var
-);
-
 /* n-ary nodes */
 
 [[nodiscard]] Evaluation evaluate(
