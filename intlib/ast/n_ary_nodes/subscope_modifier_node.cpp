@@ -51,19 +51,19 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscopeModifierNode& v)
 
 	ctx.memory.get_current_scope().push_local_scope();
 	for (const auto& w : v.get_children()) {
-		Evaluation res_w = interpret_node(ctx, w);
-		if (not res_w) {
+		Evaluation eval = interpret_node(ctx, w);
+		if (not eval) {
 			INTERPRETER_PRINT("Evaluation of node failed.");
 			return append_error(
-				std::move(res_w.error()),
+				std::move(eval.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				evaluation_function_e::Subscope_Modifier,
 				"Node evaluation failed"
 			);
 		}
 
-		const std::any& value = *res_w;
-		if (value.has_value()) {
+		const std::any& value_w = *eval;
+		if (value_w.has_value()) {
 			INTERPRETER_PRINT("Ignored return value or expression.");
 		}
 	}

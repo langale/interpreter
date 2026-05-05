@@ -176,35 +176,35 @@ namespace ast {
 	while (var_iter_pos != var_iter_end and value_iter_pos != value_iter_end) {
 		INTERPRETER_PRINT("Going to declare a variable.");
 
-		Evaluation var_res_w = *var_iter_pos;
-		if (not var_res_w) {
+		Evaluation var_eval = *var_iter_pos;
+		if (not var_eval) {
 			INTERPRETER_PRINT(
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT("Error: '{}'", var_res_w.error().errors.at(0));
+			INTERPRETER_PRINT("Error: '{}'", var_eval.error().errors.at(0));
 			return append_error(
-				std::move(var_res_w.error()),
+				std::move(var_eval.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Declaration,
 				"Something went wrong when retrieving the next variable"
 			);
 		}
 
-		Evaluation value_res_w = *value_iter_pos;
-		if (not value_res_w) {
+		Evaluation value_eval = *value_iter_pos;
+		if (not value_eval) {
 			INTERPRETER_PRINT(
 				"Something went wrong when computing the next value."
 			);
-			INTERPRETER_PRINT("Error: '{}'", value_res_w.error().errors.at(0));
+			INTERPRETER_PRINT("Error: '{}'", value_eval.error().errors.at(0));
 			return append_error(
-				std::move(value_res_w.error()),
+				std::move(value_eval.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Declaration,
 				"Something went wrong when retrieving the next value"
 			);
 		}
 
-		memory::WrappedAny value_w = std::move(*value_res_w);
+		memory::WrappedAny value_w = std::move(*value_eval);
 		const memory::WrappedAny *actual_value_w = nullptr;
 		if (value_w.type == detail::type_string_cpp<memory::RefVar>) {
 			actual_value_w =
@@ -218,7 +218,7 @@ namespace ast {
 			actual_value_w = &value_w;
 		}
 
-		memory::WrappedAny name_w = std::move(*var_res_w);
+		memory::WrappedAny name_w = std::move(*var_eval);
 #if defined DEBUG
 		INTERPRETER_PRINT("Container of variable name: {}.", name_w);
 		assert(name_w.type == detail::type_string_cpp<std::string>);
@@ -230,12 +230,12 @@ namespace ast {
 		INTERPRETER_PRINT("Of type:  '{}'.", var_type);
 		INTERPRETER_PRINT("Of value: '{}'.", *actual_value_w);
 
-		Evaluation declaration_res = declare_variable(
+		Evaluation declaration_eval = declare_variable(
 			ctx, decl_t, std::move(name), var_type, *actual_value_w
 		);
-		if (not declaration_res) {
+		if (not declaration_eval) {
 			return append_error(
-				std::move(declaration_res.error()),
+				std::move(declaration_eval.error()),
 				evaluation_error_e::Declaration_Of_Variable,
 				evaluation_function_e::Declaration,
 				"Something went wrong when declaring a variable"
@@ -283,10 +283,10 @@ namespace ast {
 	auto var_iter_pos = var_iter.begin();
 	auto var_iter_end = var_iter.end();
 
-	Evaluation rhs_res_w = interpret_node(ctx, right_child);
-	if (not rhs_res_w) {
+	Evaluation rhs_eval = interpret_node(ctx, right_child);
+	if (not rhs_eval) {
 		return append_error(
-			std::move(rhs_res_w.error()),
+			std::move(rhs_eval.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Declaration,
 			"Something went wrong when evaluating a node"
@@ -295,7 +295,7 @@ namespace ast {
 
 	INTERPRETER_PRINT("Going to retrieve the actual rhs value.");
 
-	memory::WrappedAny rhs_w = std::move(*rhs_res_w);
+	memory::WrappedAny rhs_w = std::move(*rhs_eval);
 	const memory::WrappedAny *actual_rhs_w = nullptr;
 	if (rhs_w.type == detail::type_string_cpp<memory::RefVar>) {
 		actual_rhs_w = &std::any_cast<memory::RefVar>(rhs_w.value).get().wrap;
@@ -311,14 +311,14 @@ namespace ast {
 	while (var_iter_pos != var_iter_end) {
 		INTERPRETER_PRINT("Going to declare a variable.");
 
-		Evaluation var_res_w = *var_iter_pos;
-		if (not var_res_w) {
+		Evaluation var_eval = *var_iter_pos;
+		if (not var_eval) {
 			INTERPRETER_PRINT(
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT("Error: '{}'", var_res_w.error().errors.at(0));
+			INTERPRETER_PRINT("Error: '{}'", var_eval.error().errors.at(0));
 			return append_error(
-				std::move(var_res_w.error()),
+				std::move(var_eval.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Declaration,
 				"Something went wrong when retrieving the next variable"
@@ -327,7 +327,7 @@ namespace ast {
 
 		INTERPRETER_PRINT("Going to retrieve the name of the variable.");
 
-		memory::WrappedAny name_w = std::move(*var_res_w);
+		memory::WrappedAny name_w = std::move(*var_eval);
 
 		auto name = std::any_cast<std::string&&>(std::move(name_w.value));
 		const std::string_view var_type = decl.get_variable_type();
@@ -336,12 +336,12 @@ namespace ast {
 		INTERPRETER_PRINT("Of type:  '{}'.", var_type);
 		INTERPRETER_PRINT("Of value: '{}'.", *actual_rhs_w);
 
-		Evaluation declaration_res = declare_variable(
+		Evaluation declaration_eval = declare_variable(
 			ctx, decl_t, std::move(name), var_type, *actual_rhs_w
 		);
-		if (not declaration_res) {
+		if (not declaration_eval) {
 			return append_error(
-				std::move(declaration_res.error()),
+				std::move(declaration_eval.error()),
 				evaluation_error_e::Declaration_Of_Variable,
 				evaluation_function_e::Declaration,
 				"Something went wrong when retrieving the next variable"
@@ -370,29 +370,29 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		auto var_iter_end = var_iter.end();
 
 		while (var_iter_pos != var_iter_end) {
-			Evaluation res_w = *var_iter_pos;
-			if (not res_w) {
+			Evaluation eval = *var_iter_pos;
+			if (not eval) {
 				return append_error(
-					std::move(res_w.error()),
+					std::move(eval.error()),
 					evaluation_error_e::List_Iteration,
 					evaluation_function_e::Declaration,
 					"Something went wrong when retrieving the next variable"
 				);
 			}
 
-			memory::WrappedAny name_w = std::move(*res_w);
+			memory::WrappedAny name_w = std::move(*eval);
 #if defined DEBUG
 			assert(name_w.type == detail::type_string_cpp<std::string>);
 #endif
 			auto name = std::any_cast<std::string&&>(std::move(name_w.value));
 			const std::string_view var_type = decl.get_variable_type();
 
-			auto declaration_res =
+			auto declaration_eval =
 				declare_variable(ctx, std::move(name), var_type);
 
-			if (not declaration_res) {
+			if (not declaration_eval) {
 				return append_error(
-					std::move(declaration_res.error()),
+					std::move(declaration_eval.error()),
 					evaluation_error_e::Declaration_Of_Variable,
 					evaluation_function_e::Declaration,
 					"Something went wrong when declaring a variable"

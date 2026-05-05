@@ -57,8 +57,8 @@ namespace ast {
 [[nodiscard]] static Evaluation
 node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 {
-	Evaluation eval_res = interpret_node(ctx, c);
-	if (not eval_res) {
+	Evaluation eval = interpret_node(ctx, c);
+	if (not eval) {
 		INTERPRETER_PRINT("Evaluation of node within arithmetic node failed.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
@@ -67,8 +67,8 @@ node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 		);
 	}
 
-	EvaluationResult res = std::move(*eval_res);
-	if (res.type == detail::type_string_cpp<void>) {
+	EvaluationResult eval_res = std::move(*eval);
+	if (eval_res.type == detail::type_string_cpp<void>) {
 		INTERPRETER_PRINT("Evaluation of node returned a void value.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},
@@ -77,7 +77,7 @@ node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 		);
 	}
 	return make_good_evaluation<EvaluationResult>(
-		std::move(res.value), res.type
+		std::move(eval_res.value), eval_res.type
 	);
 }
 
@@ -94,26 +94,26 @@ Evaluation evaluate(
 	assert(children.size() >= 2);
 #endif
 
-	Evaluation eval_res = node_eval(ctx, children[0]);
-	if (not eval_res) {
-		return eval_res;
+	Evaluation eval = node_eval(ctx, children[0]);
+	if (not eval) {
+		return eval;
 	}
 
-	EvaluationResult expr_res_1 = std::move(*eval_res);
+	EvaluationResult eval1_res = std::move(*eval);
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		eval_res = node_eval(ctx, c);
-		if (not eval_res) {
-			return eval_res;
+		eval = node_eval(ctx, c);
+		if (not eval) {
+			return eval;
 		}
 
-		EvaluationResult expr_res_2 = std::move(*eval_res);
-		std::optional<EvaluationResult> operation_res =
-			arithmetic::any_arithmetic(t, expr_res_1, expr_res_2);
+		EvaluationResult eval2_res = std::move(*eval);
+		std::optional<memory::WrappedAny> arithmetic_result_w =
+			arithmetic::any_arithmetic(t, eval1_res, eval2_res);
 
-		if (not operation_res.has_value()) {
+		if (not arithmetic_result_w.has_value()) {
 			INTERPRETER_PRINT(
 				"Arithmetic operation '{}' did not return a value.",
 				v.get_operation_string()
@@ -123,16 +123,16 @@ Evaluation evaluate(
 				Vec{evaluation_function_e::Arithmetic},
 				Vec{std::format(
 					"Could not operate two std::any values: '{}' and '{}'",
-					expr_res_1,
-					expr_res_2
+					eval1_res,
+					eval2_res
 				)}
 			);
 		}
 
-		expr_res_1 = std::move(*operation_res);
+		eval1_res = std::move(*arithmetic_result_w);
 	}
 
-	return make_good_evaluation<EvaluationResult>(std::move(expr_res_1));
+	return make_good_evaluation<EvaluationResult>(std::move(eval1_res));
 }
 
 } // namespace ast

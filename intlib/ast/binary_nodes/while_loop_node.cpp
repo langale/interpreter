@@ -52,10 +52,10 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 {
 	INTERPRETER_ENTER_AST_FUNCTION;
 
-	const auto& left_child = v.get_left_child();
-	const auto& right_child = v.get_right_child();
+	const auto& condition = v.get_left_child();
+	const auto& body = v.get_right_child();
 
-	if (left_child == nullptr) {
+	if (condition == nullptr) {
 		INTERPRETER_PRINT("Condition in while loop is missing.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Node_Is_Malformed},
@@ -66,25 +66,25 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 
 	bool stop = false;
 	while (not stop) {
-		Evaluation cond_w = interpret_node(ctx, left_child);
-		if (not cond_w) {
+		Evaluation cond_eval = interpret_node(ctx, condition);
+		if (not cond_eval) {
 			INTERPRETER_PRINT("Node evaluation failed.");
 			return append_error(
-				std::move(cond_w.error()),
+				std::move(cond_eval.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				evaluation_function_e::While_Loop,
 				"Node evaluation failed"
 			);
 		}
 
-		const std::optional cond_res_w = detail::any_to_bool(*cond_w);
-		if (not cond_res_w) {
+		const std::optional cond_w = detail::any_to_bool(*cond_eval);
+		if (not cond_w) {
 			INTERPRETER_PRINT(
 				"Could not convert value in while loop condition to a Boolean "
 				"value."
 			);
 			return append_error(
-				std::move(cond_w.error()),
+				std::move(cond_eval.error()),
 				evaluation_error_e::Conversion_To_Bool_Failed,
 				evaluation_function_e::While_Loop,
 				"Could not convert value in while loop condition to a Boolean "
@@ -92,19 +92,19 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::WhileLoopNode& v)
 			);
 		}
 
-		stop = not * cond_res_w;
-		if (*cond_res_w) {
+		stop = not * cond_w;
+		if (*cond_w) {
 
-			if (right_child == nullptr) {
+			if (body == nullptr) {
 				// yes, this may produce infinite loops
 				continue;
 			}
 
-			Evaluation res_w = interpret_node(ctx, right_child);
-			if (not res_w) {
+			Evaluation body_eval = interpret_node(ctx, body);
+			if (not body_eval) {
 				INTERPRETER_PRINT("Evaluation of while loop body failed.");
 				return append_error(
-					std::move(cond_w.error()),
+					std::move(cond_eval.error()),
 					evaluation_error_e::Evaluation_Of_Node_While_Loop_Failed,
 					evaluation_function_e::While_Loop,
 					"Evaluation of while loop body failed."

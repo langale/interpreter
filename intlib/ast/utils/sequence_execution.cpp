@@ -90,15 +90,15 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 		const auto& child = children[i];
 		const bool has_index = indices.has_index(d, name);
 
-		Evaluation res_w = interpret_node(ctx, child);
-		if (not res_w.has_value()) {
-			return res_w;
+		Evaluation eval = interpret_node(ctx, child);
+		if (not eval.has_value()) {
+			return eval;
 		}
 
-		EvaluationResult new_index_w = std::move(*res_w);
+		EvaluationResult new_index_res = std::move(*eval);
 		if (not has_index) {
-			if (new_index_w.type == detail::type_string_cpp<int64_t>) {
-				const int64_t idx = std::any_cast<int64_t>(new_index_w.value);
+			if (new_index_res.type == detail::type_string_cpp<int64_t>) {
+				const auto idx = std::any_cast<int64_t>(new_index_res.value);
 				INTERPRETER_PRINT(
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
@@ -107,8 +107,9 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 				);
 				indices.set_index(d, name, idx);
 			}
-			else if (new_index_w.type == detail::type_string_cpp<uint64_t>) {
-				const uint64_t idx = std::any_cast<uint64_t>(new_index_w.value);
+			else if (new_index_res.type == detail::type_string_cpp<uint64_t>) {
+				const auto idx = std::any_cast<uint64_t>(new_index_res.value);
+
 				INTERPRETER_PRINT(
 					"At depth '{}', for variable '{}', set index '{}'.",
 					d,
@@ -119,15 +120,16 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 			}
 			else {
 				const std::optional idx_w =
-					detail::any_to_numeric<int64_t>(new_index_w);
+					detail::any_to_numeric<int64_t>(new_index_res);
+
 				if (not idx_w) {
 					return make_bad_evaluation(
 						Vec{evaluation_error_e::Conversion_To_Numeric_Failed},
 						Vec{evaluation_function_e::
 								Sequence_Execution_Environment_Construction},
 						Vec{std::format(
-							"Could not convert value '{}' to int64_t.",
-							new_index_w
+							"Could not convert value '{}' to int64_t",
+							new_index_res
 						)}
 					);
 				}
@@ -143,12 +145,12 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 		}
 		else {
 			const int64_t known_index = indices.get_index(d, name);
-			if (not check_equal_anys(new_index_w, known_index)) {
+			if (not check_equal_anys(new_index_res, known_index)) {
 				INTERPRETER_PRINT(
 					"Mismatch between known index value '{}' and new "
 					"computed index value '{}', for variable '{}'",
 					known_index,
-					new_index_w,
+					new_index_res,
 					name
 				);
 
@@ -161,7 +163,7 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 						"Mismatch between known index value '{}' and new "
 						"computed index value '{}', for variable '{}'",
 						known_index,
-						new_index_w,
+						new_index_res,
 						name
 					)}
 				);
@@ -214,17 +216,17 @@ template <indices_type_e indices_type>
 				}
 			}
 
-			auto res1 = add_indices<indices_type>(
+			auto res1_eval = add_indices<indices_type>(
 				ctx, binary.get_left_child(), d, indices
 			);
-			if (not res1.has_value()) {
-				return res1;
+			if (not res1_eval.has_value()) {
+				return res1_eval;
 			}
-			auto res2 = add_indices<indices_type>(
+			auto res2_eval = add_indices<indices_type>(
 				ctx, binary.get_right_child(), d, indices
 			);
-			if (not res2.has_value()) {
-				return res2;
+			if (not res2_eval.has_value()) {
+				return res2_eval;
 			}
 			return make_good_evaluation<EvaluationResult>();
 		}
@@ -232,23 +234,23 @@ template <indices_type_e indices_type>
 		if (ale::ast::is_node_ternary(t)) {
 			const auto& ternary =
 				*static_cast<ale::ast::TernaryNode *>(n.get());
-			auto res1 = add_indices<indices_type>(
+			auto res1_eval = add_indices<indices_type>(
 				ctx, ternary.get_first_child(), d, indices
 			);
-			if (not res1.has_value()) {
-				return res1;
+			if (not res1_eval.has_value()) {
+				return res1_eval;
 			}
-			auto res2 = add_indices<indices_type>(
+			auto res2_eval = add_indices<indices_type>(
 				ctx, ternary.get_second_child(), d, indices
 			);
-			if (not res2.has_value()) {
-				return res2;
+			if (not res2_eval.has_value()) {
+				return res2_eval;
 			}
-			auto res3 = add_indices<indices_type>(
+			auto res3_eval = add_indices<indices_type>(
 				ctx, ternary.get_third_child(), d, indices
 			);
-			if (not res3.has_value()) {
-				return res3;
+			if (not res3_eval.has_value()) {
+				return res3_eval;
 			}
 			return make_good_evaluation<EvaluationResult>();
 		}
@@ -256,9 +258,10 @@ template <indices_type_e indices_type>
 		if (ale::ast::is_node_n_ary(t)) {
 			const auto& nary = *static_cast<ale::ast::NAryNode *>(n.get());
 			for (const auto& child : nary.get_children()) {
-				auto res = add_indices<indices_type>(ctx, child, d, indices);
-				if (not res.has_value()) {
-					return res;
+				auto res_eval =
+					add_indices<indices_type>(ctx, child, d, indices);
+				if (not res_eval.has_value()) {
+					return res_eval;
 				}
 			}
 			return make_good_evaluation<EvaluationResult>();
@@ -352,9 +355,9 @@ Evaluation make_sequence_execution_environment(
 {
 	if (depth == env.get_depth()) {
 		ctx.sequence_execution_environment = std::optional{&env};
-		Evaluation res = interpret_node(ctx, env.get_expression());
+		Evaluation eval = interpret_node(ctx, env.get_expression());
 		ctx.sequence_execution_environment = {};
-		co_yield std::move(res);
+		co_yield std::move(eval);
 		co_return;
 	}
 
@@ -370,12 +373,12 @@ Evaluation make_sequence_execution_environment(
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
-			Evaluation res = *pos;
-			if (not res) {
-				co_yield std::move(res);
+			Evaluation eval = *pos;
+			if (not eval) {
+				co_yield std::move(eval);
 				co_return;
 			}
-			co_yield std::move(res);
+			co_yield std::move(eval);
 			++pos;
 		}
 	}
@@ -391,12 +394,12 @@ std::generator<Evaluation> enumerate_values_sequence(
 	auto pos = gen.begin();
 	const auto end = gen.end();
 	while (pos != end) {
-		Evaluation res = *pos;
-		if (not res) {
-			co_yield std::move(res);
+		Evaluation eval = *pos;
+		if (not eval) {
+			co_yield std::move(eval);
 			co_return;
 		}
-		co_yield std::move(res);
+		co_yield std::move(eval);
 		++pos;
 	}
 }
@@ -419,10 +422,10 @@ std::generator<Evaluation> enumerate_values_sequence(
 			*static_cast<const ale::ast::SubscriptedVariableNode *>(expr.get());
 
 		ctx.sequence_execution_environment = {&env};
-		Evaluation res = make_subscripted_variable_name(ctx, sub);
+		Evaluation eval = make_subscripted_variable_name(ctx, sub);
 		ctx.sequence_execution_environment = {};
 
-		co_yield std::move(res);
+		co_yield std::move(eval);
 		co_return;
 	}
 
@@ -438,12 +441,12 @@ std::generator<Evaluation> enumerate_values_sequence(
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
-			Evaluation res = *pos;
-			if (not res) {
-				co_yield std::move(res);
+			Evaluation eval = *pos;
+			if (not eval) {
+				co_yield std::move(eval);
 				co_return;
 			}
-			co_yield std::move(res);
+			co_yield std::move(eval);
 			++pos;
 		}
 	}
@@ -468,12 +471,12 @@ std::generator<Evaluation> enumerate_names_sequence(
 	auto pos = gen.begin();
 	const auto end = gen.end();
 	while (pos != end) {
-		Evaluation res = *pos;
-		if (not res) {
-			co_yield std::move(res);
+		Evaluation eval = *pos;
+		if (not eval) {
+			co_yield std::move(eval);
 			co_return;
 		}
-		co_yield std::move(res);
+		co_yield std::move(eval);
 		++pos;
 	}
 }

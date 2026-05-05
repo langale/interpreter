@@ -149,34 +149,34 @@ namespace ast {
 
 		INTERPRETER_PRINT("Going to assign a variable.");
 
-		Evaluation var_res_w = *var_iter_pos;
-		if (not var_res_w) {
+		Evaluation var_eval = *var_iter_pos;
+		if (not var_eval) {
 			INTERPRETER_PRINT(
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT("Error: '{}'", var_res_w.error().errors.at(0));
+			INTERPRETER_PRINT("Error: '{}'", var_eval.error().errors.at(0));
 			return append_error(
-				std::move(var_res_w.error()),
+				std::move(var_eval.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Assignation,
 				"Something went wrong when retrieving the next variable"
 			);
 		}
 
-		Evaluation value_res_w = *value_iter_pos;
-		if (not value_res_w) {
+		Evaluation value_eval = *value_iter_pos;
+		if (not value_eval) {
 			INTERPRETER_PRINT(
 				"Something went wrong when computing the next value."
 			);
 			return append_error(
-				std::move(value_res_w.error()),
+				std::move(value_eval.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Assignation,
 				"Something went wrong when retrieving the next value"
 			);
 		}
 
-		const memory::WrappedAny& value_w = *value_res_w;
+		const memory::WrappedAny& value_w = *value_eval;
 		const memory::WrappedAny *actual_value_w = nullptr;
 		if (value_w.type == detail::type_string_cpp<memory::RefVar>) {
 			actual_value_w =
@@ -190,7 +190,7 @@ namespace ast {
 			actual_value_w = &value_w;
 		}
 
-		const memory::WrappedAny& name_w = *var_res_w;
+		const memory::WrappedAny& name_w = *var_eval;
 #if defined DEBUG
 		assert(name_w.type == detail::type_string_cpp<std::string>);
 #endif
@@ -199,13 +199,13 @@ namespace ast {
 		INTERPRETER_PRINT("Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT("Of value: '{}'.", *actual_value_w);
 
-		Evaluation assignation_res =
+		Evaluation assignation_eval =
 			assign_variable(ctx, var_name, *actual_value_w);
 
-		if (not assignation_res) {
+		if (not assignation_eval) {
 			INTERPRETER_PRINT("An error occurred.");
 			return append_error(
-				std::move(var_res_w.error()),
+				std::move(var_eval.error()),
 				evaluation_error_e::Assignation_Of_Variable,
 				evaluation_function_e::Assignation,
 				std::format(
@@ -245,17 +245,17 @@ namespace ast {
 	const std::unique_ptr<ale::ast::Node>& right_child
 )
 {
-	Evaluation rhs_res_w = interpret_node(ctx, right_child);
-	if (not rhs_res_w) {
+	Evaluation rhs_eval = interpret_node(ctx, right_child);
+	if (not rhs_eval) {
 		return append_error(
-			std::move(rhs_res_w.error()),
+			std::move(rhs_eval.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Assignation,
 			"Something went wrong when evaluating a node"
 		);
 	}
 
-	const EvaluationResult& rhs_w = *rhs_res_w;
+	const EvaluationResult& rhs_w = *rhs_eval;
 	const memory::WrappedAny *actual_rhs_w = nullptr;
 	if (rhs_w.type == detail::type_string_cpp<memory::RefVar>) {
 		actual_rhs_w = &std::any_cast<memory::RefVar>(rhs_w.value).get().wrap;
@@ -275,21 +275,21 @@ namespace ast {
 	while (var_iter_pos != var_iter_end) {
 		INTERPRETER_PRINT("Going to assign a variable.");
 
-		Evaluation var_res_w = *var_iter_pos;
-		if (not var_res_w) {
+		Evaluation var_eval = *var_iter_pos;
+		if (not var_eval) {
 			INTERPRETER_PRINT(
 				"Something went wrong when retrieving the next variable."
 			);
-			INTERPRETER_PRINT("Error: '{}'", var_res_w.error().errors.at(0));
+			INTERPRETER_PRINT("Error: '{}'", var_eval.error().errors.at(0));
 			return append_error(
-				std::move(var_res_w.error()),
+				std::move(var_eval.error()),
 				evaluation_error_e::List_Iteration,
 				evaluation_function_e::Assignation,
 				"Something went wrong when retrieving the next variable"
 			);
 		}
 
-		const memory::WrappedAny& name_w = *var_res_w;
+		const memory::WrappedAny& name_w = *var_eval;
 #if defined DEBUG
 		assert(name_w.type == detail::type_string_cpp<std::string>);
 #endif
@@ -298,13 +298,13 @@ namespace ast {
 		INTERPRETER_PRINT("Of name:  '{}'.", var_name);
 		INTERPRETER_PRINT("Of value: '{}'.", *actual_rhs_w);
 
-		Evaluation assignation_res =
+		Evaluation assignation_eval =
 			assign_variable(ctx, var_name, *actual_rhs_w);
 
-		if (not assignation_res) {
+		if (not assignation_eval) {
 			INTERPRETER_PRINT("An error occurred.");
 			return append_error(
-				std::move(assignation_res.error()),
+				std::move(assignation_eval.error()),
 				evaluation_error_e::Assignation_Of_Variable,
 				evaluation_function_e::Assignation,
 				"Something went wrong when retrieving the next variable"

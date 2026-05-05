@@ -49,43 +49,43 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegativeNode& v)
 
 	const auto& child = v.get_child();
 
-	Evaluation int_res_w = interpret_node(ctx, child);
-	if (not int_res_w.has_value()) {
+	Evaluation eval = interpret_node(ctx, child);
+	if (not eval.has_value()) {
 		INTERPRETER_PRINT("Node evaluation failed.");
 		return append_error(
-			std::move(int_res_w.error()),
+			std::move(eval.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Negative,
 			"Node evaluation failed"
 		);
 	}
 
-	const EvaluationResult& res_w = *int_res_w;
-	if (res_w.type == detail::type_string_cpp<uint64_t>) {
-		const auto ri = std::any_cast<uint64_t>(res_w.value);
+	const EvaluationResult& res = *eval;
+	if (res.type == detail::type_string_cpp<uint64_t>) {
+		const auto ri = std::any_cast<uint64_t>(res.value);
 		INTERPRETER_PRINT("Evaluation of node is uint64_t: {}.", ri);
 		return make_good_evaluation<
 			EvaluationResult>(-detail::to_int64(ri), detail::type_string_cpp<int64_t>);
 	}
 
-	if (res_w.type == detail::type_string_cpp<int64_t>) {
-		const auto ri = std::any_cast<int64_t>(res_w.value);
+	if (res.type == detail::type_string_cpp<int64_t>) {
+		const auto ri = std::any_cast<int64_t>(res.value);
 		INTERPRETER_PRINT("Evaluation of node is int64_t: {}.", ri);
 		return detail::adapt_type(-ri);
 	}
 
-	if (res_w.type == detail::type_string_cpp<std::float64_t>) {
-		const auto ri = std::any_cast<std::float64_t>(res_w.value);
+	if (res.type == detail::type_string_cpp<std::float64_t>) {
+		const auto ri = std::any_cast<std::float64_t>(res.value);
 		INTERPRETER_PRINT("Evaluation of node is double: {}.", ri);
 		return make_good_evaluation<
 			EvaluationResult>(-ri, detail::type_string_cpp<std::float64_t>);
 	}
 
-	INTERPRETER_PRINT("Unhandled value '{}'.", res_w);
+	INTERPRETER_PRINT("Unhandled value '{}'.", res);
 	return make_bad_evaluation(
 		Vec{evaluation_error_e::Unhandled_Variable_Type},
 		Vec{evaluation_function_e::Negative},
-		Vec{std::format("Unhandled value '{}'", res_w)}
+		Vec{std::format("Unhandled value '{}'", res)}
 	);
 }
 

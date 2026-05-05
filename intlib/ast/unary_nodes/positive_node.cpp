@@ -48,18 +48,18 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::PositiveNode& v)
 
 	const auto& child = v.get_child();
 
-	Evaluation int_res_w = interpret_node(ctx, child);
-	if (not int_res_w.has_value()) {
+	Evaluation eval = interpret_node(ctx, child);
+	if (not eval.has_value()) {
 		INTERPRETER_PRINT("Node evaluation failed.");
 		return append_error(
-			std::move(int_res_w.error()),
+			std::move(eval.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Positive,
 			"Node evaluation failed"
 		);
 	}
 
-	const EvaluationResult& res = *int_res_w;
+	const EvaluationResult& res = *eval;
 	if (res.type == detail::type_string_cpp<uint64_t>) {
 		const auto ri = std::any_cast<uint64_t>(res.value);
 		INTERPRETER_PRINT("Evaluation of node is uint64_t: {}.", ri);

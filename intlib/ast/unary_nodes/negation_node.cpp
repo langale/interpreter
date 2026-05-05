@@ -49,23 +49,23 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::NegationNode& v)
 
 	const auto& child = v.get_child();
 
-	Evaluation res_w = interpret_node(ctx, child);
-	if (not res_w.has_value()) {
+	Evaluation eval = interpret_node(ctx, child);
+	if (not eval.has_value()) {
 		INTERPRETER_PRINT("Node evaluation failed.");
 		return append_error(
-			std::move(res_w.error()),
+			std::move(eval.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Negation,
 			"Node evaluation failed"
 		);
 	}
 
-	const EvaluationResult& res = *res_w;
-	const std::optional res_bool_w = detail::any_to_bool(res);
-	if (res_bool_w) {
-		INTERPRETER_PRINT("Evaluation of node: {}.", *res_bool_w);
+	const EvaluationResult& res = *eval;
+	const std::optional value_w = detail::any_to_bool(res);
+	if (value_w) {
+		INTERPRETER_PRINT("Evaluation of node: {}.", *value_w);
 		return make_good_evaluation<
-			EvaluationResult>(not*res_bool_w, detail::type_string_cpp<bool>);
+			EvaluationResult>(not*value_w, detail::type_string_cpp<bool>);
 	}
 
 	INTERPRETER_PRINT("Unhandled value of type '{}'.", res.type);

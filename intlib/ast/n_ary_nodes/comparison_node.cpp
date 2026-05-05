@@ -67,52 +67,52 @@ Evaluation evaluate(
 	assert(children.size() > 0);
 #endif
 
-	EvaluationResult previous_w;
+	EvaluationResult previous_res;
 	{
-		Evaluation res = interpret_node(ctx, children.at(0));
-		if (not res.has_value()) {
+		Evaluation eval = interpret_node(ctx, children.at(0));
+		if (not eval.has_value()) {
 			INTERPRETER_PRINT("Evaluation of node failed.");
 			return append_error(
-				std::move(res.error()),
+				std::move(eval.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				evaluation_function_e::Comparison,
 				"Evaluation of node failed"
 			);
 		}
-		previous_w = std::move(*res);
+		previous_res = std::move(*eval);
 	}
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		Evaluation res_w = interpret_node(ctx, c);
-		if (not res_w.has_value()) {
+		Evaluation eval = interpret_node(ctx, c);
+		if (not eval.has_value()) {
 			INTERPRETER_PRINT("Evaluation of node failed.");
 			return append_error(
-				std::move(res_w.error()),
+				std::move(eval.error()),
 				evaluation_error_e::Evaluation_Of_Node_Failed,
 				evaluation_function_e::Comparison,
 				"Evaluation of node failed"
 			);
 		}
-		EvaluationResult current_w = std::move(*res_w);
+		EvaluationResult current_res = std::move(*eval);
 
 		const std::optional<bool> comparison_result_w =
-			comparison::any_comparison(t, previous_w, current_w);
+			comparison::any_comparison(t, previous_res, current_res);
 
 		if (not comparison_result_w.has_value()) {
 			INTERPRETER_PRINT(
 				"Could not compare two std::any values: '{}' and '{}'.",
-				previous_w,
-				current_w
+				previous_res,
+				current_res
 			);
 			return make_bad_evaluation(
 				Vec{evaluation_error_e::Comparison_Operation_Failed},
 				Vec{evaluation_function_e::Comparison},
 				Vec{std::format(
 					"Could not compare two std::any values: '{}' and '{}'",
-					previous_w,
-					current_w
+					previous_res,
+					current_res
 				)}
 			);
 		}
@@ -121,7 +121,7 @@ Evaluation evaluate(
 			return make_good_evaluation<
 				EvaluationResult>(false, detail::type_string_cpp<bool>);
 		}
-		previous_w = std::move(current_w);
+		previous_res = std::move(current_res);
 	}
 
 	return make_good_evaluation<

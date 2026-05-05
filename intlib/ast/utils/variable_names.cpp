@@ -70,19 +70,19 @@ namespace ast {
 
 		INTERPRETER_PRINT("Made index for child {}.", i);
 
-		Evaluation res_w = interpret_node(ctx, child);
-		if (not res_w.has_value()) {
-			return res_w;
+		Evaluation eval = interpret_node(ctx, child);
+		if (not eval.has_value()) {
+			return eval;
 		}
 
 		INTERPRETER_PRINT("Successfully evaluated child.");
 
-		const memory::WrappedAny& val = *res_w;
+		const memory::WrappedAny& val_w = *eval;
 		std::optional<int64_t> idx_w;
 
-		if (val.type == detail::type_string_cpp<memory::Variable>) {
+		if (val_w.type == detail::type_string_cpp<memory::Variable>) {
 			const auto& memory_variable =
-				std::any_cast<const memory::Variable&>(val.value);
+				std::any_cast<const memory::Variable&>(val_w.value);
 
 			idx_w = detail::any_to_numeric<int64_t>(memory_variable);
 
@@ -94,11 +94,11 @@ namespace ast {
 			}
 		}
 		else {
-			idx_w = detail::any_to_numeric<int64_t>(val);
+			idx_w = detail::any_to_numeric<int64_t>(val_w);
 
 			if (not idx_w) {
 				INTERPRETER_PRINT(
-					"Could not convert value '{}' into a numeric int64_t.", val
+					"Could not convert value '{}' into a numeric int64_t.", val_w
 				);
 			}
 		}
@@ -190,14 +190,14 @@ Evaluation make_subscripted_variable_name(
 		"There is no sequence environment so retrieving the indices normally."
 	);
 
-	Evaluation res_w = get_indices(ctx, subscripted_variable);
-	if (not res_w.has_value()) {
-		return res_w;
+	Evaluation eval = get_indices(ctx, subscripted_variable);
+	if (not eval.has_value()) {
+		return eval;
 	}
 
 	INTERPRETER_PRINT("Successfully made indices.");
 
-	memory::WrappedAny indices_w = std::move(*res_w);
+	memory::WrappedAny indices_w = std::move(*eval);
 
 	INTERPRETER_PRINT("Make indices for variable {}.", name);
 
