@@ -40,7 +40,7 @@
 namespace intlib {
 namespace detail {
 
-[[nodiscard]] std::optional<memory::WrappedAny> convert_to_ale_type(
+[[nodiscard]] memory::WrappedAny convert_to_ale_type(
 	const memory::WrappedAny& value, const std::string_view ale_type
 );
 

@@ -50,10 +50,9 @@ namespace detail {
 #define OPTIONAL_TO_ANY(func, value, CppType)                                  \
 	const auto o = func(value);                                                \
 	if (o) {                                                                   \
-		return ale::detail::make_optional<                                     \
-			memory::WrappedAny>(*o, detail::type_string_cpp<CppType>);         \
+		return {*o, detail::type_string_cpp<CppType>};                         \
 	}                                                                          \
-	return {};
+	return {std::any{}, detail::type_string_cpp<void>};
 
 #define TEST(test_ale_type)                                                                     \
 	if (ale_type == (test_ale_type)) {                                                          \
@@ -63,7 +62,7 @@ namespace detail {
 		OPTIONAL_TO_ANY(any_to_numeric<CppType>, value, CppType);                               \
 	}
 
-std::optional<memory::WrappedAny> convert_to_ale_type(
+memory::WrappedAny convert_to_ale_type(
 	const memory::WrappedAny& value, const std::string_view ale_type
 )
 {
