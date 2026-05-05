@@ -61,7 +61,7 @@ public:
 		m_indices.reserve(n);
 	}
 
-	[[nodiscard]] size_t depth() const noexcept
+	[[nodiscard]] size_t get_depth() const noexcept
 	{
 		return m_indices.size();
 	}

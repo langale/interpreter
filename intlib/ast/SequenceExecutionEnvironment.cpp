@@ -36,7 +36,6 @@
 #if defined DEBUG
 #include <cassert>
 #endif
-
 #include <optional>
 #include <ranges>
 
@@ -47,7 +46,7 @@ namespace ast {
 
 Evaluation SequenceExecutionEnvironment::make_distances()
 {
-	const auto depth_levels = m_first_indices.depth();
+	const auto depth_levels = m_first_indices.get_depth();
 	m_distances.resize(depth_levels, 0);
 	for (size_t depth = 0; depth < depth_levels; ++depth) {
 		const auto& first = m_first_indices.get_variables_depth(depth);
