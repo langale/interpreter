@@ -45,6 +45,9 @@
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/ast/utils/node_type_enum.hpp>
 #include <ale/ast/utils/node_is_type.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <ale/ast/utils/node_type_to_string.hpp>
+#endif
 
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/SequenceIndices.hpp>
@@ -186,7 +189,24 @@ template <indices_type_e indices_type>
 	SequenceIndices& indices
 )
 {
+	static_assert(ale::ast::is_node_binary(ale::ast::node_type_e::Sequence));
+
 	const auto t = n->get_node_type();
+
+	if (t == ale::ast::node_type_e::Sequence) {
+		const auto& seq = *static_cast<ale::ast::SequenceNode *>(n.get());
+		if constexpr (indices_type == indices_type_e::first) {
+			return add_indices<indices_type>(
+				ctx, seq.get_left_child(), d + 1, indices
+			);
+		}
+		else {
+			return add_indices<indices_type>(
+				ctx, seq.get_right_child(), d + 1, indices
+			);
+		}
+	}
+
 	if (t != ale::ast::node_type_e::Subscripted_Variable) {
 
 		if (ale::ast::is_node_unary(t)) {
@@ -197,24 +217,7 @@ template <indices_type_e indices_type>
 		}
 
 		if (ale::ast::is_node_binary(t)) {
-
-			static_assert(
-				ale::ast::is_node_binary(ale::ast::node_type_e::Sequence)
-			);
-
 			const auto& binary = *static_cast<ale::ast::BinaryNode *>(n.get());
-			if (t == ale::ast::node_type_e::Sequence) {
-				if constexpr (indices_type == indices_type_e::first) {
-					return add_indices<indices_type>(
-						ctx, binary.get_left_child(), d + 1, indices
-					);
-				}
-				else {
-					return add_indices<indices_type>(
-						ctx, binary.get_right_child(), d + 1, indices
-					);
-				}
-			}
 
 			auto res1_eval = add_indices<indices_type>(
 				ctx, binary.get_left_child(), d, indices
@@ -286,6 +289,26 @@ get_expression(const ale::ast::SequenceNode& seq) noexcept
 	return next_child;
 }
 
+static void fill_node_types(
+	const ale::ast::SequenceNode& seq, SequenceExecutionEnvironment& env
+)
+{
+	static_assert(ale::ast::is_node_binary(ale::ast::node_type_e::Sequence));
+#if defined DEBUG
+	assert(seq.get_operator_type().has_value());
+#endif
+	env.add_node_type(*seq.get_operator_type());
+
+	const auto& left = seq.get_left_child();
+	if (left->get_node_type() != ale::ast::node_type_e::Sequence) {
+		return;
+	}
+
+	const auto& seq_left =
+		*static_cast<const ale::ast::SequenceNode *>(left.get());
+	fill_node_types(seq_left, env);
+}
+
 Evaluation make_sequence_execution_environment(
 	EvaluationContext& ctx, const ale::ast::SequenceNode& seq
 )
@@ -319,8 +342,8 @@ Evaluation make_sequence_execution_environment(
 	INTERPRETER_PRINT("Going to check correctness.");
 
 	// check correctness: variables match
-	const auto depth_start = env.get_first_indices().depth();
-	const auto depth_end = env.get_first_indices().depth();
+	const auto depth_start = env.get_first_indices().get_depth();
+	const auto depth_end = env.get_last_indices().get_depth();
 	if (depth_start != depth_end) {
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Sequence_Environment_Mismatch_Depth},
@@ -340,6 +363,20 @@ Evaluation make_sequence_execution_environment(
 		return distances_eval;
 	}
 
+	INTERPRETER_PRINT("Going to retrieve the operator types.");
+
+	fill_node_types(seq, env);
+
+#if defined ALE_LOGGING_MESSAGES
+	const size_t depth = env.get_depth();
+	INTERPRETER_PRINT("Depth (total number of indices): {}.", depth);
+	for (size_t i = 0; i < depth; ++i) {
+		INTERPRETER_PRINT(
+			"    Node type at depth {}: '{}'.", i, env.get_node_type(i)
+		);
+	}
+#endif
+
 	const auto& expression = get_expression(seq);
 	env.set_expression(&expression);
 
@@ -347,14 +384,21 @@ Evaluation make_sequence_execution_environment(
 		EvaluationResult>(std::move(env), detail::type_string_cpp<SequenceExecutionEnvironment>);
 }
 
-[[nodiscard]] static std::generator<Evaluation> enumerate_values_sequence(
-	EvaluationContext& ctx,
-	SequenceExecutionEnvironment& env,
-	const size_t depth
+[[nodiscard]] static std::generator<Evaluation>
+enumerate_values_sequence_recursive(
+	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 )
 {
+#if defined DEBUG
+	assert(ctx.sequence_depth.has_value());
+#endif
+
+	const size_t depth = *ctx.sequence_depth;
+
+	INTERPRETER_PRINT("Enumerating at depth: {}/{}.", depth, env.get_depth());
+
 	if (depth == env.get_depth()) {
-		ctx.sequence_execution_environment = std::optional{&env};
+		ctx.sequence_execution_environment = &env;
 		Evaluation eval = interpret_node(ctx, env.get_expression());
 		ctx.sequence_execution_environment = {};
 		co_yield std::move(eval);
@@ -368,8 +412,9 @@ Evaluation make_sequence_execution_environment(
 	const int64_t distance = env.get_distance(depth);
 	for (int64_t i = 0; i < distance; ++i) {
 		env.set_working_distance(depth, i);
+		ctx.sequence_depth = depth + 1;
 
-		auto gen = enumerate_values_sequence(ctx, env, depth + 1);
+		auto gen = enumerate_values_sequence_recursive(ctx, env);
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
@@ -383,6 +428,7 @@ Evaluation make_sequence_execution_environment(
 		}
 	}
 
+	ctx.sequence_depth.reset();
 	co_return;
 }
 
@@ -390,26 +436,20 @@ std::generator<Evaluation> enumerate_values_sequence(
 	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 )
 {
-	auto gen = enumerate_values_sequence(ctx, env, 0);
-	auto pos = gen.begin();
-	const auto end = gen.end();
-	while (pos != end) {
-		Evaluation eval = *pos;
-		if (not eval) {
-			co_yield std::move(eval);
-			co_return;
-		}
-		co_yield std::move(eval);
-		++pos;
-	}
+	ctx.sequence_depth = {0};
+	return enumerate_values_sequence_recursive(ctx, env);
 }
 
-[[nodiscard]] static std::generator<Evaluation> enumerate_names_sequence(
-	EvaluationContext& ctx,
-	SequenceExecutionEnvironment& env,
-	const size_t depth
+[[nodiscard]] static std::generator<Evaluation>
+enumerate_names_sequence_recursive(
+	EvaluationContext& ctx, SequenceExecutionEnvironment& env
 )
 {
+#if defined DEBUG
+	assert(ctx.sequence_depth.has_value());
+#endif
+
+	const size_t depth = *ctx.sequence_depth;
 	if (depth == env.get_depth()) {
 		const auto& expr = env.get_expression();
 #if defined DEBUG
@@ -421,7 +461,7 @@ std::generator<Evaluation> enumerate_values_sequence(
 		const ale::ast::SubscriptedVariableNode& sub =
 			*static_cast<const ale::ast::SubscriptedVariableNode *>(expr.get());
 
-		ctx.sequence_execution_environment = {&env};
+		ctx.sequence_execution_environment = &env;
 		Evaluation eval = make_subscripted_variable_name(ctx, sub);
 		ctx.sequence_execution_environment = {};
 
@@ -436,8 +476,9 @@ std::generator<Evaluation> enumerate_values_sequence(
 	const int64_t distance = env.get_distance(depth);
 	for (int64_t i = 0; i < distance; ++i) {
 		env.set_working_distance(depth, i);
+		ctx.sequence_depth = depth + 1;
 
-		auto gen = enumerate_names_sequence(ctx, env, depth + 1);
+		auto gen = enumerate_names_sequence_recursive(ctx, env);
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
@@ -451,6 +492,7 @@ std::generator<Evaluation> enumerate_values_sequence(
 		}
 	}
 
+	ctx.sequence_depth.reset();
 	co_return;
 }
 
@@ -467,18 +509,8 @@ std::generator<Evaluation> enumerate_names_sequence(
 
 	INTERPRETER_PRINT("Going to enumerate the variable names of a sequence.");
 
-	auto gen = enumerate_names_sequence(ctx, env, 0);
-	auto pos = gen.begin();
-	const auto end = gen.end();
-	while (pos != end) {
-		Evaluation eval = *pos;
-		if (not eval) {
-			co_yield std::move(eval);
-			co_return;
-		}
-		co_yield std::move(eval);
-		++pos;
-	}
+	ctx.sequence_depth = {0};
+	return enumerate_names_sequence_recursive(ctx, env);
 }
 
 } // namespace ast
