@@ -80,13 +80,6 @@ namespace ast {
 	const ale::ast::node_type_e t
 );
 
-[[nodiscard]] Evaluation evaluate_logical_node(
-	EvaluationContext& ctx,
-	const ale::ast::LogicalNode& v,
-	const ale::ast::node_type_e t,
-	const std::unique_ptr<ale::ast::Node>& c
-);
-
 [[nodiscard]] Evaluation evaluate(
 	EvaluationContext& ctx,
 	const ale::ast::LogicalNode& v,

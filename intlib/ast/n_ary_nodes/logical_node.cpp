@@ -96,7 +96,7 @@ namespace ast {
 	return false;
 }
 
-Evaluation evaluate_logical_node(
+[[nodiscard]] static Evaluation evaluate_logical_node(
 	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c
 )
 {
