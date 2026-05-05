@@ -97,10 +97,10 @@ namespace ast {
 		);
 	}
 
-	std::optional value_conv_w =
+	memory::WrappedAny value_conv_w =
 		detail::convert_to_ale_type(value_w, var_in_memory.ale_type);
 
-	if (not value_conv_w) {
+	if (value_conv_w.type == detail::type_string_cpp<void>) {
 		INTERPRETER_PRINT(
 			"Could not convert value '{}' to a value of ALE type '{}'.",
 			value_w,
@@ -121,10 +121,10 @@ namespace ast {
 		"Value '{}' after conversion to '{}' is: '{}'.",
 		value_w,
 		var_in_memory.ale_type,
-		*value_conv_w
+		value_conv_w
 	);
 
-	var_in_memory.wrap = std::move(*value_conv_w);
+	var_in_memory.wrap = std::move(value_conv_w);
 
 	INTERPRETER_PRINT("Successfully assigned variable '{}'.", var_name);
 

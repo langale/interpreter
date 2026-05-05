@@ -113,9 +113,10 @@ namespace ast {
 		);
 	}
 
-	std::optional value_conv_w = detail::convert_to_ale_type(value_w, var_type);
+	memory::WrappedAny value_conv_w =
+		detail::convert_to_ale_type(value_w, var_type);
 
-	if (not value_conv_w) {
+	if (value_conv_w.type == detail::type_string_cpp<void>) {
 		INTERPRETER_PRINT(
 			"Could not convert value '{}' to a value of type '{}'.",
 			value_w,
@@ -133,17 +134,17 @@ namespace ast {
 	}
 
 	INTERPRETER_PRINT(
-		"Value after conversion to '{}' is: '{}'.", var_type, *value_conv_w
+		"Value after conversion to '{}' is: '{}'.", var_type, value_conv_w
 	);
 
 	if (t == ale::ast::node_type_e::Declaration_Const) {
 		ctx.memory.declare_constant_variable(
-			std::move(var_name), std::move(*value_conv_w), var_type
+			std::move(var_name), std::move(value_conv_w), var_type
 		);
 	}
 	else {
 		ctx.memory.declare_variable(
-			std::move(var_name), std::move(*value_conv_w), var_type
+			std::move(var_name), std::move(value_conv_w), var_type
 		);
 	}
 
