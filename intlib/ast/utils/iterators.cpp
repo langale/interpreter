@@ -38,7 +38,6 @@
 #include <string>
 using namespace std::string_literals;
 
-#include <ale/ast/utils/node_is_type.hpp>
 #include <ale/ast/zero_ary_nodes/VariableNode.hpp>
 #include <ale/ast/n_ary_nodes/SubscriptedVariableNode.hpp>
 #include <ale/ast/n_ary_nodes/CommaSeparatedGroupNode.hpp>
@@ -62,34 +61,6 @@ using namespace std::string_literals;
 
 namespace intlib {
 namespace ast {
-
-[[nodiscard]] static bool is_node_interpretable(const ale::ast::node_type_e t
-) noexcept
-{
-
-	return ale::ast::is_node_numerical_literal(t) or
-		   ale::ast::is_node_arithmetic(t) or ale::ast::is_node_logical(t) or
-		   ale::ast::is_node_comparison(t) or
-		   t == ale::ast::node_type_e::Negative or
-		   t == ale::ast::node_type_e::Positive or
-		   t == ale::ast::node_type_e::Negation or
-		   t == ale::ast::node_type_e::Variable or
-		   t == ale::ast::node_type_e::Subscripted_Variable;
-}
-
-template <typename node_t>
-[[nodiscard]] static bool is_node_interpretable(
-	const node_t *node, const ale::ast::node_type_e t
-) noexcept
-{
-
-	if (t == ale::ast::node_type_e::Sequence) {
-		const ale::ast::SequenceNode *seq =
-			static_cast<const ale::ast::SequenceNode *>(node);
-		return is_node_interpretable(*seq->get_operator_type());
-	}
-	return is_node_interpretable(t);
-}
 
 std::generator<Evaluation>
 make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var)
