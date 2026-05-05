@@ -46,13 +46,17 @@ struct EvaluationContext {
 
 	std::optional<const SequenceExecutionEnvironment *>
 		sequence_execution_environment;
+
+	std::optional<size_t> sequence_depth;
 };
 
 [[nodiscard]] inline EvaluationContext
 new_evaluation_context(memory::Memory& mem)
 {
 	return EvaluationContext{
-		.memory = mem, .sequence_execution_environment = {}
+		.memory = mem,
+		.sequence_execution_environment = {},
+		.sequence_depth = {}
 	};
 }
 
