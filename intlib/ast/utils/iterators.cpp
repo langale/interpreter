@@ -62,6 +62,20 @@ using namespace std::string_literals;
 namespace intlib {
 namespace ast {
 
+[[nodiscard]] static std::generator<Evaluation>
+make_value_iterator_over_interpret(
+	EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& node
+)
+{
+	auto eval = interpret_node(ctx, node);
+	co_yield std::move(eval);
+}
+
+[[nodiscard]] static std::generator<Evaluation> iterator_empty()
+{
+	co_yield make_good_evaluation<EvaluationResult>();
+}
+
 std::generator<Evaluation>
 make_value_iterator(EvaluationContext& ctx, const ale::ast::VariableNode& var)
 {
@@ -356,54 +370,35 @@ std::generator<Evaluation> make_value_iterator(
 		const ale::ast::VariableNode& var =
 			*static_cast<ale::ast::VariableNode *>(node.get());
 
-		auto gen = make_value_iterator(ctx, var);
-		auto pos = gen.begin();
-		co_yield std::move(*pos);
-		co_return;
+		return make_value_iterator(ctx, var);
 	}
 
 	if (t == ale::ast::node_type_e::Subscripted_Variable) {
 		const ale::ast::SubscriptedVariableNode& subsvar =
 			*static_cast<ale::ast::SubscriptedVariableNode *>(node.get());
 
-		auto gen = make_value_iterator(ctx, subsvar);
-		auto pos = gen.begin();
-		co_yield std::move(*pos);
-		co_return;
+		return make_value_iterator(ctx, subsvar);
 	}
 
 	if (t == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& seq =
 			*static_cast<ale::ast::SequenceNode *>(node.get());
 
-		auto gen = make_value_iterator(ctx, seq);
-		auto pos = gen.begin();
-		auto end = gen.end();
-		while (pos != end) {
-			co_yield std::move(*pos);
-			++pos;
-		}
-		co_return;
+		return make_value_iterator(ctx, seq);
 	}
 
 	if (t == ale::ast::node_type_e::Comma_Separated_Group) {
 		const ale::ast::CommaSeparatedGroupNode& group =
 			*static_cast<ale::ast::CommaSeparatedGroupNode *>(node.get());
 
-		auto gen = make_value_iterator(ctx, group);
-		auto pos = gen.begin();
-		auto end = gen.end();
-		while (pos != end) {
-			co_yield std::move(*pos);
-			++pos;
-		}
-		co_return;
+		return make_value_iterator(ctx, group);
 	}
 
 	if (is_node_interpretable(t)) {
-		co_yield interpret_node(ctx, node);
-		co_return;
+		return make_value_iterator_over_interpret(ctx, node);
 	}
+
+	return iterator_empty();
 }
 
 // -----------------------------------------------------------------------------
@@ -465,11 +460,11 @@ std::generator<Evaluation> make_name_iterator(
 
 	INTERPRETER_PRINT("Going to make the sequence execution environment.");
 
-	Evaluation eval = make_sequence_execution_environment(ctx, sequence);
+	Evaluation seq_eval = make_sequence_execution_environment(ctx, sequence);
 
-	if (not eval.has_value()) {
+	if (not seq_eval.has_value()) {
 		co_yield append_error(
-			std::move(eval.error()),
+			std::move(seq_eval.error()),
 			evaluation_error_e::Evaluation_Of_Node_Failed,
 			evaluation_function_e::Iterator_Value_Sequence,
 			"Could not construct sequence execution environment"
@@ -481,7 +476,7 @@ std::generator<Evaluation> make_name_iterator(
 		"Successfully constructed the sequence execution environment."
 	);
 
-	memory::WrappedAny seq_env_w = std::move(*eval);
+	memory::WrappedAny seq_env_w = std::move(*seq_eval);
 	SequenceExecutionEnvironment seq_env =
 		std::any_cast<SequenceExecutionEnvironment&&>(std::move(seq_env_w.value)
 		);
@@ -595,49 +590,31 @@ std::generator<Evaluation> make_name_iterator(
 		const ale::ast::VariableNode& var =
 			*static_cast<ale::ast::VariableNode *>(node.get());
 
-		auto gen = make_name_iterator(ctx, var);
-		auto pos = gen.begin();
-		co_yield std::move(*pos);
-		co_return;
+		return make_name_iterator(ctx, var);
 	}
 
 	if (t == ale::ast::node_type_e::Subscripted_Variable) {
 		const ale::ast::SubscriptedVariableNode& subsvar =
 			*static_cast<ale::ast::SubscriptedVariableNode *>(node.get());
 
-		auto gen = make_name_iterator(ctx, subsvar);
-		auto pos = gen.begin();
-		co_yield std::move(*pos);
-		co_return;
+		return make_name_iterator(ctx, subsvar);
 	}
 
 	if (t == ale::ast::node_type_e::Sequence) {
 		const ale::ast::SequenceNode& seq =
 			*static_cast<ale::ast::SequenceNode *>(node.get());
 
-		auto gen = make_name_iterator(ctx, seq);
-		auto pos = gen.begin();
-		auto end = gen.end();
-		while (pos != end) {
-			co_yield std::move(*pos);
-			++pos;
-		}
-		co_return;
+		return make_name_iterator(ctx, seq);
 	}
 
 	if (t == ale::ast::node_type_e::Comma_Separated_Group) {
 		const ale::ast::CommaSeparatedGroupNode& group =
 			*static_cast<ale::ast::CommaSeparatedGroupNode *>(node.get());
 
-		auto gen = make_name_iterator(ctx, group);
-		auto pos = gen.begin();
-		auto end = gen.end();
-		while (pos != end) {
-			co_yield std::move(*pos);
-			++pos;
-		}
-		co_return;
+		return make_name_iterator(ctx, group);
 	}
+
+	return iterator_empty();
 }
 
 } // namespace ast
