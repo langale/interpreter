@@ -39,7 +39,6 @@
 
 #include <intlib/ast/SequenceIndices.hpp>
 #include <intlib/ast/Evaluation.hpp>
-#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace ast {
