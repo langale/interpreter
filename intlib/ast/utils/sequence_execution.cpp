@@ -396,8 +396,13 @@ enumerate_values_sequence_recursive(
 	const size_t depth = *ctx.sequence_depth;
 
 	INTERPRETER_PRINT("Enumerate value depth: {}/{}.", depth, env.get_depth());
+	const bool is_comma =
+		depth == env.get_depth()
+			? true
+			: env.get_node_type(depth) ==
+				  ale::ast::node_type_e::Comma_Separated_Group;
 
-	if (depth == env.get_depth()) {
+	if (depth == env.get_depth() or not is_comma) {
 		INTERPRETER_PRINT("Level {} of the sequence is interpretable.", depth);
 
 		ctx.sequence_execution_environment = &env;
