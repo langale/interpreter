@@ -112,6 +112,8 @@ evaluation_error_to_string(const evaluation_error_e e) noexcept
 		return "Sequence_Environment_Missing_Right_Variable";
 	case evaluation_error_e::Sequence_Environment_Mismatch_Distance:
 		return "Sequence_Environment_Mismatch_Distance";
+	case evaluation_error_e::Sequence_Evaluation_Failed:
+		return "Sequence_Evaluation_Failed";
 
 	case evaluation_error_e::Overfull_Left_Hand_Side_Values:
 		return "Overfull_Left_Hand_Side_Values";

@@ -73,6 +73,7 @@ enum class evaluation_error_e : uint8_t {
 	Sequence_Environment_Mismatch_Depth,
 	Sequence_Environment_Missing_Right_Variable,
 	Sequence_Environment_Mismatch_Distance,
+	Sequence_Evaluation_Failed,
 
 	If_Statement_Condition_Empty,
 	If_Statement_First_Branch_Empty,
