@@ -47,6 +47,7 @@ using namespace std::string_literals;
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/ast/utils/iterators.hpp>
+#include <intlib/memory/utils/unwrap.hpp>
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
 #if defined ALE_LOGGING_MESSAGES
@@ -211,18 +212,7 @@ namespace ast {
 		}
 
 		memory::WrappedAny value_w = std::move(*value_eval);
-		const memory::WrappedAny *actual_value_w = nullptr;
-		if (value_w.type == detail::type_string_cpp<memory::RefVar>) {
-			actual_value_w =
-				&std::any_cast<memory::RefVar>(value_w.value).get().wrap;
-		}
-		else if (value_w.type == detail::type_string_cpp<memory::RefConstVar>) {
-			actual_value_w =
-				&std::any_cast<memory::RefConstVar>(value_w.value).get().wrap;
-		}
-		else {
-			actual_value_w = &value_w;
-		}
+		const memory::WrappedAny *actual_value_w = memory::unwrap_out(value_w);
 
 		memory::WrappedAny name_w = std::move(*var_eval);
 #if defined DEBUG
@@ -305,18 +295,8 @@ namespace ast {
 
 	INTERPRETER_PRINT("Going to retrieve the actual rhs value.");
 
-	memory::WrappedAny rhs_w = std::move(*rhs_eval);
-	const memory::WrappedAny *actual_rhs_w = nullptr;
-	if (rhs_w.type == detail::type_string_cpp<memory::RefVar>) {
-		actual_rhs_w = &std::any_cast<memory::RefVar>(rhs_w.value).get().wrap;
-	}
-	else if (rhs_w.type == detail::type_string_cpp<memory::RefConstVar>) {
-		actual_rhs_w =
-			&std::any_cast<memory::RefConstVar>(rhs_w.value).get().wrap;
-	}
-	else {
-		actual_rhs_w = &rhs_w;
-	}
+	const memory::WrappedAny rhs_w = std::move(*rhs_eval);
+	const memory::WrappedAny *actual_rhs_w = memory::unwrap_out(rhs_w);
 
 	while (var_iter_pos != var_iter_end) {
 		INTERPRETER_PRINT("Going to declare a variable.");
