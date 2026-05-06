@@ -44,7 +44,7 @@ namespace ast {
 struct EvaluationContext {
 	memory::Memory& memory;
 
-	std::optional<const SequenceExecutionEnvironment *>
+	std::optional<SequenceExecutionEnvironment *>
 		sequence_execution_environment;
 
 	std::optional<size_t> sequence_depth;
