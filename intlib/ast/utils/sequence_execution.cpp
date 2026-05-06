@@ -398,9 +398,11 @@ enumerate_values_sequence_recursive(
 	INTERPRETER_PRINT("Enumerate value depth: {}/{}.", depth, env.get_depth());
 
 	if (depth == env.get_depth()) {
+		INTERPRETER_PRINT("Level {} of the sequence is interpretable.", depth);
+
 		ctx.sequence_execution_environment = &env;
 		Evaluation eval = interpret_node(ctx, env.get_expression());
-		ctx.sequence_execution_environment = {};
+		ctx.sequence_execution_environment.reset();
 		co_yield std::move(eval);
 		co_return;
 	}
@@ -466,7 +468,7 @@ enumerate_names_sequence_recursive(
 
 		ctx.sequence_execution_environment = &env;
 		Evaluation eval = make_subscripted_variable_name(ctx, sub);
-		ctx.sequence_execution_environment = {};
+		ctx.sequence_execution_environment.reset();
 
 		co_yield std::move(eval);
 		co_return;
