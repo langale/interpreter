@@ -165,10 +165,14 @@ namespace ast {
 {
 	INTERPRETER_ENTER_AST_FUNCTION;
 
+	INTERPRETER_PRINT("Make iterator for the left hand side.");
+
 	EvaluationContext lhs_ctx = new_evaluation_context(ctx.memory);
 	auto var_iter = make_name_iterator(lhs_ctx, left_child);
 	auto var_iter_pos = var_iter.begin();
 	auto var_iter_end = var_iter.end();
+
+	INTERPRETER_PRINT("Make iterator for the left hand side.");
 
 	EvaluationContext rhs_ctx = new_evaluation_context(ctx.memory);
 	auto value_iter = make_value_iterator(rhs_ctx, right_child);
@@ -279,12 +283,14 @@ namespace ast {
 {
 	INTERPRETER_ENTER_AST_FUNCTION;
 
-	INTERPRETER_PRINT("Going to make name iterator.");
+	INTERPRETER_PRINT("Make iterator for the left hand side.");
 
 	EvaluationContext lhs_ctx = new_evaluation_context(ctx.memory);
 	auto var_iter = make_name_iterator(lhs_ctx, left_child);
 	auto var_iter_pos = var_iter.begin();
 	auto var_iter_end = var_iter.end();
+
+	INTERPRETER_PRINT("Make iterator for the right hand side.");
 
 	EvaluationContext rhs_ctx = new_evaluation_context(ctx.memory);
 	Evaluation rhs_eval = interpret_node(rhs_ctx, right_child);
@@ -369,6 +375,8 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 #endif
 
 	if (decl_t == ale::ast::node_type_e::Declaration_Declare) {
+		INTERPRETER_PRINT("Make iterator for the left hand side.");
+
 		auto var_iter = make_name_iterator(ctx, left_child);
 		auto var_iter_pos = var_iter.begin();
 		auto var_iter_end = var_iter.end();
