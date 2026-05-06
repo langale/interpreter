@@ -39,32 +39,13 @@ namespace memory {
 
 const WrappedAny *unwrap_out(const WrappedAny& w)
 {
-	const WrappedAny *actual_w = nullptr;
 	if (w.type == detail::type_string_cpp<RefVar>) {
-		actual_w = &std::any_cast<RefVar>(w.value).get().wrap;
+		return &std::any_cast<RefVar>(w.value).get().wrap;
 	}
-	else if (w.type == detail::type_string_cpp<RefConstVar>) {
-		actual_w = &std::any_cast<const RefVar>(w.value).get().wrap;
+	if (w.type == detail::type_string_cpp<RefConstVar>) {
+		return &std::any_cast<const RefConstVar>(w.value).get().wrap;
 	}
-	else {
-		actual_w = &w;
-	}
-	return actual_w;
-}
-
-WrappedAny *unwrap_out(WrappedAny& w)
-{
-	WrappedAny *actual_w = nullptr;
-	if (w.type == detail::type_string_cpp<RefVar>) {
-		actual_w = &std::any_cast<RefVar>(w.value).get().wrap;
-	}
-	else if (w.type == detail::type_string_cpp<RefConstVar>) {
-		actual_w = &std::any_cast<const RefVar>(w.value).get().wrap;
-	}
-	else {
-		actual_w = &w;
-	}
-	return actual_w;
+	return &w;
 }
 
 void unwrap_into(WrappedAny& w)

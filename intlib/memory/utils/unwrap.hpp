@@ -39,7 +39,6 @@ namespace intlib {
 namespace memory {
 
 [[nodiscard]] const WrappedAny *unwrap_out(const WrappedAny& w);
-[[nodiscard]] WrappedAny *unwrap_out(WrappedAny& w);
 
 void unwrap_into(WrappedAny& w);
 
