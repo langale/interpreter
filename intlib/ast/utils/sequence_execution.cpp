@@ -395,7 +395,7 @@ enumerate_values_sequence_recursive(
 
 	const size_t depth = *ctx.sequence_depth;
 
-	INTERPRETER_PRINT("Enumerating at depth: {}/{}.", depth, env.get_depth());
+	INTERPRETER_PRINT("Enumerate value depth: {}/{}.", depth, env.get_depth());
 
 	if (depth == env.get_depth()) {
 		ctx.sequence_execution_environment = &env;
@@ -450,6 +450,9 @@ enumerate_names_sequence_recursive(
 #endif
 
 	const size_t depth = *ctx.sequence_depth;
+
+	INTERPRETER_PRINT("Enumerate name depth: {}/{}.", depth, env.get_depth());
+
 	if (depth == env.get_depth()) {
 		const auto& expr = env.get_expression();
 #if defined DEBUG
