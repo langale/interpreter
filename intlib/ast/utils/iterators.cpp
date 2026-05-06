@@ -252,7 +252,7 @@ std::generator<Evaluation> make_value_iterator(
 	if (is_node_interpretable(*sequence.get_operator_type())) {
 		INTERPRETER_PRINT("The node is interpretable, so going to interpret.");
 
-		ctx.sequence_execution_environment = {&seq_env};
+		ctx.sequence_execution_environment = &seq_env;
 		Evaluation eval = evaluate(ctx, sequence);
 		ctx.sequence_execution_environment.reset();
 
