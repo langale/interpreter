@@ -98,7 +98,8 @@ namespace ast {
 
 			if (not idx_w) {
 				INTERPRETER_PRINT(
-					"Could not convert value '{}' into a numeric int64_t.", val_w
+					"Could not convert value '{}' into a numeric int64_t.",
+					val_w
 				);
 			}
 		}
@@ -153,10 +154,12 @@ Evaluation make_subscripted_variable_name(
 		assert(*ctx.sequence_execution_environment != nullptr);
 #endif
 
+		const auto N = subscripted_variable.get_num_children();
 		const auto& indices_order = subscripted_variable.get_indices_order();
+		std::vector<int64_t> indices(N);
 
 		const auto env = *ctx.sequence_execution_environment;
-		for (size_t i = 0; i < subscripted_variable.get_num_children(); ++i) {
+		for (size_t i = 0; i < N; ++i) {
 #if defined DEBUG
 			assert(i < indices_order.size());
 #endif
@@ -174,6 +177,12 @@ Evaluation make_subscripted_variable_name(
 			INTERPRETER_PRINT("First index value: '{}'.", first_index);
 			INTERPRETER_PRINT("Working distance: '{}'.", plus_distance);
 			INTERPRETER_PRINT("Resulting index: '{}'.", idx);
+
+			indices[depth] = idx;
+		}
+
+		for (size_t i = 0; i < indices.size(); ++i) {
+			const auto idx = indices[i];
 
 			name += "_" + std::to_string(idx);
 
