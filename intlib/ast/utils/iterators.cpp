@@ -264,7 +264,7 @@ std::generator<Evaluation> make_value_iterator(
 	INTERPRETER_PRINT("Environment's depth: {}.", env_depth);
 
 	if (env_depth > 0) {
-		auto gen = enumerate_values_sequence(ctx, seq_env);
+		auto gen = enumerate_values_sequence(ctx, seq_env, sequence);
 		auto pos = gen.begin();
 		auto end = gen.end();
 		while (pos != end) {
