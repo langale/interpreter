@@ -36,10 +36,12 @@
 #if defined DEBUG
 #include <cassert>
 #endif
+
 #include <optional>
 #include <ranges>
 
 #include <intlib/ast/Evaluation.hpp>
+#include <intlib/logger/macros.hpp>
 
 namespace intlib {
 namespace ast {
@@ -47,10 +49,24 @@ namespace ast {
 Evaluation SequenceExecutionEnvironment::make_distances()
 {
 	const auto depth_levels = m_first_indices.get_depth();
+
+	INTERPRETER_PRINT("depth_levels= {}.", depth_levels);
+
 	m_distances.resize(depth_levels, 0);
 	for (size_t depth = 0; depth < depth_levels; ++depth) {
+		INTERPRETER_PRINT("At depth= {}.", depth);
+
 		const auto& first = m_first_indices.get_variables_depth(depth);
+		INTERPRETER_PRINT("First indices:");
+		for (const auto& [var, index] : first) {
+			INTERPRETER_PRINT("    {} -> {}.", var, index);
+		}
+
 		const auto& last = m_last_indices.get_variables_depth(depth);
+		INTERPRETER_PRINT("Last indices:");
+		for (const auto& [var, index] : last) {
+			INTERPRETER_PRINT("    {} -> {}.", var, index);
+		}
 
 		std::optional<int64_t> distance;
 		for (const auto& [var, first_index] : first) {
@@ -95,6 +111,7 @@ Evaluation SequenceExecutionEnvironment::make_distances()
 		}
 
 #if defined DEBUG
+		assert(distance.has_value());
 		assert(*distance > 0);
 #endif
 		m_distances[depth] = *distance;
