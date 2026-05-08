@@ -47,12 +47,14 @@
 #include <ale/ast/utils/node_is_type.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <ale/ast/utils/node_type_to_string.hpp>
+#include <ale/ast/utils/xml_tree.hpp>
 #endif
 
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/SequenceIndices.hpp>
 #include <intlib/ast/SequenceExecutionEnvironment.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/ast/evaluation.hpp>
 #include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/detail/any_to_numeric.hpp>
 #include <intlib/detail/macros.hpp>
@@ -86,12 +88,15 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 	const auto& var_subs =
 		*static_cast<ale::ast::SubscriptedVariableNode *>(n.get());
 
+	indices.reserve(d);
+
 	const auto& children = var_subs.get_children();
-	if (d < children.size()) {
+	for (size_t i = 0; i < children.size(); ++i) {
 		const std::string_view name = var_subs.get_variable_name();
-		const size_t i = var_subs.get_indices_order()[d];
-		const auto& child = children[i];
-		const bool has_index = indices.has_index(d, name);
+
+		const size_t depth = var_subs.get_indices_order()[i];
+		const auto& child = children[depth];
+		const bool has_index = indices.has_index(depth, name);
 
 		Evaluation eval = interpret_node(ctx, child);
 		if (not eval.has_value()) {
@@ -99,27 +104,37 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 		}
 
 		EvaluationResult new_index_res = std::move(*eval);
+
+		INTERPRETER_PRINT(
+			"At subscripted variable '{}', child {} is the {}th index, with "
+			"value {}.",
+			name,
+			i,
+			depth,
+			new_index_res
+		);
+
 		if (not has_index) {
 			if (new_index_res.type == detail::type_string_cpp<int64_t>) {
 				const auto idx = std::any_cast<int64_t>(new_index_res.value);
 				INTERPRETER_PRINT(
 					"At depth '{}', for variable '{}', set index '{}'.",
-					d,
+					depth,
 					name,
 					idx
 				);
-				indices.set_index(d, name, idx);
+				indices.set_index(depth, name, idx);
 			}
 			else if (new_index_res.type == detail::type_string_cpp<uint64_t>) {
 				const auto idx = std::any_cast<uint64_t>(new_index_res.value);
 
 				INTERPRETER_PRINT(
 					"At depth '{}', for variable '{}', set index '{}'.",
-					d,
+					depth,
 					name,
 					idx
 				);
-				indices.set_index(d, name, detail::to_int64(idx));
+				indices.set_index(depth, name, detail::to_int64(idx));
 			}
 			else {
 				const std::optional idx_w =
@@ -139,15 +154,15 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 				const auto idx = std::any_cast<int64_t>(idx_w);
 				INTERPRETER_PRINT(
 					"At depth '{}', for variable '{}', set index '{}'.",
-					d,
+					depth,
 					name,
 					idx
 				);
-				indices.set_index(d, name, idx);
+				indices.set_index(depth, name, idx);
 			}
 		}
 		else {
-			const int64_t known_index = indices.get_index(d, name);
+			const int64_t known_index = indices.get_index(depth, name);
 			if (not check_equal_anys(new_index_res, known_index)) {
 				INTERPRETER_PRINT(
 					"Mismatch between known index value '{}' and new "
@@ -177,8 +192,8 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 }
 
 enum class indices_type_e : int8_t {
-	first,
-	last
+	First,
+	Last
 };
 
 template <indices_type_e indices_type>
@@ -195,7 +210,7 @@ template <indices_type_e indices_type>
 
 	if (t == ale::ast::node_type_e::Sequence) {
 		const auto& seq = *static_cast<ale::ast::SequenceNode *>(n.get());
-		if constexpr (indices_type == indices_type_e::first) {
+		if constexpr (indices_type == indices_type_e::First) {
 			return add_indices<indices_type>(
 				ctx, seq.get_left_child(), d + 1, indices
 			);
@@ -274,6 +289,20 @@ template <indices_type_e indices_type>
 		return make_good_evaluation<EvaluationResult>();
 	}
 
+#if defined ALE_LOGGING_MESSAGES
+	INTERPRETER_PRINT("Going to set the indices for the node");
+	ale::ast::print_xml_tree(
+		n,
+		ale::ast::PrintXMLTreeParams{
+			.os = ale::logger::get_instance().out(),
+			.start = ale::logger::get_instance().tab(),
+			.sep = "    ",
+			.use_tab = true,
+			.include_attributes = true
+		}
+	);
+#endif
+
 	return add_indices_from_subvar(ctx, n, d, indices);
 }
 
@@ -322,7 +351,7 @@ Evaluation make_sequence_execution_environment(
 	INTERPRETER_PRINT("Going to extract first indices.");
 
 	const auto& left = seq.get_left_child();
-	auto left_eval = add_indices<indices_type_e::first>(
+	auto left_eval = add_indices<indices_type_e::First>(
 		ctx, left, 0, env.get_first_indices()
 	);
 	if (not left_eval.has_value()) {
@@ -332,7 +361,7 @@ Evaluation make_sequence_execution_environment(
 	INTERPRETER_PRINT("Going to extract last indices.");
 
 	const auto& right = seq.get_right_child();
-	auto right_eval = add_indices<indices_type_e::last>(
+	auto right_eval = add_indices<indices_type_e::Last>(
 		ctx, right, 0, env.get_last_indices()
 	);
 	if (not right_eval.has_value()) {
@@ -344,6 +373,10 @@ Evaluation make_sequence_execution_environment(
 	// check correctness: variables match
 	const auto depth_start = env.get_first_indices().get_depth();
 	const auto depth_end = env.get_last_indices().get_depth();
+
+	INTERPRETER_PRINT("depth_start= {}.", depth_start);
+	INTERPRETER_PRINT("depth_end=   {}.", depth_end);
+
 	if (depth_start != depth_end) {
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Sequence_Environment_Mismatch_Depth},
@@ -386,7 +419,9 @@ Evaluation make_sequence_execution_environment(
 
 [[nodiscard]] static std::generator<Evaluation>
 enumerate_values_sequence_recursive(
-	EvaluationContext& ctx, SequenceExecutionEnvironment& env
+	EvaluationContext& ctx,
+	SequenceExecutionEnvironment& env,
+	const ale::ast::SequenceNode& seq
 )
 {
 #if defined DEBUG
@@ -406,7 +441,13 @@ enumerate_values_sequence_recursive(
 		INTERPRETER_PRINT("Level {} of the sequence is interpretable.", depth);
 
 		ctx.sequence_execution_environment = &env;
-		Evaluation eval = interpret_node(ctx, env.get_expression());
+		Evaluation eval;
+		if (depth == env.get_depth()) {
+			eval = interpret_node(ctx, env.get_expression());
+		}
+		else {
+			eval = evaluate(ctx, seq);
+		}
 		ctx.sequence_execution_environment.reset();
 		co_yield std::move(eval);
 		co_return;
@@ -421,7 +462,7 @@ enumerate_values_sequence_recursive(
 		env.set_working_distance(depth, i);
 		ctx.sequence_depth = depth + 1;
 
-		auto gen = enumerate_values_sequence_recursive(ctx, env);
+		auto gen = enumerate_values_sequence_recursive(ctx, env, seq);
 		auto pos = gen.begin();
 		const auto end = gen.end();
 		while (pos != end) {
@@ -440,11 +481,13 @@ enumerate_values_sequence_recursive(
 }
 
 std::generator<Evaluation> enumerate_values_sequence(
-	EvaluationContext& ctx, SequenceExecutionEnvironment& env
+	EvaluationContext& ctx,
+	SequenceExecutionEnvironment& env,
+	const ale::ast::SequenceNode& seq
 )
 {
 	ctx.sequence_depth = {0};
-	return enumerate_values_sequence_recursive(ctx, env);
+	return enumerate_values_sequence_recursive(ctx, env, seq);
 }
 
 [[nodiscard]] static std::generator<Evaluation>

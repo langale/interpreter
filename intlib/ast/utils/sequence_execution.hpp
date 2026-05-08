@@ -51,7 +51,9 @@ namespace ast {
 );
 
 [[nodiscard]] std::generator<Evaluation> enumerate_values_sequence(
-	EvaluationContext& ctx, SequenceExecutionEnvironment& env
+	EvaluationContext& ctx,
+	SequenceExecutionEnvironment& env,
+	const ale::ast::SequenceNode& seq
 );
 
 [[nodiscard]] std::generator<Evaluation> enumerate_names_sequence(
