@@ -33,6 +33,9 @@
 
 #pragma once
 
+#if defined DEBUG
+#include <cassert>
+#endif
 #include <memory>
 
 #include <ale/ast/Node.hpp>
