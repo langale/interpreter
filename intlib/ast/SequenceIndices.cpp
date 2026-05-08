@@ -31,56 +31,42 @@
  *
  ********************************************************************/
 
-#pragma once
+#include <intlib/ast/SequenceIndices.hpp>
 
-#include <unordered_map>
-#include <string_view>
+#if defined DEBUG
+#include <cassert>
+#endif
 #include <cstdint>
-#include <vector>
 
 namespace intlib {
 namespace ast {
 
-class SequenceIndices {
-public:
-
-	using VariableToIndex = std::unordered_map<std::string_view, int64_t>;
-
-public:
-
-	void add_depth(size_t d);
-
-	void reserve(const size_t n)
-	{
-		m_indices.reserve(n);
+void SequenceIndices::add_depth(const size_t d)
+{
+	if (d >= m_indices.size()) {
+		m_indices.emplace_back();
 	}
+}
 
-	[[nodiscard]] size_t get_depth() const noexcept
-	{
-		return m_indices.size();
+void SequenceIndices::set_index(
+	const size_t d, const std::string_view var, const int64_t i
+)
+{
+	if (d >= m_indices.size()) {
+		m_indices.resize(d + 1);
 	}
+	m_indices[d].insert({var, i});
+}
 
-	void set_index(size_t d, std::string_view var, int64_t i);
-
-	[[nodiscard]] int64_t
-	get_index(size_t d, std::string_view var) const noexcept;
-
-	[[nodiscard]] bool
-	has_index(const size_t d, const std::string_view var) const noexcept
-	{
-		return d < m_indices.size() and m_indices[d].contains(var);
-	}
-
-	[[nodiscard]] decltype(auto)
-	get_variables_depth(this auto& self, const size_t d) noexcept
-	{
-		return (self.m_indices[d]);
-	}
-
-private:
-
-	std::vector<VariableToIndex> m_indices;
-};
+int64_t SequenceIndices::get_index(const size_t d, const std::string_view var)
+	const noexcept
+{
+#if defined DEBUG
+	assert(d < m_indices.size());
+	assert(m_indices[d].contains(var));
+#endif
+	return m_indices[d].find(var)->second;
+}
 
 } // namespace ast
 } // namespace intlib
