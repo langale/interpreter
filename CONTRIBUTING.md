@@ -8,7 +8,7 @@
 
 ## Naming style
 
-We provide a `.clang-tidy` to help you write the code in the style of `ALE`: Stick to it. For the style that cannot be enforced through a `.clang-tidy` file: 
+We provide a `.clang-tidy` to help you write the code in the style of `ALE`: Stick to it. For the style that cannot be enforced through a `.clang-tidy` file:
 
 - All variables of the following types should be suffixed with `_w`:
   - `std::optional`, `std::variant`, `std::expected`, `std::any`,
