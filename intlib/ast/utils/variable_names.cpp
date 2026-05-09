@@ -181,13 +181,7 @@ Evaluation make_subscripted_variable_name(
 			indices[depth] = idx;
 		}
 
-		for (size_t i = 0; i < indices.size(); ++i) {
-			const auto idx = indices[i];
-
-			name += "_" + std::to_string(idx);
-
-			INTERPRETER_PRINT("Name so far: '{}'.", name);
-		}
+		append_variable_name(name, indices);
 
 		INTERPRETER_PRINT("Name constructed '{}'.", name);
 
