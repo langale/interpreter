@@ -33,9 +33,8 @@
 
 #pragma once
 
-#include <string>
-
 #include <intlib/memory/WrappedAny.hpp>
+#include <intlib/detail/type_string_cpp.hpp>
 
 namespace intlib {
 namespace detail {
@@ -43,6 +42,19 @@ namespace detail {
 [[nodiscard]] memory::WrappedAny convert_to_ale_type(
 	const memory::WrappedAny& value, const std::string_view ale_type
 );
+
+template <typename type_t, typename output_t>
+[[nodiscard]] bool adapt_to_type(memory::WrappedAny& w)
+{
+	if (w.type == detail::type_string_cpp<type_t>) {
+		w.type = detail::type_string_cpp<output_t>;
+		w.value = static_cast<output_t>(std::any_cast<type_t>(w.value));
+		return true;
+	}
+	return false;
+}
+
+void upcast_numeric(memory::WrappedAny& w);
 
 } // namespace detail
 } // namespace intlib

@@ -40,6 +40,8 @@
 #include <intlib/detail/type_string_ale.hpp>
 #include <intlib/detail/type_traits_ale.hpp>
 #include <intlib/detail/type_string_cpp.hpp>
+#include <intlib/detail/type_traits_cpp.hpp>
+#include <intlib/detail/any_conversion.hpp>
 #include <intlib/logger/macros.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/memory/utils/wrapped_any_to_string.hpp>
@@ -98,6 +100,49 @@ memory::WrappedAny convert_to_ale_type(
 	INTERPRETER_PRINT("Unhandled conversion to type '{}'.", ale_type);
 
 	return {};
+}
+
+void upcast_numeric(memory::WrappedAny& w)
+{
+	// decimal types
+	if (is_decimal(w.type)) {
+		if (adapt_to_type<float, std::float64_t>(w)) {
+			return;
+		}
+		if (adapt_to_type<double, std::float64_t>(w)) {
+			return;
+		}
+		if (adapt_to_type<std::float16_t, std::float64_t>(w)) {
+			return;
+		}
+		if (adapt_to_type<std::float32_t, std::float64_t>(w)) {
+			return;
+		}
+		return;
+	}
+
+	// integral types
+	if (adapt_to_type<bool, uint64_t>(w)) {
+		return;
+	}
+	if (adapt_to_type<uint8_t, uint64_t>(w)) {
+		return;
+	}
+	if (adapt_to_type<int8_t, int64_t>(w)) {
+		return;
+	}
+	if (adapt_to_type<uint16_t, uint64_t>(w)) {
+		return;
+	}
+	if (adapt_to_type<int16_t, int64_t>(w)) {
+		return;
+	}
+	if (adapt_to_type<uint32_t, uint64_t>(w)) {
+		return;
+	}
+	if (adapt_to_type<int32_t, int64_t>(w)) {
+		return;
+	}
 }
 
 } // namespace detail
