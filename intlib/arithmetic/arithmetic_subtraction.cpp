@@ -78,7 +78,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_float64(res);
 		}
 
-		INTERPRETER_PRINT("Parameter right_w '{}'.", right_w);
+		INTERPRETER_PRINT("Unhandled parameter type of right_w '{}'.", right_w);
 	}
 
 	if (left_w.type == detail::type_string_cpp<int64_t>) {
@@ -109,7 +109,7 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_float64(res);
 		}
 
-		INTERPRETER_PRINT("Parameter right_w '{}'.", right_w);
+		INTERPRETER_PRINT("Unhandled parameter type of right_w '{}'.", right_w);
 	}
 
 	if (left_w.type == detail::type_string_cpp<std::float64_t>) {
@@ -140,10 +140,10 @@ arithmetic_subtraction(const WrappedAny& left_w, const WrappedAny& right_w)
 			return make_float64(res);
 		}
 
-		INTERPRETER_PRINT("Parameter right_w '{}'.", right_w);
+		INTERPRETER_PRINT("Unhandled parameter type of right_w '{}'.", right_w);
 	}
 
-	INTERPRETER_PRINT("Parameter left_w '{}'.", left_w);
+	INTERPRETER_PRINT("Unhandled parameter type of left_w '{}'.", left_w);
 
 	return {};
 }
