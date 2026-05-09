@@ -50,6 +50,7 @@ using namespace std::string_literals;
 #include <intlib/memory/utils/unwrap.hpp>
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
+#include <intlib/ast/utils/sequence_execution.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/ast/utils/evaluation_error_to_string.hpp>
 #endif
@@ -316,24 +317,31 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 {
 	INTERPRETER_ENTER_AST_FUNCTION;
 
-	const auto& left_child = assign.get_left_child();
+	const auto& lhs = assign.get_left_child();
 #if defined DEBUG
-	assert(left_child != nullptr);
+	assert(lhs != nullptr);
 #endif
 
-	const auto& right_child = assign.get_right_child();
+	const auto& rhs = assign.get_right_child();
 #if defined DEBUG
-	assert(right_child != nullptr);
+	assert(rhs != nullptr);
 #endif
-	const auto right_t = right_child->get_node_type();
+	const auto right_t = rhs->get_node_type();
 
-	if (right_t == ale::ast::node_type_e::Sequence or
-		right_t == ale::ast::node_type_e::Comma_Separated_Group) {
-
-		return assign_multiple_values_rhs(ctx, left_child, right_child);
+	bool is_rhs_single_value = false;
+	if (right_t == ale::ast::node_type_e::Comma_Separated_Group) {
+		is_rhs_single_value = true;
+	}
+	else if (right_t == ale::ast::node_type_e::Sequence) {
+		const auto& seq = *static_cast<ale::ast::SequenceNode *>(rhs.get());
+		is_rhs_single_value = *seq.get_operator_type() !=
+							  ale::ast::node_type_e::Comma_Separated_Group;
 	}
 
-	return assign_single_values_rhs(ctx, left_child, right_child);
+	if (is_rhs_single_value) {
+		return assign_single_values_rhs(ctx, lhs, rhs);
+	}
+	return assign_multiple_values_rhs(ctx, lhs, rhs);
 }
 
 } // namespace ast

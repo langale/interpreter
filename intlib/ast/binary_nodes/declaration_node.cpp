@@ -50,6 +50,7 @@ using namespace std::string_literals;
 #include <intlib/memory/utils/unwrap.hpp>
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
+#include <intlib/ast/utils/sequence_execution.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/ast/utils/evaluation_error_to_string.hpp>
 #endif
@@ -349,15 +350,15 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 	INTERPRETER_ENTER_AST_FUNCTION;
 
 	const auto decl_t = decl.get_node_type();
-	const auto& left_child = decl.get_left_child();
+	const auto& lhs = decl.get_left_child();
 #if defined DEBUG
-	assert(left_child != nullptr);
+	assert(lhs != nullptr);
 #endif
 
 	if (decl_t == ale::ast::node_type_e::Declaration_Declare) {
 		INTERPRETER_PRINT("Make iterator for the left hand side.");
 
-		auto var_iter = make_name_iterator(ctx, left_child);
+		auto var_iter = make_name_iterator(ctx, lhs);
 		auto var_iter_pos = var_iter.begin();
 		auto var_iter_end = var_iter.end();
 
@@ -395,23 +396,26 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 		return make_good_evaluation<EvaluationResult>();
 	}
 
-	const auto& right_child = decl.get_right_child();
+	const auto& rhs = decl.get_right_child();
 #if defined DEBUG
-	assert(right_child != nullptr);
+	assert(rhs != nullptr);
 #endif
-	const auto right_t = right_child->get_node_type();
+	const auto right_t = rhs->get_node_type();
 
-	if (right_t == ale::ast::node_type_e::Sequence or
-		right_t == ale::ast::node_type_e::Comma_Separated_Group) {
-
-		return declare_multiple_values_rhs(
-			ctx, decl, decl_t, left_child, right_child
-		);
+	bool is_rhs_single_value = false;
+	if (right_t == ale::ast::node_type_e::Comma_Separated_Group) {
+		is_rhs_single_value = true;
+	}
+	else if (right_t == ale::ast::node_type_e::Sequence) {
+		const auto& seq = *static_cast<ale::ast::SequenceNode *>(rhs.get());
+		is_rhs_single_value = *seq.get_operator_type() !=
+							  ale::ast::node_type_e::Comma_Separated_Group;
 	}
 
-	return declare_single_values_rhs(
-		ctx, decl, decl_t, left_child, right_child
-	);
+	if (is_rhs_single_value) {
+		return declare_single_values_rhs(ctx, decl, decl_t, lhs, rhs);
+	}
+	return declare_multiple_values_rhs(ctx, decl, decl_t, lhs, rhs);
 }
 
 } // namespace ast
