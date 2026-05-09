@@ -36,6 +36,8 @@
 #endif
 
 #include <intlib/arithmetic/arithmetic.hpp>
+#include <intlib/detail/type_traits_cpp.hpp>
+#include <intlib/detail/any_conversion.hpp>
 #include <intlib/logger/macros.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/memory/utils/wrapped_any_to_string.hpp>
@@ -52,24 +54,30 @@ std::optional<WrappedAny> any_arithmetic(
 {
 	INTERPRETER_ENTER_ARITHMETIC_FUNCTION;
 
+	WrappedAny left = left_w;
+	detail::upcast_numeric(left);
+
+	WrappedAny right = right_w;
+	detail::upcast_numeric(right);
+
 	switch (t) {
 	case ale::ast::node_type_e::Arithmetic_Addition:
-		return arithmetic_addition(left_w, right_w);
+		return arithmetic_addition(left, right);
 
 	case ale::ast::node_type_e::Arithmetic_Division:
-		return arithmetic_division(left_w, right_w);
+		return arithmetic_division(left, right);
 
 	case ale::ast::node_type_e::Arithmetic_Exponentiation:
-		return arithmetic_exponentiation(left_w, right_w);
+		return arithmetic_exponentiation(left, right);
 
 	case ale::ast::node_type_e::Arithmetic_Modulus:
-		return arithmetic_modulus(left_w, right_w);
+		return arithmetic_modulus(left, right);
 
 	case ale::ast::node_type_e::Arithmetic_Multiplication:
-		return arithmetic_multiplication(left_w, right_w);
+		return arithmetic_multiplication(left, right);
 
 	case ale::ast::node_type_e::Arithmetic_Subtraction:
-		return arithmetic_subtraction(left_w, right_w);
+		return arithmetic_subtraction(left, right);
 
 	default:
 		INTERPRETER_PRINT("Wrong node type '{}' for arithmetic.", t);
