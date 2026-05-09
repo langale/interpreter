@@ -150,12 +150,6 @@ any_comparison_greater_than(const WrappedAny& left_w, const WrappedAny& right_w)
 		return r;
 	}
 
-	if (const auto r = any_comparison_greater_than<std::string, std::string>(
-			left_w, right_w
-		);
-		r.has_value()) {
-		return r;
-	}
 	return {};
 }
 

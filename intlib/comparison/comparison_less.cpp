@@ -145,11 +145,6 @@ std::optional<bool> any_comparison_less_than(
 		return r;
 	}
 
-	if (const auto r =
-			any_comparison_less_than<std::string, std::string>(left_w, right_w);
-		r.has_value()) {
-		return r;
-	}
 	return {};
 }
 

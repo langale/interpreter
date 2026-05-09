@@ -156,12 +156,6 @@ std::optional<bool> any_comparison_greater_equal(
 		return r;
 	}
 
-	if (const auto r = any_comparison_greater_equal<std::string, std::string>(
-			left_w, right_w
-		);
-		r.has_value()) {
-		return r;
-	}
 	return {};
 }
 

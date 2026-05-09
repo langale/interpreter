@@ -147,12 +147,6 @@ any_comparison_less_equal(const WrappedAny& left_w, const WrappedAny& right_w)
 		return r;
 	}
 
-	if (const auto r = any_comparison_less_equal<std::string, std::string>(
-			left_w, right_w
-		);
-		r.has_value()) {
-		return r;
-	}
 	return {};
 }
 
