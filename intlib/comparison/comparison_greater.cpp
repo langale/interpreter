@@ -98,11 +98,6 @@ any_comparison_greater_than_right_numeric(
 	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
 	if (const auto r =
-			any_comparison_greater_than<left_t, bool>(left_w, right_w);
-		r.has_value()) {
-		return r;
-	}
-	if (const auto r =
 			any_comparison_greater_than<left_t, int64_t>(left_w, right_w);
 		r.has_value()) {
 		return r;
@@ -126,11 +121,6 @@ any_comparison_greater_than(const WrappedAny& left_w, const WrappedAny& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
-	if (const auto r =
-			any_comparison_greater_than_right_numeric<bool>(left_w, right_w);
-		r.has_value()) {
-		return r;
-	}
 	if (const auto r =
 			any_comparison_greater_than_right_numeric<int64_t>(left_w, right_w);
 		r.has_value()) {

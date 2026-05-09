@@ -97,10 +97,6 @@ template <typename left_t>
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
-	if (const auto r = any_comparison_not_equal<left_t, bool>(left_w, right_w);
-		r.has_value()) {
-		return r;
-	}
 	if (const auto r =
 			any_comparison_not_equal<left_t, int64_t>(left_w, right_w);
 		r.has_value()) {
@@ -124,11 +120,6 @@ any_comparison_not_equal(const WrappedAny& left_w, const WrappedAny& right_w)
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
-	if (const auto r =
-			any_comparison_not_equal_right_numeric<bool>(left_w, right_w);
-		r.has_value()) {
-		return r;
-	}
 	if (const auto r =
 			any_comparison_not_equal_right_numeric<int64_t>(left_w, right_w);
 		r.has_value()) {
