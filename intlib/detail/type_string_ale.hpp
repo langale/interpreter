@@ -96,11 +96,5 @@ MAKE_ALE_TO_CPP(ale_f16, std::float16_t);
 MAKE_ALE_TO_CPP(ale_f32, std::float32_t);
 MAKE_ALE_TO_CPP(ale_f64, std::float64_t);
 
-[[nodiscard]] static constexpr bool
-is_ale_type_numeric(const std::string_view type) noexcept
-{
-	return std::ranges::find(numeric_types, type) != numeric_types.end();
-}
-
 } // namespace detail
 } // namespace intlib
