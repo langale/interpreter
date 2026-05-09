@@ -40,6 +40,7 @@
 #include <intlib/ast/utils/variable_names.hpp>
 #include <intlib/logger/macros.hpp>
 #if defined ALE_LOGGING_MESSAGES
+#include <intlib/memory/utils/variable_to_string.hpp>
 #endif
 
 namespace intlib {
@@ -99,6 +100,8 @@ evaluate(EvaluationContext& ctx, const ale::ast::SubscriptedVariableNode& v)
 			Vec{std::format("Variable '{}' has no value", var_name)}
 		);
 	}
+
+	INTERPRETER_PRINT("Variable found: '{}' -> '{}'.", var_name, variable);
 
 	if (variable.is_constant) {
 		return make_good_evaluation<

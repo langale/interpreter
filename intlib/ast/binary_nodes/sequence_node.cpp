@@ -76,6 +76,7 @@ static constexpr std::string_view could_not_convert_to_bool =
 	Evaluation expression_eval = evaluate(ctx, seq);
 
 	if (not expression_eval) {
+		INTERPRETER_PRINT("Expression could not be evaluated.");
 		return append_error(
 			std::move(expression_eval.error()),
 			evaluation_error_e::Sequence_Evaluation_Failed,
@@ -93,8 +94,10 @@ static constexpr std::string_view could_not_convert_to_bool =
 	while (i < distance) {
 		env.set_working_distance(depth, i);
 		ctx.sequence_depth = depth + 1;
+
 		Evaluation current_eval = evaluate(ctx, seq);
 		if (not current_eval) {
+			INTERPRETER_PRINT("Expression could not be evaluated.");
 			return append_error(
 				std::move(current_eval.error()),
 				evaluation_error_e::Sequence_Evaluation_Failed,
@@ -110,6 +113,7 @@ static constexpr std::string_view could_not_convert_to_bool =
 		std::optional res =
 			arithmetic::any_arithmetic(op_type, seq_res, *actual_current_w);
 		if (not res) {
+			INTERPRETER_PRINT("Arithmetic expression failed.");
 			return make_bad_evaluation(
 				Vec{evaluation_error_e::Arithmetic_Operation_Failed,
 					evaluation_error_e::Sequence_Evaluation_Failed},
@@ -158,6 +162,7 @@ static constexpr std::string_view could_not_convert_to_bool =
 	while (i < distance) {
 		env.set_working_distance(depth, i);
 		ctx.sequence_depth = depth + 1;
+
 		Evaluation current_eval = evaluate(ctx, seq);
 		if (not current_eval) {
 			return append_error(
@@ -249,6 +254,7 @@ static constexpr std::string_view could_not_convert_to_bool =
 	while (i < distance) {
 		env.set_working_distance(depth, i);
 		ctx.sequence_depth = depth + 1;
+
 		Evaluation current_eval = evaluate(ctx, seq);
 		if (not current_eval) {
 			return append_error(
@@ -303,6 +309,9 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 	INTERPRETER_PRINT("Trying to evaluate a sequence.");
 
 	if (not ctx.sequence_execution_environment.has_value()) {
+		INTERPRETER_PRINT("Context does not have a sequence execution "
+						  "environment, make one now.");
+
 		Evaluation eval = make_sequence_execution_environment(ctx, seq);
 		if (not eval) {
 			return eval;
@@ -327,11 +336,8 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 
 #if defined DEBUG
 	assert(ctx.sequence_execution_environment.has_value());
+	assert(ctx.sequence_depth.has_value());
 #endif
-
-	if (not ctx.sequence_depth.has_value()) {
-		ctx.sequence_depth = {0};
-	}
 
 	SequenceExecutionEnvironment& env = **ctx.sequence_execution_environment;
 	const size_t depth = *ctx.sequence_depth;
@@ -366,6 +372,8 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 	if (is_logical) {
 		return evaluate_sequence_logical(ctx, seq, op_type, env, depth);
 	}
+
+	INTERPRETER_PRINT("    Could not classify operator {}.", op_type);
 
 	return make_bad_evaluation(
 		Vec{evaluation_error_e::Sequence_Evaluation_Failed},
