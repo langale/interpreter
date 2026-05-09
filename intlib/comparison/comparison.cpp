@@ -32,7 +32,6 @@
  ********************************************************************/
 
 #include <optional>
-#include <any>
 
 #if defined ALE_LOGGING_MESSAGES
 #include <ale/ast/utils/node_type_to_string.hpp>
@@ -40,11 +39,11 @@
 
 #include <intlib/comparison/comparison.hpp>
 #include <intlib/comparison/definitions.hpp>
+#include <intlib/detail/any_conversion.hpp>
 #include <intlib/logger/macros.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/memory/utils/wrapped_any_to_string.hpp>
 #endif
-
 
 namespace intlib {
 namespace comparison {
@@ -57,27 +56,33 @@ std::optional<bool> any_comparison(
 {
 	INTERPRETER_ENTER_COMPARISON_FUNCTION;
 
+	WrappedAny left = left_w;
+	detail::upcast_numeric(left);
+
+	WrappedAny right = right_w;
+	detail::upcast_numeric(right);
+
 	switch (t) {
 	case ale::ast::node_type_e::Comparison_Equal:
-		return any_comparison_equal(left_w, right_w);
+		return any_comparison_equal(left, right);
 
 	case ale::ast::node_type_e::Comparison_Not_Equal:
-		return any_comparison_not_equal(left_w, right_w);
+		return any_comparison_not_equal(left, right);
 
 	case ale::ast::node_type_e::Comparison_Less_Than:
-		return any_comparison_less_than(left_w, right_w);
+		return any_comparison_less_than(left, right);
 
 	case ale::ast::node_type_e::Comparison_Less_Equal:
-		return any_comparison_less_equal(left_w, right_w);
+		return any_comparison_less_equal(left, right);
 
 	case ale::ast::node_type_e::Comparison_Greater_Than:
-		return any_comparison_greater_than(left_w, right_w);
+		return any_comparison_greater_than(left, right);
 
 	case ale::ast::node_type_e::Comparison_Greater_Equal:
-		return any_comparison_greater_equal(left_w, right_w);
+		return any_comparison_greater_equal(left, right);
 
 	default:
-		INTERPRETER_PRINT( "Wrong node type '{}' for comparison.", t);
+		INTERPRETER_PRINT("Wrong node type '{}' for comparison.", t);
 		return {};
 	}
 }
