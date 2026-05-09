@@ -253,7 +253,9 @@ std::generator<Evaluation> make_value_iterator(
 		INTERPRETER_PRINT("The node is interpretable, so going to interpret.");
 
 		ctx.sequence_execution_environment = &seq_env;
+		ctx.sequence_depth = 0;
 		Evaluation eval = evaluate(ctx, sequence);
+		ctx.sequence_depth.reset();
 		ctx.sequence_execution_environment.reset();
 
 		co_yield std::move(eval);
