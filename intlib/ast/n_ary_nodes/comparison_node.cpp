@@ -48,10 +48,44 @@ using namespace std::string_literals;
 #include <intlib/ast/interpretation.hpp>
 #include <intlib/comparison/comparison.hpp>
 #include <intlib/logger/macros.hpp>
+#include <intlib/memory/utils/unwrap.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
 
 namespace intlib {
 namespace ast {
+
+[[nodiscard]] static Evaluation
+node_interpret(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
+{
+	Evaluation eval = interpret_node(ctx, c);
+	if (not eval) {
+		INTERPRETER_PRINT("Evaluation of node within arithmetic node failed.");
+		return make_bad_evaluation(
+			Vec{evaluation_error_e::Evaluation_Of_Node_Failed},
+			Vec{evaluation_function_e::Arithmetic},
+			Vec{"Evaluation of node within arithmetic node failed"s}
+		);
+	}
+
+	EvaluationResult res = std::move(*eval);
+	if (res.type == detail::type_string_cpp<void>) {
+		INTERPRETER_PRINT("Evaluation of node returned a void value.");
+		return make_bad_evaluation(
+			Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},
+			Vec{evaluation_function_e::Arithmetic},
+			Vec{"Evaluation of node returned a void value"s}
+		);
+	}
+
+	if (res.type == detail::type_string_cpp<memory::RefConstVar> or
+		res.type == detail::type_string_cpp<memory::RefVar>) {
+		memory::unwrap_into(res);
+	}
+
+	return make_good_evaluation<EvaluationResult>(
+		std::move(res.value), res.type
+	);
+}
 
 Evaluation evaluate(
 	EvaluationContext& ctx,
@@ -67,34 +101,21 @@ Evaluation evaluate(
 	assert(children.size() > 0);
 #endif
 
-	EvaluationResult previous_res;
-	{
-		Evaluation eval = interpret_node(ctx, children.at(0));
-		if (not eval.has_value()) {
-			INTERPRETER_PRINT("Evaluation of node failed.");
-			return append_error(
-				std::move(eval.error()),
-				evaluation_error_e::Evaluation_Of_Node_Failed,
-				evaluation_function_e::Comparison,
-				"Evaluation of node failed"
-			);
-		}
-		previous_res = std::move(*eval);
+	Evaluation eval = node_interpret(ctx, children[0]);
+	if (not eval) {
+		return eval;
 	}
+
+	EvaluationResult previous_res = std::move(*eval);
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		Evaluation eval = interpret_node(ctx, c);
-		if (not eval.has_value()) {
-			INTERPRETER_PRINT("Evaluation of node failed.");
-			return append_error(
-				std::move(eval.error()),
-				evaluation_error_e::Evaluation_Of_Node_Failed,
-				evaluation_function_e::Comparison,
-				"Evaluation of node failed"
-			);
+		eval = node_interpret(ctx, c);
+		if (not eval) {
+			return eval;
 		}
+
 		EvaluationResult current_res = std::move(*eval);
 
 		const std::optional<bool> comparison_result_w =

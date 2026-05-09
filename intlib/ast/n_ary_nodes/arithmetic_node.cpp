@@ -50,12 +50,13 @@ using namespace std::string_literals;
 #include <intlib/logger/macros.hpp>
 #include <intlib/ast/utils/evaluation_error_to_string.hpp>
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
+#include <intlib/memory/utils/unwrap.hpp>
 
 namespace intlib {
 namespace ast {
 
 [[nodiscard]] static Evaluation
-node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
+node_interpret(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 {
 	Evaluation eval = interpret_node(ctx, c);
 	if (not eval) {
@@ -67,8 +68,8 @@ node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 		);
 	}
 
-	EvaluationResult eval_res = std::move(*eval);
-	if (eval_res.type == detail::type_string_cpp<void>) {
+	EvaluationResult res = std::move(*eval);
+	if (res.type == detail::type_string_cpp<void>) {
 		INTERPRETER_PRINT("Evaluation of node returned a void value.");
 		return make_bad_evaluation(
 			Vec{evaluation_error_e::Evaluation_Of_Node_Is_Void},
@@ -76,8 +77,14 @@ node_eval(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& c)
 			Vec{"Evaluation of node returned a void value"s}
 		);
 	}
+
+	if (res.type == detail::type_string_cpp<memory::RefConstVar> or
+		res.type == detail::type_string_cpp<memory::RefVar>) {
+		memory::unwrap_into(res);
+	}
+
 	return make_good_evaluation<EvaluationResult>(
-		std::move(eval_res.value), eval_res.type
+		std::move(res.value), res.type
 	);
 }
 
@@ -94,24 +101,24 @@ Evaluation evaluate(
 	assert(children.size() >= 2);
 #endif
 
-	Evaluation eval = node_eval(ctx, children[0]);
+	Evaluation eval = node_interpret(ctx, children[0]);
 	if (not eval) {
 		return eval;
 	}
 
-	EvaluationResult eval1_res = std::move(*eval);
+	EvaluationResult acc_res = std::move(*eval);
 
 	for (const std::unique_ptr<ale::ast::Node>& c :
 		 children | std::views::drop(1)) {
 
-		eval = node_eval(ctx, c);
+		eval = node_interpret(ctx, c);
 		if (not eval) {
 			return eval;
 		}
 
-		EvaluationResult eval2_res = std::move(*eval);
+		EvaluationResult res = std::move(*eval);
 		std::optional<memory::WrappedAny> arithmetic_result_w =
-			arithmetic::any_arithmetic(t, eval1_res, eval2_res);
+			arithmetic::any_arithmetic(t, acc_res, res);
 
 		if (not arithmetic_result_w.has_value()) {
 			INTERPRETER_PRINT(
@@ -123,16 +130,16 @@ Evaluation evaluate(
 				Vec{evaluation_function_e::Arithmetic},
 				Vec{std::format(
 					"Could not operate two std::any values: '{}' and '{}'",
-					eval1_res,
-					eval2_res
+					acc_res,
+					res
 				)}
 			);
 		}
 
-		eval1_res = std::move(*arithmetic_result_w);
+		acc_res = std::move(*arithmetic_result_w);
 	}
 
-	return make_good_evaluation<EvaluationResult>(std::move(eval1_res));
+	return make_good_evaluation<EvaluationResult>(std::move(acc_res));
 }
 
 } // namespace ast

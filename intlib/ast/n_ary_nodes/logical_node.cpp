@@ -49,6 +49,7 @@ using namespace std::string_literals;
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/interpretation.hpp>
+#include <intlib/memory/utils/unwrap.hpp>
 #include <intlib/logger/macros.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #include <intlib/ast/utils/evaluation_result_to_string.hpp>
@@ -114,7 +115,7 @@ namespace ast {
 		);
 	}
 
-	const EvaluationResult& res = *eval;
+	EvaluationResult res = std::move(*eval);
 	INTERPRETER_PRINT("Evaluation of node '{}'", res);
 
 	if (res.type == detail::type_string_cpp<void>) {
@@ -124,6 +125,11 @@ namespace ast {
 			Vec{evaluation_function_e::Logical},
 			Vec{"Evaluation of node produced a void value"s}
 		);
+	}
+
+	if (res.type == detail::type_string_cpp<memory::RefConstVar> or
+		res.type == detail::type_string_cpp<memory::RefVar>) {
+		memory::unwrap_into(res);
 	}
 
 	const std::optional r_conv_w = detail::any_to_bool(res);
