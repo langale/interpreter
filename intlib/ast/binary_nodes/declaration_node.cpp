@@ -41,6 +41,9 @@
 using namespace std::string_literals;
 
 #include <ale/ast/binary_nodes/DeclarationNode.hpp>
+#if defined ALE_LOGGING_MESSAGES
+#include <ale/ast/utils/node_type_to_string.hpp>
+#endif
 
 #include <intlib/detail/any_conversion.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
@@ -338,6 +341,7 @@ namespace ast {
 				"Something went wrong when retrieving the next variable"
 			);
 		};
+		
 		++var_iter_pos;
 	}
 
@@ -402,9 +406,9 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 #endif
 	const auto right_t = rhs->get_node_type();
 
-	bool is_rhs_single_value = false;
+	bool is_rhs_single_value = true;
 	if (right_t == ale::ast::node_type_e::Comma_Separated_Group) {
-		is_rhs_single_value = true;
+		is_rhs_single_value = false;
 	}
 	else if (right_t == ale::ast::node_type_e::Sequence) {
 		const auto& seq = *static_cast<ale::ast::SequenceNode *>(rhs.get());
@@ -415,6 +419,7 @@ evaluate(EvaluationContext& ctx, const ale::ast::DeclarationNode& decl)
 	if (is_rhs_single_value) {
 		return declare_single_values_rhs(ctx, decl, decl_t, lhs, rhs);
 	}
+	
 	return declare_multiple_values_rhs(ctx, decl, decl_t, lhs, rhs);
 }
 

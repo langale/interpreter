@@ -328,9 +328,9 @@ evaluate(EvaluationContext& ctx, const ale::ast::AssignationNode& assign)
 #endif
 	const auto right_t = rhs->get_node_type();
 
-	bool is_rhs_single_value = false;
+	bool is_rhs_single_value = true;
 	if (right_t == ale::ast::node_type_e::Comma_Separated_Group) {
-		is_rhs_single_value = true;
+		is_rhs_single_value = false;
 	}
 	else if (right_t == ale::ast::node_type_e::Sequence) {
 		const auto& seq = *static_cast<ale::ast::SequenceNode *>(rhs.get());
