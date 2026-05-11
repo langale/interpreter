@@ -68,9 +68,9 @@ public:
 		m_working_distances[depth] = distance;
 	}
 
-	void add_node_type(const ale::ast::node_type_e t)
+	void add_operator_type(const ale::ast::node_type_e t)
 	{
-		m_node_types_sequence.push_back(t);
+		m_operator_types.push_back(t);
 	}
 
 	/* GETTERS */
@@ -90,7 +90,14 @@ public:
 		return *m_expression;
 	}
 
-	/// The depth corresponds to the number of indices to be enumerated.
+	/**
+	 * @brief The depth of the sequence in number of indices.
+	 *
+	 * This value, so-called depth, corresponds to the largest number of indices
+	 * among all subscripted variables in the sequence. That is, if there is one
+	 * variable with two subscripts, and all the others have at most one subscript
+	 * then the depth is 2.
+	 */
 	[[nodiscard]] size_t get_depth() const noexcept
 	{
 #if defined DEBUG
@@ -117,13 +124,17 @@ public:
 		return m_distances[depth];
 	}
 
-	[[nodiscard]] ale::ast::node_type_e get_node_type(const size_t depth
+	[[nodiscard]] ale::ast::node_type_e get_operator_type(const size_t depth
 	) const noexcept
 	{
 #if defined DEBUG
-		assert(depth < m_node_types_sequence.size());
+		assert(depth < m_operator_types.size());
 #endif
-		return m_node_types_sequence[depth];
+		return m_operator_types[depth];
+	}
+	[[nodiscard]] size_t get_num_operators() const noexcept
+	{
+		return m_operator_types.size();
 	}
 
 private:
@@ -134,7 +145,7 @@ private:
 
 	std::vector<int64_t> m_distances;
 	std::vector<int64_t> m_working_distances;
-	std::vector<ale::ast::node_type_e> m_node_types_sequence;
+	std::vector<ale::ast::node_type_e> m_operator_types;
 };
 
 } // namespace ast
