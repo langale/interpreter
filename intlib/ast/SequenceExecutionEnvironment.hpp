@@ -124,14 +124,15 @@ public:
 		return m_distances[depth];
 	}
 
-	[[nodiscard]] ale::ast::node_type_e get_operator_type(const size_t depth
+	[[nodiscard]] ale::ast::node_type_e get_operator_type(const size_t height
 	) const noexcept
 	{
 #if defined DEBUG
-		assert(depth < m_operator_types.size());
+		assert(height < m_operator_types.size());
 #endif
-		return m_operator_types[depth];
+		return m_operator_types[height];
 	}
+	/// This corresponds to the 'height' of the sequence.
 	[[nodiscard]] size_t get_num_operators() const noexcept
 	{
 		return m_operator_types.size();
