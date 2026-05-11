@@ -48,19 +48,29 @@ public:
 
 public:
 
-	void add_depth(size_t d);
+	/* SETTERS */
 
 	void reserve(const size_t n)
 	{
 		m_indices.reserve(n);
 	}
 
+	void set_index(size_t d, std::string_view var, int64_t i);
+
+	/* GETTERS */
+
+	/**
+	 * @brief The depth of the sequence in number of indices.
+	 *
+	 * This value, so-called depth, corresponds to the largest number of indices
+	 * among all subscripted variables in the sequence. That is, if there is one
+	 * variable with two subscripts, and all the others have at most one subscript
+	 * then the depth is 2.
+	 */
 	[[nodiscard]] size_t get_depth() const noexcept
 	{
 		return m_indices.size();
 	}
-
-	void set_index(size_t d, std::string_view var, int64_t i);
 
 	[[nodiscard]] int64_t
 	get_index(size_t d, std::string_view var) const noexcept;

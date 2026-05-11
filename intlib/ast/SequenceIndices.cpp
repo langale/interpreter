@@ -41,13 +41,6 @@
 namespace intlib {
 namespace ast {
 
-void SequenceIndices::add_depth(const size_t d)
-{
-	if (d >= m_indices.size()) {
-		m_indices.emplace_back();
-	}
-}
-
 void SequenceIndices::set_index(
 	const size_t d, const std::string_view var, const int64_t i
 )
