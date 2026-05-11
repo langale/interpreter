@@ -57,16 +57,20 @@ Evaluation SequenceExecutionEnvironment::make_distances()
 		INTERPRETER_PRINT("At depth= {}.", depth);
 
 		const auto& first = m_first_indices.get_variables_depth(depth);
+#if defined ALE_LOGGING_MESSAGES
 		INTERPRETER_PRINT("First indices:");
 		for (const auto& [var, index] : first) {
 			INTERPRETER_PRINT("    {} -> {}.", var, index);
 		}
+#endif
 
 		const auto& last = m_last_indices.get_variables_depth(depth);
+#if defined ALE_LOGGING_MESSAGES
 		INTERPRETER_PRINT("Last indices:");
 		for (const auto& [var, index] : last) {
 			INTERPRETER_PRINT("    {} -> {}.", var, index);
 		}
+#endif
 
 		std::optional<int64_t> distance;
 		for (const auto& [var, first_index] : first) {
@@ -114,6 +118,8 @@ Evaluation SequenceExecutionEnvironment::make_distances()
 		assert(distance.has_value());
 		assert(*distance > 0);
 #endif
+
+		INTERPRETER_PRINT("    calculated distance= {}.", *distance);
 		m_distances[depth] = *distance;
 	}
 
