@@ -348,7 +348,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 		return interpret_node(ctx, env.get_expression());
 	}
 
-	const auto op_type = env.get_node_type(depth);
+	const auto op_type = env.get_operator_type(depth);
 
 #if defined DEBUG
 	assert(is_node_interpretable(op_type));
