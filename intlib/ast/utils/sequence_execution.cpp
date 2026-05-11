@@ -81,17 +81,18 @@ check_equal_anys(const memory::WrappedAny& l, const int64_t r)
 [[nodiscard]] static Evaluation add_indices_from_subvar(
 	EvaluationContext& ctx,
 	const std::unique_ptr<ale::ast::Node>& n,
-	const size_t d,
 	SequenceIndices& indices
 )
 {
 	const auto& var_subs =
 		*static_cast<ale::ast::SubscriptedVariableNode *>(n.get());
 
-	indices.reserve(d);
-
 	const auto& children = var_subs.get_children();
-	for (size_t i = 0; i < children.size(); ++i) {
+	const size_t N = children.size();
+
+	indices.reserve(N);
+
+	for (size_t i = 0; i < N; ++i) {
 		const std::string_view name = var_subs.get_variable_name();
 
 		const size_t depth = var_subs.get_indices_order()[i];
@@ -303,7 +304,7 @@ template <indices_type_e indices_type>
 	);
 #endif
 
-	return add_indices_from_subvar(ctx, n, d, indices);
+	return add_indices_from_subvar(ctx, n, indices);
 }
 
 [[nodiscard]] static const std::unique_ptr<ale::ast::Node>&
@@ -326,7 +327,7 @@ static void fill_node_types(
 #if defined DEBUG
 	assert(seq.get_operator_type().has_value());
 #endif
-	env.add_node_type(*seq.get_operator_type());
+	env.add_operator_type(*seq.get_operator_type());
 
 	const auto& left = seq.get_left_child();
 	if (left->get_node_type() != ale::ast::node_type_e::Sequence) {
@@ -401,11 +402,11 @@ Evaluation make_sequence_execution_environment(
 	fill_node_types(seq, env);
 
 #if defined ALE_LOGGING_MESSAGES
-	const size_t depth = env.get_depth();
-	INTERPRETER_PRINT("Depth (total number of indices): {}.", depth);
-	for (size_t i = 0; i < depth; ++i) {
+	const size_t height = env.get_num_operators();
+	INTERPRETER_PRINT("Height (total number of sequence operators): {}.", height);
+	for (size_t i = 0; i < height; ++i) {
 		INTERPRETER_PRINT(
-			"    Node type at depth {}: '{}'.", i, env.get_node_type(i)
+			"    Node type at depth {}: '{}'.", i, env.get_operator_type(i)
 		);
 	}
 #endif
@@ -434,7 +435,7 @@ enumerate_values_sequence_recursive(
 	const bool is_comma =
 		depth == env.get_depth()
 			? true
-			: env.get_node_type(depth) ==
+			: env.get_operator_type(depth) ==
 				  ale::ast::node_type_e::Comma_Separated_Group;
 
 	if (depth == env.get_depth() or not is_comma) {
