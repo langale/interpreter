@@ -70,6 +70,8 @@ static constexpr std::string_view could_not_convert_to_bool =
 	const size_t depth
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION;
+
 	// first value of the sequence
 	env.set_working_distance(depth, 0);
 	ctx.sequence_depth = depth + 1;
@@ -139,6 +141,8 @@ static constexpr std::string_view could_not_convert_to_bool =
 	const size_t depth
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION;
+
 	// first value of the sequence
 	env.set_working_distance(depth, 0);
 	ctx.sequence_depth = depth + 1;
@@ -211,6 +215,8 @@ static constexpr std::string_view could_not_convert_to_bool =
 	const size_t depth
 )
 {
+	INTERPRETER_ENTER_AST_FUNCTION;
+
 	// first value of the sequence
 	env.set_working_distance(depth, 0);
 	ctx.sequence_depth = depth + 1;
@@ -348,7 +354,19 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::SequenceNode& seq)
 		return interpret_node(ctx, env.get_expression());
 	}
 
-	const auto op_type = env.get_operator_type(depth);
+	const auto op_type = [&]()
+	{
+		if (depth >= env.get_num_operators()) {
+			// Corner case: the assumption is that there is one sequence
+			// operator for every index, but in this case operators are missing.
+			// The default behavior is to take the latest operator seen in the
+			// sequence.
+			const size_t height = env.get_num_operators();
+			return env.get_operator_type(height - 1);
+		}
+		return env.get_operator_type(depth);
+	}();
+
 
 #if defined DEBUG
 	assert(is_node_interpretable(op_type));
