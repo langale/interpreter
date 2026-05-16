@@ -41,6 +41,8 @@ using namespace std::string_literals;
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
+#include <intlib/ast/utils/evaluation_error_enum.hpp>
+#include <intlib/ast/utils/evaluation_function_enum.hpp>
 #include <intlib/logger/macros.hpp>
 #if defined ALE_LOGGING_MESSAGES
 #endif
@@ -58,7 +60,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::ProgramNode& p)
 			const auto& func =
 				*static_cast<ale::ast::FunctionNode *>(child.get());
 			if (func.get_name() == "main") {
-				return evaluate_node(ctx, func);
+				return evaluate(ctx, func);
 			}
 		}
 	}
