@@ -79,6 +79,9 @@ enum class evaluation_error_e : uint8_t {
 	If_Statement_First_Branch_Empty,
 	If_Statement_Second_Branch_Empty,
 
+	Function_Main_Missing,
+	Function_Missing,
+
 	Memory_Variable_Does_Not_Exist,
 	Memory_Variable_Already_Exists,
 	Memory_Type_Mismatch,

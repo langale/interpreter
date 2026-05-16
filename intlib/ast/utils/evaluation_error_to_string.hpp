@@ -74,6 +74,10 @@ evaluation_error_to_string(const evaluation_error_e e) noexcept
 	case evaluation_error_e::If_Statement_Second_Branch_Empty:
 		return "If_Statement_Second_Branch_Empty";
 
+	case evaluation_error_e::Function_Main_Missing:
+		return "Function_Main_Missing";
+	case evaluation_error_e::Function_Missing: return "Function_Missing";
+
 	case evaluation_error_e::Evaluation_Of_Node_Is_Forbidden:
 		return "Forbidden_Evaluation_Of_Node";
 	case evaluation_error_e::Evaluation_Of_Indices_Failed:
