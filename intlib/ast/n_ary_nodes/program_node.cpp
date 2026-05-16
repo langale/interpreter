@@ -32,10 +32,14 @@
  ********************************************************************/
 
 #include <optional>
+#include <string>
+using namespace std::string_literals;
 
 #include <ale/ast/n_ary_nodes/ProgramNode.hpp>
+#include <ale/ast/unary_nodes/FunctionNode.hpp>
 
 #include <intlib/ast/Evaluation.hpp>
+#include <intlib/ast/evaluation.hpp>
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/logger/macros.hpp>
 #if defined ALE_LOGGING_MESSAGES
@@ -44,11 +48,26 @@
 namespace intlib {
 namespace ast {
 
-Evaluation evaluate(EvaluationContext&, const ale::ast::ProgramNode&)
+Evaluation evaluate(EvaluationContext& ctx, const ale::ast::ProgramNode& p)
 {
 	INTERPRETER_ENTER_AST_FUNCTION;
 
-	return make_good_evaluation<EvaluationResult>();
+	// iterate over the functions and execute 'main'
+	for (const auto& child : p.get_children()) {
+		if (child->get_node_type() == ale::ast::node_type_e::Function) {
+			const auto& func =
+				*static_cast<ale::ast::FunctionNode *>(child.get());
+			if (func.get_name() == "main") {
+				return evaluate_node(ctx, func);
+			}
+		}
+	}
+
+	return make_bad_evaluation(
+		Vec{evaluation_error_e::Function_Main_Missing},
+		Vec{evaluation_function_e::Program},
+		Vec{"Missing 'main' function"s}
+	);
 }
 
 } // namespace ast
