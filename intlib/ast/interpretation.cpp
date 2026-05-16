@@ -50,6 +50,7 @@
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 #include <ale/ast/binary_nodes/WhileLoopNode.hpp>
 
+#include <ale/ast/unary_nodes/FunctionNode.hpp>
 #include <ale/ast/unary_nodes/NegationNode.hpp>
 #include <ale/ast/unary_nodes/NegativeNode.hpp>
 #include <ale/ast/unary_nodes/PositiveNode.hpp>
@@ -148,6 +149,8 @@ interpret_node(EvaluationContext& ctx, const std::unique_ptr<ale::ast::Node>& v)
 
 		/* unary nodes */
 
+	case ale::ast::node_type_e::Function:
+		return call_evaluate<ale::ast::FunctionNode>(ctx, v);
 	case ale::ast::node_type_e::Negation:
 		return call_evaluate<ale::ast::NegationNode>(ctx, v);
 	case ale::ast::node_type_e::Negative:
