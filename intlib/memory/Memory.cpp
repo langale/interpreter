@@ -110,9 +110,9 @@ FunctionScope& Memory::get_current_scope() noexcept
 {
 	INTERPRETER_ENTER_MEMORY_FUNCTION;
 
-#if defined DEBUG
-	assert(not is_current_scope_global());
-#endif
+	if (is_current_scope_global()) {
+		m_function_scopes.emplace();
+	}
 	return m_function_scopes.top();
 }
 
