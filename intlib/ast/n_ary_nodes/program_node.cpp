@@ -36,7 +36,7 @@
 using namespace std::string_literals;
 
 #include <ale/ast/n_ary_nodes/ProgramNode.hpp>
-#include <ale/ast/unary_nodes/FunctionNode.hpp>
+#include <ale/ast/hybrid_nodes/FunctionNode.hpp>
 
 #include <intlib/ast/Evaluation.hpp>
 #include <intlib/ast/evaluation.hpp>

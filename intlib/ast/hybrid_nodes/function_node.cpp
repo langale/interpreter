@@ -31,7 +31,7 @@
  *
  ********************************************************************/
 
-#include <ale/ast/unary_nodes/FunctionNode.hpp>
+#include <ale/ast/hybrid_nodes/FunctionNode.hpp>
 
 #include <intlib/ast/EvaluationContext.hpp>
 #include <intlib/ast/interpretation.hpp>
@@ -47,7 +47,7 @@ Evaluation evaluate(EvaluationContext& ctx, const ale::ast::FunctionNode& v)
 
 	/// TODO: push parameters into the scope
 
-	const auto& child = v.get_child();
+	const auto& child = v.get_body();
 	return interpret_node(ctx, child);
 }
 

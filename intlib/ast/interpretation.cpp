@@ -50,7 +50,7 @@
 #include <ale/ast/binary_nodes/SequenceNode.hpp>
 #include <ale/ast/binary_nodes/WhileLoopNode.hpp>
 
-#include <ale/ast/unary_nodes/FunctionNode.hpp>
+#include <ale/ast/hybrid_nodes/FunctionNode.hpp>
 #include <ale/ast/unary_nodes/NegationNode.hpp>
 #include <ale/ast/unary_nodes/NegativeNode.hpp>
 #include <ale/ast/unary_nodes/PositiveNode.hpp>
